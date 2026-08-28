@@ -4256,63 +4256,81 @@ button {
 
 
 
+
 /* ==========================================================================
-   STABLE ZERO-SHIFT NATIVE SCROLLBAR (NO LAYOUT MOVEMENT ON HOVER)
+   OVERLAY SCROLLBAR (ZERO BLACK GUTTER & ZERO LAYOUT SHIFT)
    ========================================================================== */
-html {
+html, body {
   width: 100%;
   min-height: 100%;
+  margin: 0;
+  padding: 0;
   overflow-x: hidden;
-  overflow-y: scroll;
-  scroll-behavior: smooth;
-  scrollbar-width: thin;
-  scrollbar-color: transparent transparent;
-  transition: scrollbar-color 0.2s ease;
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
 }
 
-body {
-  width: 100%;
-  min-height: 100%;
-  overflow-x: hidden;
-  background-color: var(--color-dark-bg);
-  color: var(--text-white);
-  font-family: var(--font-sans-ui);
-  -webkit-font-smoothing: antialiased;
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
 }
 
-/* Width is fixed at 7px so the layout NEVER reflows or shifts */
-::-webkit-scrollbar {
+.zero-shift-scrollbar-dock {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 28px;
+  z-index: 9999999;
+  pointer-events: auto;
+  display: flex;
+  justify-content: flex-end;
+  opacity: 0;
+  transform: translateX(8px);
+  transition: opacity 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.zero-shift-scrollbar-dock.is-visible,
+.zero-shift-scrollbar-dock.is-dragging,
+.zero-shift-scrollbar-dock:hover {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.zero-shift-scrollbar-track {
+  position: relative;
   width: 7px;
-  height: 7px;
+  height: 100%;
+  background: rgba(9, 13, 11, 0.75);
+  cursor: pointer;
+  box-sizing: border-box;
 }
 
-/* 100% transparent by default so the background shows through seamlessly */
-::-webkit-scrollbar-track {
-  background: transparent;
+.zero-shift-scrollbar-thumb {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(180deg, #df9039 0%, #b45309 100%);
+  border-radius: var(--radius-full);
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  cursor: grab;
+  box-sizing: border-box;
+  will-change: transform;
   transition: background 0.2s ease;
 }
 
-::-webkit-scrollbar-thumb {
-  background: transparent;
-  border-radius: var(--radius-full);
-  border: 1px solid transparent;
-  transition: background 0.2s ease, border-color 0.2s ease;
-}
-
-/* When cursor moves near the right edge: only colors fade in, zero layout shift */
-html.cursor-near-scrollbar {
-  scrollbar-color: var(--accent-gold) rgba(9, 13, 11, 0.85);
-}
-
-html.cursor-near-scrollbar ::-webkit-scrollbar-track {
-  background: rgba(9, 13, 11, 0.75);
-}
-
-html.cursor-near-scrollbar ::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, #df9039 0%, #b45309 100%);
-  border: 1px solid rgba(0, 0, 0, 0.2);
-}
-
-html.cursor-near-scrollbar ::-webkit-scrollbar-thumb:hover {
+.zero-shift-scrollbar-thumb:hover,
+.zero-shift-scrollbar-dock.is-dragging .zero-shift-scrollbar-thumb {
   background: linear-gradient(180deg, #f59e0b 0%, #d97706 100%);
+  cursor: grabbing;
+}
+
+@media (max-width: 768px) {
+  .zero-shift-scrollbar-dock {
+    display: none;
+  }
 }
