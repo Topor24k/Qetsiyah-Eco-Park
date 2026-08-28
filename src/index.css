@@ -4258,61 +4258,83 @@ button {
 
 
 
-/* ==========================================================================
-   100% TRUE DEFAULT NATIVE SCROLLBAR (ZERO BLACK SPACE & ZERO LAYOUT SHIFT)
-   ========================================================================== */
-html {
-  width: 100%;
-  min-height: 100%;
-  overflow-x: hidden;
-  overflow-y: scroll;
-  scroll-behavior: smooth;
-  scrollbar-width: thin;
-  scrollbar-color: transparent transparent;
-  transition: scrollbar-color 0.22s ease;
-}
 
-body {
+/* ==========================================================================
+   PERFECT PROXIMITY OVERLAY SCROLLBAR (0px BLACK GUTTER & 0px LAYOUT SHIFT)
+   ========================================================================== */
+html, body {
   width: 100%;
   min-height: 100%;
   margin: 0;
   padding: 0;
   overflow-x: hidden;
-  background-color: var(--color-dark-bg);
-  color: var(--text-white);
-  font-family: var(--font-sans-ui);
-  -webkit-font-smoothing: antialiased;
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
 }
 
-/* Width is fixed at 7px so layout NEVER moves */
-::-webkit-scrollbar {
+html::-webkit-scrollbar,
+body::-webkit-scrollbar,
+*::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+.native-feel-scrollbar-dock {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 24px;
+  z-index: 99999999;
+  pointer-events: auto;
+  display: flex;
+  justify-content: flex-end;
+  opacity: 0;
+  transform: translateX(8px);
+  transition: opacity 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.native-feel-scrollbar-dock.is-visible,
+.native-feel-scrollbar-dock.is-dragging,
+.native-feel-scrollbar-dock:hover {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.native-feel-scrollbar-track {
+  position: relative;
   width: 7px;
-  height: 7px;
+  height: 100%;
+  background: rgba(9, 13, 11, 0.75);
+  cursor: pointer;
+  box-sizing: border-box;
 }
 
-/* Track is ALWAYS 100% transparent: ZERO black space/strip on the right */
-::-webkit-scrollbar-track {
-  background: transparent !important;
-}
-
-/* Thumb is transparent until cursor is near the right edge */
-::-webkit-scrollbar-thumb {
-  background: transparent;
-  border-radius: var(--radius-full);
-  border: 1px solid transparent;
-  transition: background 0.22s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.22s ease;
-}
-
-/* Proximity reveal: ONLY thumb fades in as a sleek floating gold pill */
-html.cursor-near-scrollbar {
-  scrollbar-color: var(--accent-gold) transparent;
-}
-
-html.cursor-near-scrollbar ::-webkit-scrollbar-thumb {
+.native-feel-scrollbar-thumb {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
   background: linear-gradient(180deg, #df9039 0%, #b45309 100%);
+  border-radius: var(--radius-full);
   border: 1px solid rgba(0, 0, 0, 0.2);
+  cursor: grab;
+  box-sizing: border-box;
+  touch-action: none;
+  will-change: transform;
+  transition: background 0.2s ease;
 }
 
-html.cursor-near-scrollbar ::-webkit-scrollbar-thumb:hover {
+.native-feel-scrollbar-thumb:hover,
+.native-feel-scrollbar-dock.is-dragging .native-feel-scrollbar-thumb {
   background: linear-gradient(180deg, #f59e0b 0%, #d97706 100%);
+  cursor: grabbing;
+}
+
+@media (max-width: 768px) {
+  .native-feel-scrollbar-dock {
+    display: none;
+  }
 }
