@@ -4254,38 +4254,54 @@ button {
 
 
 
+
 /* ==========================================================================
-   DEFAULT NATIVE SCROLLBAR WITH ANIMATED PROXIMITY REVEAL
+   DEFAULT NATIVE SCROLLBAR (ZERO BLACK GUTTER - FLUSH EDGE TO EDGE)
    ========================================================================== */
 html {
   width: 100%;
   min-height: 100%;
   overflow-x: hidden;
+  overflow-y: auto;
+  overflow-y: overlay;
   scroll-behavior: smooth;
-  scrollbar-width: thin;
-  scrollbar-color: transparent transparent;
-  transition: scrollbar-color 0.25s ease;
+  scrollbar-width: none;
 }
 
-html.cursor-near-scrollbar {
-  scrollbar-color: var(--accent-gold) #090d0b;
+body {
+  width: 100%;
+  min-height: 100%;
+  overflow-x: hidden;
+  background-color: var(--color-dark-bg);
+  color: var(--text-white);
+  font-family: var(--font-sans-ui);
+  -webkit-font-smoothing: antialiased;
 }
 
+/* 0px by default so NO black space/gutter exists on the right */
 ::-webkit-scrollbar {
-  width: 7px;
-  height: 7px;
+  width: 0px;
+  height: 0px;
+  background: transparent;
 }
 
 ::-webkit-scrollbar-track {
   background: transparent;
-  transition: background 0.25s ease;
 }
 
 ::-webkit-scrollbar-thumb {
   background: transparent;
-  border-radius: var(--radius-full);
-  border: 1px solid transparent;
-  transition: background 0.25s ease, border-color 0.25s ease;
+}
+
+/* Reveal only when cursor is in the scrollbar area */
+html.cursor-near-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent-gold) #090d0b;
+}
+
+html.cursor-near-scrollbar ::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
 }
 
 html.cursor-near-scrollbar ::-webkit-scrollbar-track {
@@ -4294,6 +4310,7 @@ html.cursor-near-scrollbar ::-webkit-scrollbar-track {
 
 html.cursor-near-scrollbar ::-webkit-scrollbar-thumb {
   background: linear-gradient(180deg, #df9039 0%, #b45309 100%);
+  border-radius: var(--radius-full);
   border: 1px solid rgba(0, 0, 0, 0.2);
 }
 
