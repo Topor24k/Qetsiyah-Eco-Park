@@ -4255,17 +4255,19 @@ button {
 
 
 
+
 /* ==========================================================================
-   DEFAULT NATIVE SCROLLBAR (ZERO BLACK GUTTER - FLUSH EDGE TO EDGE)
+   STABLE ZERO-SHIFT NATIVE SCROLLBAR (NO LAYOUT MOVEMENT ON HOVER)
    ========================================================================== */
 html {
   width: 100%;
   min-height: 100%;
   overflow-x: hidden;
-  overflow-y: auto;
-  overflow-y: overlay;
+  overflow-y: scroll;
   scroll-behavior: smooth;
-  scrollbar-width: none;
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+  transition: scrollbar-color 0.2s ease;
 }
 
 body {
@@ -4278,39 +4280,36 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* 0px by default so NO black space/gutter exists on the right */
+/* Width is fixed at 7px so the layout NEVER reflows or shifts */
 ::-webkit-scrollbar {
-  width: 0px;
-  height: 0px;
-  background: transparent;
-}
-
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  background: transparent;
-}
-
-/* Reveal only when cursor is in the scrollbar area */
-html.cursor-near-scrollbar {
-  scrollbar-width: thin;
-  scrollbar-color: var(--accent-gold) #090d0b;
-}
-
-html.cursor-near-scrollbar ::-webkit-scrollbar {
   width: 7px;
   height: 7px;
 }
 
+/* 100% transparent by default so the background shows through seamlessly */
+::-webkit-scrollbar-track {
+  background: transparent;
+  transition: background 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: var(--radius-full);
+  border: 1px solid transparent;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+/* When cursor moves near the right edge: only colors fade in, zero layout shift */
+html.cursor-near-scrollbar {
+  scrollbar-color: var(--accent-gold) rgba(9, 13, 11, 0.85);
+}
+
 html.cursor-near-scrollbar ::-webkit-scrollbar-track {
-  background: #090d0b;
+  background: rgba(9, 13, 11, 0.75);
 }
 
 html.cursor-near-scrollbar ::-webkit-scrollbar-thumb {
   background: linear-gradient(180deg, #df9039 0%, #b45309 100%);
-  border-radius: var(--radius-full);
   border: 1px solid rgba(0, 0, 0, 0.2);
 }
 
