@@ -2,53 +2,46 @@ import React, { useState, useEffect, useRef } from 'react';
 
 export function CustomScrollbar() {
   const [scrollProgress, setScrollProgress] = useState(0);
+  const [thumbHeight, setThumbHeight] = useState(60);
   const [isVisible, setIsVisible] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
-  const hideTimerRef = useRef(null);
   const trackRef = useRef(null);
 
-  // Calculate scroll position
+  // Calculate scroll position & proportional thumb height
   const updateScrollProgress = () => {
     const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
     if (totalHeight > 0) {
       const current = window.scrollY;
       setScrollProgress((current / totalHeight) * 100);
+      
+      const calculatedHeight = Math.max(
+        40, 
+        Math.min(180, (window.innerHeight / document.documentElement.scrollHeight) * window.innerHeight)
+      );
+      setThumbHeight(calculatedHeight);
     }
   };
 
   useEffect(() => {
+    // Only update position on scroll - DO NOT reveal on scroll
     const handleScroll = () => {
       updateScrollProgress();
-      setIsVisible(true);
-      document.documentElement.classList.add('show-scrollbar');
-
-      if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
-      hideTimerRef.current = setTimeout(() => {
-        if (!isHovered && !isDragging) {
-          setIsVisible(false);
-          document.documentElement.classList.remove('show-scrollbar');
-        }
-      }, 1200);
     };
 
     const handleMouseMove = (e) => {
       const distanceFromRight = window.innerWidth - e.clientX;
-      // When cursor is within 45px of the right screen edge
-      if (distanceFromRight <= 45) {
+      // ONLY appear when cursor moves within 35px of the right scroll area
+      if (distanceFromRight <= 35) {
         setIsVisible(true);
-        document.documentElement.classList.add('show-scrollbar');
-        if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
       } else if (!isDragging && !isHovered) {
         setIsVisible(false);
-        document.documentElement.classList.remove('show-scrollbar');
       }
     };
 
     const handleMouseLeaveWindow = () => {
       if (!isDragging) {
         setIsVisible(false);
-        document.documentElement.classList.remove('show-scrollbar');
       }
     };
 
@@ -62,7 +55,6 @@ export function CustomScrollbar() {
       window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseleave', handleMouseLeaveWindow);
-      if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
     };
   }, [isDragging, isHovered]);
 
@@ -72,20 +64,22 @@ export function CustomScrollbar() {
     e.stopPropagation();
     setIsDragging(true);
     setIsVisible(true);
-    document.documentElement.classList.add('show-scrollbar');
 
     const startY = e.clientY;
     const startScrollY = window.scrollY;
-    const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
+    const totalScrollable = document.documentElement.scrollHeight - window.innerHeight;
     const trackHeight = trackRef.current ? trackRef.current.clientHeight : window.innerHeight;
+    const maxThumbTravel = trackHeight - thumbHeight;
 
     const onMouseMove = (moveEvent) => {
       const deltaY = moveEvent.clientY - startY;
-      const scrollDelta = (deltaY / trackHeight) * totalHeight;
-      window.scrollTo({
-        top: Math.max(0, Math.min(totalHeight, startScrollY + scrollDelta)),
-        behavior: 'auto'
-      });
+      if (maxThumbTravel > 0) {
+        const scrollDelta = (deltaY / maxThumbTravel) * totalScrollable;
+        window.scrollTo({
+          top: Math.max(0, Math.min(totalScrollable, startScrollY + scrollDelta)),
+          behavior: 'auto'
+        });
+      }
     };
 
     const onMouseUp = () => {
@@ -102,44 +96,46 @@ export function CustomScrollbar() {
   const handleTrackClick = (e) => {
     if (trackRef.current) {
       const rect = trackRef.current.getBoundingClientRect();
-      const clickY = e.clientY - rect.top;
-      const percentage = clickY / rect.height;
-      const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const clickY = e.clientY - rect.top - thumbHeight / 2;
+      const trackAvailable = rect.height - thumbHeight;
+      const percentage = Math.max(0, Math.min(1, clickY / trackAvailable));
+      const totalScrollable = document.documentElement.scrollHeight - window.innerHeight;
       window.scrollTo({
-        top: totalHeight * percentage,
+        top: totalScrollable * percentage,
         behavior: 'smooth'
       });
     }
   };
 
+  const currentTop = trackRef.current 
+    ? (scrollProgress / 100) * (trackRef.current.clientHeight - thumbHeight)
+    : 0;
+
   return (
     <div
-      className={`animated-scrollbar-dock ${isVisible ? 'is-visible' : ''} ${isDragging ? 'is-dragging' : ''}`}
+      className={`original-style-scrollbar-dock ${isVisible ? 'is-visible' : ''} ${isDragging ? 'is-dragging' : ''}`}
       onMouseEnter={() => {
         setIsHovered(true);
         setIsVisible(true);
-        document.documentElement.classList.add('show-scrollbar');
       }}
       onMouseLeave={() => {
         setIsHovered(false);
         setIsVisible(false);
-        document.documentElement.classList.remove('show-scrollbar');
       }}
     >
       <div 
-        className="animated-scrollbar-track" 
+        className="original-style-scrollbar-track" 
         ref={trackRef}
         onClick={handleTrackClick}
       >
         <div
-          className="animated-scrollbar-thumb"
+          className="original-style-scrollbar-thumb"
           style={{
-            top: `${Math.min(92, Math.max(0, scrollProgress * 0.92))}%`
+            top: `${Math.max(0, currentTop)}px`,
+            height: `${thumbHeight}px`
           }}
           onMouseDown={handleThumbMouseDown}
-        >
-          <span className="scrollbar-thumb-glow" />
-        </div>
+        />
       </div>
     </div>
   );
