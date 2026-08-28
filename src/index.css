@@ -4274,3 +4274,124 @@ button {
     color: var(--accent-gold);
   }
 }
+
+/* ==========================================================================
+   ANIMATED PROXIMITY SCROLLBAR SYSTEM
+   ========================================================================== */
+
+/* 1. Browser Native Scrollbar: Hidden by default, fades in on proximity/scroll */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+  transition: scrollbar-color 0.3s ease;
+}
+
+html.show-scrollbar *,
+body.show-scrollbar * {
+  scrollbar-color: var(--accent-gold) rgba(9, 13, 11, 0.7);
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+  transition: background 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: var(--radius-full);
+  transition: background 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+html.show-scrollbar ::-webkit-scrollbar-track,
+body.show-scrollbar ::-webkit-scrollbar-track {
+  background: rgba(9, 13, 11, 0.4);
+}
+
+html.show-scrollbar ::-webkit-scrollbar-thumb,
+body.show-scrollbar ::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #df9039 0%, #a36a3f 100%);
+  box-shadow: 0 0 8px rgba(223, 144, 57, 0.5);
+}
+
+/* 2. Floating Animated Proximity Scrollbar Dock (Right Edge) */
+.animated-scrollbar-dock {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 32px;
+  z-index: 9999999;
+  pointer-events: auto;
+  display: flex;
+  justify-content: flex-end;
+  opacity: 0;
+  transform: translateX(12px);
+  transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.animated-scrollbar-dock.is-visible,
+.animated-scrollbar-dock.is-dragging,
+.animated-scrollbar-dock:hover {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.animated-scrollbar-track {
+  position: relative;
+  width: 8px;
+  height: 100%;
+  background: rgba(9, 13, 11, 0.55);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-left: 1px solid rgba(223, 144, 57, 0.2);
+  cursor: pointer;
+  transition: width 0.2s cubic-bezier(0.16, 1, 0.3, 1), background 0.2s ease;
+}
+
+.animated-scrollbar-dock:hover .animated-scrollbar-track,
+.animated-scrollbar-dock.is-dragging .animated-scrollbar-track {
+  width: 12px;
+  background: rgba(9, 13, 11, 0.85);
+  border-left-color: rgba(223, 144, 57, 0.5);
+}
+
+.animated-scrollbar-thumb {
+  position: absolute;
+  left: 1px;
+  right: 1px;
+  height: 64px;
+  border-radius: 9999px;
+  background: linear-gradient(180deg, #f5a647 0%, #df9039 50%, #b45309 100%);
+  cursor: grab;
+  box-shadow: 0 0 12px rgba(223, 144, 57, 0.6), inset 0 1px 1px rgba(255, 255, 255, 0.4);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  user-select: none;
+}
+
+.animated-scrollbar-thumb:hover,
+.animated-scrollbar-dock.is-dragging .animated-scrollbar-thumb {
+  cursor: grabbing;
+  background: linear-gradient(180deg, #ffb85e 0%, #df9039 50%, #92400e 100%);
+  box-shadow: 0 0 16px rgba(223, 144, 57, 0.85), inset 0 1px 2px rgba(255, 255, 255, 0.6);
+  transform: scaleX(1.15);
+}
+
+.scrollbar-thumb-glow {
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.35) 0%, transparent 80%);
+  pointer-events: none;
+}
+
+@media (max-width: 768px) {
+  .animated-scrollbar-dock {
+    display: none;
+  }
+}

@@ -5,6 +5,7 @@ import { WelcomeSection } from './components/WelcomeSection';
 import { FoodPreviewSection } from './components/FoodPreviewSection';
 import { ContactSection } from './components/ContactSection';
 import { Footer } from './components/Footer';
+import { CustomScrollbar } from './components/CustomScrollbar';
 
 // Dedicated Frames
 import { AboutFrame } from './components/frames/AboutFrame';
@@ -47,6 +48,9 @@ export function App() {
 
   return (
     <div className="site-root">
+      {/* Dynamic Proximity Animated Scrollbar */}
+      <CustomScrollbar />
+
       {/* Global Fixed Navbar with Frame Switching */}
       <Navbar activeFrame={activeFrame} onNavigate={navigateTo} />
 
