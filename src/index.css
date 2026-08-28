@@ -4259,8 +4259,9 @@ button {
 
 
 
+
 /* ==========================================================================
-   PERFECT PROXIMITY OVERLAY SCROLLBAR (0px BLACK GUTTER & 0px LAYOUT SHIFT)
+   0MS-LATENCY PROXIMITY SCROLLBAR (ZERO BLACK GUTTER & ZERO LAYOUT SHIFT)
    ========================================================================== */
 html, body {
   width: 100%;
@@ -4280,7 +4281,7 @@ body::-webkit-scrollbar,
   height: 0 !important;
 }
 
-.native-feel-scrollbar-dock {
+.zero-lag-scrollbar-dock {
   position: fixed;
   top: 0;
   right: 0;
@@ -4296,14 +4297,14 @@ body::-webkit-scrollbar,
               transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.native-feel-scrollbar-dock.is-visible,
-.native-feel-scrollbar-dock.is-dragging,
-.native-feel-scrollbar-dock:hover {
+.zero-lag-scrollbar-dock.is-visible,
+.zero-lag-scrollbar-dock.is-dragging,
+.zero-lag-scrollbar-dock:hover {
   opacity: 1;
   transform: translateX(0);
 }
 
-.native-feel-scrollbar-track {
+.zero-lag-scrollbar-track {
   position: relative;
   width: 7px;
   height: 100%;
@@ -4312,7 +4313,7 @@ body::-webkit-scrollbar,
   box-sizing: border-box;
 }
 
-.native-feel-scrollbar-thumb {
+.zero-lag-scrollbar-thumb {
   position: absolute;
   top: 0;
   left: 0;
@@ -4324,17 +4325,18 @@ body::-webkit-scrollbar,
   box-sizing: border-box;
   touch-action: none;
   will-change: transform;
-  transition: background 0.2s ease;
+  /* Crucial: No transform transitions so dragging is 100% instant 0ms response */
+  transition: background 0.15s ease;
 }
 
-.native-feel-scrollbar-thumb:hover,
-.native-feel-scrollbar-dock.is-dragging .native-feel-scrollbar-thumb {
+.zero-lag-scrollbar-thumb:hover,
+.zero-lag-scrollbar-dock.is-dragging .zero-lag-scrollbar-thumb {
   background: linear-gradient(180deg, #f59e0b 0%, #d97706 100%);
   cursor: grabbing;
 }
 
 @media (max-width: 768px) {
-  .native-feel-scrollbar-dock {
+  .zero-lag-scrollbar-dock {
     display: none;
   }
 }

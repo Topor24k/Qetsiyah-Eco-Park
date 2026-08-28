@@ -1,52 +1,67 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 /**
- * 100% Native-feel Custom Scrollbar:
- * - ZERO black space / gutter (native scrollbar width is 0).
- * - ZERO website layout shift (fixed overlay).
- * - Appears ONLY when cursor moves near the right edge (<= 40px).
- * - Full native OS physics: Pointer-capture hardware drag, page-up/page-down track clicking, sub-pixel sync.
+ * High-Performance 0ms Latency Native-Feel Scrollbar:
+ * - Direct DOM transform updates for 144Hz/240Hz zero-lag drag response.
+ * - Zero black space / gutter.
+ * - Zero website layout movement (fixed overlay).
+ * - Appears ONLY on cursor proximity (<= 40px).
  */
 export function CustomScrollbar() {
-  const [scrollProgress, setScrollProgress] = useState(0);
-  const [thumbHeight, setThumbHeight] = useState(60);
   const [isVisible, setIsVisible] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
 
+  const trackRef = useRef(null);
+  const thumbRef = useRef(null);
   const isDraggingRef = useRef(false);
   const startPointerYRef = useRef(0);
-  const startScrollYRef = useRef(0);
-  const trackRef = useRef(null);
+  const startThumbTopRef = useRef(0);
+  const currentThumbTopRef = useRef(0);
+  const thumbHeightRef = useRef(60);
 
-  // Calculate thumb size and position with exact viewport proportions
-  const updateScroll = useCallback(() => {
+  // Synchronously update thumb position on screen without React render latency
+  const syncThumbToScroll = () => {
+    if (isDraggingRef.current) return; // Drag has direct pointer control
+
     const docHeight = document.documentElement.scrollHeight;
     const winHeight = window.innerHeight;
     const maxScroll = docHeight - winHeight;
 
-    if (maxScroll > 0) {
-      const currentScroll = window.scrollY;
-      const progress = Math.min(1, Math.max(0, currentScroll / maxScroll));
-      setScrollProgress(progress);
+    if (maxScroll <= 0) return;
 
-      const calculatedThumbH = Math.max(
-        32,
-        Math.min(winHeight - 20, (winHeight / docHeight) * winHeight)
-      );
-      setThumbHeight(calculatedThumbH);
+    const trackH = trackRef.current ? trackRef.current.clientHeight : winHeight;
+    const calculatedThumbH = Math.max(
+      32,
+      Math.min(winHeight - 20, (winHeight / docHeight) * winHeight)
+    );
+    thumbHeightRef.current = calculatedThumbH;
+
+    const maxThumbTravel = trackH - calculatedThumbH;
+    const scrollRatio = window.scrollY / maxScroll;
+    const top = Math.max(0, Math.min(maxThumbTravel, scrollRatio * maxThumbTravel));
+    currentThumbTopRef.current = top;
+
+    if (thumbRef.current) {
+      thumbRef.current.style.height = `${calculatedThumbH}px`;
+      thumbRef.current.style.transform = `translate3d(0, ${top}px, 0)`;
     }
-  }, []);
+  };
 
   useEffect(() => {
-    // Only update position on scroll (NEVER show on scroll down)
+    let rafId = null;
+
     const onScroll = () => {
-      updateScroll();
+      if (!rafId) {
+        rafId = requestAnimationFrame(() => {
+          syncThumbToScroll();
+          rafId = null;
+        });
+      }
     };
 
     const onMouseMove = (e) => {
       const distFromRight = window.innerWidth - e.clientX;
-      // ONLY reveal when cursor is near the right edge (<= 40px)
       if (distFromRight <= 40) {
         setIsVisible(true);
       } else if (!isDraggingRef.current && !isHovered) {
@@ -61,7 +76,7 @@ export function CustomScrollbar() {
     };
 
     const onResize = () => {
-      updateScroll();
+      syncThumbToScroll();
     };
 
     window.addEventListener('scroll', onScroll, { passive: true });
@@ -69,17 +84,18 @@ export function CustomScrollbar() {
     window.addEventListener('resize', onResize);
     document.addEventListener('mouseleave', onMouseLeave);
 
-    updateScroll();
+    syncThumbToScroll();
 
     return () => {
+      if (rafId) cancelAnimationFrame(rafId);
       window.removeEventListener('scroll', onScroll);
       window.removeEventListener('mousemove', onMouseMove);
       window.removeEventListener('resize', onResize);
       document.removeEventListener('mouseleave', onMouseLeave);
     };
-  }, [isHovered, updateScroll]);
+  }, [isHovered]);
 
-  // 1:1 Native OS Dragging using Pointer Events & Pointer Capture
+  // Instant 0ms Lag Direct Hardware Pointer Drag
   const handlePointerDownThumb = (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -89,77 +105,89 @@ export function CustomScrollbar() {
     setIsVisible(true);
 
     startPointerYRef.current = e.clientY;
-    startScrollYRef.current = window.scrollY;
+    startThumbTopRef.current = currentThumbTopRef.current;
+
+    document.documentElement.style.scrollBehavior = 'auto';
+    document.body.style.userSelect = 'none';
 
     try {
       e.target.setPointerCapture(e.pointerId);
     } catch {
-      // fallback if capture not supported
+      // fallback
     }
 
     const docHeight = document.documentElement.scrollHeight;
     const winHeight = window.innerHeight;
     const maxScroll = docHeight - winHeight;
     const trackH = trackRef.current ? trackRef.current.clientHeight : winHeight;
-    const maxThumbTravel = trackH - thumbHeight;
+    const maxThumbTravel = trackH - thumbHeightRef.current;
 
     const onPointerMove = (moveEvt) => {
-      if (!isDraggingRef.current) return;
+      if (!isDraggingRef.current || maxThumbTravel <= 0) return;
+
       const deltaY = moveEvt.clientY - startPointerYRef.current;
-      if (maxThumbTravel > 0) {
-        const scrollDelta = (deltaY / maxThumbTravel) * maxScroll;
-        window.scrollTo(0, Math.max(0, Math.min(maxScroll, startScrollYRef.current + scrollDelta)));
+      const newThumbTop = Math.max(0, Math.min(maxThumbTravel, startThumbTopRef.current + deltaY));
+      currentThumbTopRef.current = newThumbTop;
+
+      // 1. Instantly move thumb with direct DOM transform (0ms delay)
+      if (thumbRef.current) {
+        thumbRef.current.style.transform = `translate3d(0, ${newThumbTop}px, 0)`;
       }
+
+      // 2. Instantly scroll page synchronously with exact 1:1 proportion
+      const targetScroll = (newThumbTop / maxThumbTravel) * maxScroll;
+      window.scrollTo(0, targetScroll);
     };
 
     const onPointerUp = (upEvt) => {
       isDraggingRef.current = false;
       setIsDragging(false);
+      document.documentElement.style.scrollBehavior = '';
+      document.body.style.userSelect = '';
+
       try {
         upEvt.target.releasePointerCapture(upEvt.pointerId);
       } catch {
         // fallback
       }
+
       window.removeEventListener('pointermove', onPointerMove);
       window.removeEventListener('pointerup', onPointerUp);
     };
 
-    window.addEventListener('pointermove', onPointerMove);
+    window.addEventListener('pointermove', onPointerMove, { passive: false });
     window.addEventListener('pointerup', onPointerUp);
   };
 
-  // Native Track Clicking: Page-Up / Page-Down (or Jump on Shift)
-  const handleTrackClick = (e) => {
-    if (e.target.classList.contains('native-feel-scrollbar-thumb')) return;
-    
+  // Instant Track Click (Page Up / Page Down or Shift+Jump)
+  const handleTrackMouseDown = (e) => {
+    if (e.target === thumbRef.current) return;
+
     const winHeight = window.innerHeight;
     const rect = e.currentTarget.getBoundingClientRect();
     const clickY = e.clientY - rect.top;
-    const maxThumbTravel = rect.height - thumbHeight;
-    const currentThumbTop = scrollProgress * maxThumbTravel;
+    const currentTop = currentThumbTopRef.current;
+    const currentBottom = currentTop + thumbHeightRef.current;
+
+    document.documentElement.style.scrollBehavior = 'auto';
 
     if (e.shiftKey) {
-      // Jump directly to percentage
+      const maxThumbTravel = rect.height - thumbHeightRef.current;
+      const targetThumbTop = Math.max(0, Math.min(maxThumbTravel, clickY - thumbHeightRef.current / 2));
       const docHeight = document.documentElement.scrollHeight;
       const maxScroll = docHeight - winHeight;
-      const pct = Math.max(0, Math.min(1, (clickY - thumbHeight / 2) / maxThumbTravel));
-      window.scrollTo({ top: pct * maxScroll, behavior: 'instant' });
-    } else if (clickY < currentThumbTop) {
-      // Page Up (default OS behavior)
-      window.scrollBy({ top: -winHeight * 0.85, behavior: 'instant' });
-    } else if (clickY > currentThumbTop + thumbHeight) {
-      // Page Down (default OS behavior)
-      window.scrollBy({ top: winHeight * 0.85, behavior: 'instant' });
+      const targetScroll = (targetThumbTop / maxThumbTravel) * maxScroll;
+      window.scrollTo(0, targetScroll);
+    } else if (clickY < currentTop) {
+      window.scrollBy(0, -winHeight * 0.85);
+    } else if (clickY > currentBottom) {
+      window.scrollBy(0, winHeight * 0.85);
     }
   };
 
-  const trackH = trackRef.current ? trackRef.current.clientHeight : (typeof window !== 'undefined' ? window.innerHeight : 800);
-  const maxThumbTravel = Math.max(1, trackH - thumbHeight);
-  const thumbTop = scrollProgress * maxThumbTravel;
-
   return (
     <div
-      className={`native-feel-scrollbar-dock ${isVisible ? 'is-visible' : ''} ${isDragging ? 'is-dragging' : ''}`}
+      className={`zero-lag-scrollbar-dock ${isVisible ? 'is-visible' : ''} ${isDragging ? 'is-dragging' : ''}`}
       onMouseEnter={() => {
         setIsHovered(true);
         setIsVisible(true);
@@ -172,16 +200,13 @@ export function CustomScrollbar() {
       }}
     >
       <div 
-        className="native-feel-scrollbar-track" 
+        className="zero-lag-scrollbar-track" 
         ref={trackRef}
-        onMouseDown={handleTrackClick}
+        onMouseDown={handleTrackMouseDown}
       >
         <div
-          className="native-feel-scrollbar-thumb"
-          style={{
-            transform: `translate3d(0, ${thumbTop}px, 0)`,
-            height: `${thumbHeight}px`
-          }}
+          className="zero-lag-scrollbar-thumb"
+          ref={thumbRef}
           onPointerDown={handlePointerDownThumb}
         />
       </div>
