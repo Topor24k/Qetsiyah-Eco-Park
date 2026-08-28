@@ -16,11 +16,11 @@ export function HeroSection({ onNavigate }) {
 
   return (
     <section className="exact-hero-section" id="home">
-      {/* Background Picture from /Background Pictures/ folder */}
+      {/* Background Hero Section II from /Background Pictures/ folder */}
       <div className="exact-hero-backdrop">
         <img
-          src="/Background Pictures/Landing Page Hero Section.png"
-          alt="Qetsiyah Eco Park Landing Page Hero"
+          src="/Background Pictures/Background Hero Section II.jpg"
+          alt="Qetsiyah Eco Park Landscape at Sunset"
           className="exact-hero-bg-img"
         />
         <div className="tropical-dusk-overlay" />
