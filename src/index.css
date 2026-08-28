@@ -56,17 +56,7 @@
   padding: 0;
 }
 
-/* Native Scrollbar Hidden for Custom Proximity Scrollbar */
-html, body {
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-html::-webkit-scrollbar,
-body::-webkit-scrollbar {
-  display: none;
-  width: 0;
-  height: 0;
-}
+
 
 html {
   width: 100%;
@@ -4263,61 +4253,50 @@ button {
 }
 
 
+
 /* ==========================================================================
-   ORIGINAL 7PX SCROLLBAR DESIGN (ONLY APPEARS ON CURSOR PROXIMITY)
+   DEFAULT NATIVE SCROLLBAR WITH ANIMATED PROXIMITY REVEAL
    ========================================================================== */
-.original-style-scrollbar-dock {
-  position: fixed;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  width: 28px;
-  z-index: 9999999;
-  pointer-events: auto;
-  display: flex;
-  justify-content: flex-end;
-  opacity: 0;
-  transform: translateX(8px);
-  transition: opacity 0.24s cubic-bezier(0.16, 1, 0.3, 1),
-              transform 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+html {
+  width: 100%;
+  min-height: 100%;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+  transition: scrollbar-color 0.25s ease;
 }
 
-.original-style-scrollbar-dock.is-visible,
-.original-style-scrollbar-dock.is-dragging,
-.original-style-scrollbar-dock:hover {
-  opacity: 1;
-  transform: translateX(0);
+html.cursor-near-scrollbar {
+  scrollbar-color: var(--accent-gold) #090d0b;
 }
 
-.original-style-scrollbar-track {
-  position: relative;
+::-webkit-scrollbar {
   width: 7px;
-  height: 100%;
-  background: #090d0b;
-  cursor: pointer;
-  box-sizing: border-box;
+  height: 7px;
 }
 
-.original-style-scrollbar-thumb {
-  position: absolute;
-  left: 0;
-  right: 0;
-  background: linear-gradient(180deg, #df9039 0%, #b45309 100%);
+::-webkit-scrollbar-track {
+  background: transparent;
+  transition: background 0.25s ease;
+}
+
+::-webkit-scrollbar-thumb {
+  background: transparent;
   border-radius: var(--radius-full);
+  border: 1px solid transparent;
+  transition: background 0.25s ease, border-color 0.25s ease;
+}
+
+html.cursor-near-scrollbar ::-webkit-scrollbar-track {
+  background: #090d0b;
+}
+
+html.cursor-near-scrollbar ::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #df9039 0%, #b45309 100%);
   border: 1px solid rgba(0, 0, 0, 0.2);
-  cursor: grab;
-  box-sizing: border-box;
-  transition: background 0.2s ease;
 }
 
-.original-style-scrollbar-thumb:hover,
-.original-style-scrollbar-dock.is-dragging .original-style-scrollbar-thumb {
+html.cursor-near-scrollbar ::-webkit-scrollbar-thumb:hover {
   background: linear-gradient(180deg, #f59e0b 0%, #d97706 100%);
-  cursor: grabbing;
-}
-
-@media (max-width: 768px) {
-  .original-style-scrollbar-dock {
-    display: none;
-  }
 }
