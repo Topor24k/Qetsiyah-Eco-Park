@@ -97,6 +97,9 @@ export function FoodOffersFrame({ onNavigate }) {
                 className="anchored-card-img" 
                 loading="lazy"
               />
+              <div className="anchored-card-badge">
+                <span>AUTHENTIC PARK CUISINE</span>
+              </div>
             </div>
             <div className="anchored-card-details">
               <div className="card-dish-header">
@@ -115,13 +118,13 @@ export function FoodOffersFrame({ onNavigate }) {
 
   return (
     <div className="frame-view-wrapper food-offers-page">
-      {/* 1. Scroll-Driven Expanding Hero Opening with Authentic Restaurant Dining Photo */}
+      {/* 1. Scroll-Driven Expanding Hero Opening with High-Resolution Video */}
       <CategoryOpeningHero 
         titleTop="DISCOVER" 
         titleBottom="OUR FOOD OFFERS" 
         flankLeft="FINE DINING & MEALS"
         flankRight="TACURONG CITY"
-        image="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1600&q=85"
+        video="/Video/Food Offer Hero Section Video.mp4"
         id="food-offers"
         hasContentBelow={true}
         onExploreBelow={scrollToMenu}
