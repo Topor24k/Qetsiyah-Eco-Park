@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ArrowDown, Volume2, VolumeX } from 'lucide-react';
+import { ArrowDown } from 'lucide-react';
 
 export function CategoryOpeningHero({
   titleTop = 'DISCOVER',
@@ -13,7 +13,7 @@ export function CategoryOpeningHero({
   onExploreBelow = null
 }) {
   const [progress, setProgress] = useState(0);
-  const [isMuted, setIsMuted] = useState(false);
+  const [windowScrollY, setWindowScrollY] = useState(0);
   const containerRef = useRef(null);
   const videoRef = useRef(null);
   const targetProgressRef = useRef(0);
@@ -24,34 +24,40 @@ export function CategoryOpeningHero({
   const isVideo = Boolean(video || (typeof image === 'string' && image.toLowerCase().endsWith('.mp4')));
   const mediaSrc = video || image;
 
-  // Attempt unmuted audio playback on user interaction
-  const enableSound = () => {
-    if (videoRef.current) {
-      videoRef.current.muted = false;
-      setIsMuted(false);
-      videoRef.current.play().catch(() => {});
-    }
-  };
+  // Track window scroll to know when user scrolled down to the menu section
+  useEffect(() => {
+    const handleWindowScroll = () => {
+      setWindowScrollY(window.scrollY || window.pageYOffset || 0);
+    };
 
-  // Control playback and sound: ONLY play when expanded to certain full size (progress >= 0.85)
+    window.addEventListener('scroll', handleWindowScroll, { passive: true });
+    handleWindowScroll();
+
+    return () => window.removeEventListener('scroll', handleWindowScroll);
+  }, []);
+
+  // Control playback & audio:
+  // 1. Play with sound ONLY when expanded (progress >= 0.85) AND still in hero section (windowScrollY <= 40).
+  // 2. TURN OFF SOUND & PAUSE when scrolled up (progress < 0.85) OR scrolled down to menu (windowScrollY > 40).
   useEffect(() => {
     if (isVideo && videoRef.current) {
-      const isCertainSize = progress >= 0.85;
+      const isHeroActive = progress >= 0.85 && windowScrollY <= 40;
 
-      if (isCertainSize) {
-        videoRef.current.muted = isMuted;
+      if (isHeroActive) {
+        videoRef.current.muted = false;
         videoRef.current.play().catch(() => {
-          if (videoRef.current && !isMuted) {
+          // If browser requires muted initial trigger before user gesture
+          if (videoRef.current) {
             videoRef.current.muted = true;
-            setIsMuted(true);
             videoRef.current.play().catch(() => {});
           }
         });
       } else {
         videoRef.current.pause();
+        videoRef.current.muted = true;
       }
     }
-  }, [progress, isVideo, isMuted]);
+  }, [progress, windowScrollY, isVideo]);
 
   // Smooth lerp animation loop for 60fps/120fps buttery easing
   useEffect(() => {
@@ -83,7 +89,6 @@ export function CategoryOpeningHero({
   // Intercept scroll, keys, and touch: FRAME STAYS 100% STATIONARY until image is FULL SIZE
   useEffect(() => {
     const handleWheel = (e) => {
-      enableSound();
       const isAtTop = window.scrollY <= 2;
 
       if (isAtTop) {
@@ -112,7 +117,6 @@ export function CategoryOpeningHero({
     };
 
     const handleKeyDown = (e) => {
-      enableSound();
       const isAtTop = window.scrollY <= 2;
 
       if (isAtTop) {
@@ -137,7 +141,6 @@ export function CategoryOpeningHero({
     };
 
     const handleTouchStart = (e) => {
-      enableSound();
       if (e.touches.length > 0) {
         touchStartYRef.current = e.touches[0].clientY;
       }
@@ -173,29 +176,14 @@ export function CategoryOpeningHero({
     window.addEventListener('keydown', handleKeyDown, { passive: false });
     window.addEventListener('touchstart', handleTouchStart, { passive: true });
     window.addEventListener('touchmove', handleTouchMove, { passive: false });
-    window.addEventListener('click', enableSound);
 
     return () => {
       window.removeEventListener('wheel', handleWheel);
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('touchstart', handleTouchStart);
       window.removeEventListener('touchmove', handleTouchMove);
-      window.removeEventListener('click', enableSound);
     };
   }, []);
-
-  // Toggle sound handler
-  const handleToggleSound = (e) => {
-    e.stopPropagation();
-    if (videoRef.current) {
-      const nextMuted = !videoRef.current.muted;
-      videoRef.current.muted = nextMuted;
-      setIsMuted(nextMuted);
-      if (!nextMuted) {
-        videoRef.current.play().catch(() => {});
-      }
-    }
-  };
 
   // Smooth interpolation calculations
   const p = Math.min(1, Math.max(0, progress));
@@ -267,7 +255,6 @@ export function CategoryOpeningHero({
           <video 
             ref={videoRef}
             src={mediaSrc} 
-            autoPlay 
             loop 
             playsInline 
             preload="auto"
@@ -288,19 +275,6 @@ export function CategoryOpeningHero({
             opacity: Math.min(0.35, Math.max(0, (p - 0.7) / 0.3))
           }}
         />
-
-        {/* Audio Toggle Pill on Video */}
-        {isVideo && p > 0.05 && (
-          <button 
-            className="hero-video-audio-toggle-btn"
-            onClick={handleToggleSound}
-            aria-label={isMuted ? "Unmute Audio" : "Mute Audio"}
-            title={isMuted ? "Unmute Audio" : "Mute Audio"}
-          >
-            {isMuted ? <VolumeX size={15} /> : <Volume2 size={15} />}
-            <span>{isMuted ? "UNMUTE AUDIO" : "SOUND ON"}</span>
-          </button>
-        )}
 
         {/* Action Button to scroll down to Menu / Content if present */}
         {hasContentBelow && p >= 0.85 && (
