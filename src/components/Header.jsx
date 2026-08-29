@@ -113,7 +113,7 @@ export function Header() {
 
             {/* About */}
             <li className="nav-link-item">
-              <a href="#about" className="nav-anchor">About</a>
+              <a href="#about" className="nav-anchor">About Us</a>
             </li>
 
             {/* Things To Do (Dropdown ▾) */}
@@ -279,7 +279,7 @@ export function Header() {
           <div className="mobile-drawer">
             <div className="mobile-drawer-body">
               <a href="#home" className="mobile-link" onClick={closeAll}>Home</a>
-              <a href="#about" className="mobile-link" onClick={closeAll}>About</a>
+              <a href="#about" className="mobile-link" onClick={closeAll}>About Us</a>
 
               {/* Things To Do Accordion */}
               <div className="mobile-accordion">
