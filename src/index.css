@@ -4497,3 +4497,388 @@ body::-webkit-scrollbar,
     display: none;
   }
 }
+
+/* ==========================================================================
+   EDITORIAL FOOD MENU CATALOG (CLICK-TO-REVEAL DISH PREVIEW)
+   ========================================================================== */
+.food-catalog-sheet-section {
+  width: 100%;
+  background-color: #faf8f4;
+  padding: 80px 0 120px;
+  border-top: 1px solid #eae3d5;
+  position: relative;
+  z-index: 10;
+}
+
+.food-catalog-container {
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 44px;
+}
+
+.menu-category-block {
+  margin-bottom: 70px;
+}
+
+.menu-category-top-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(48px, 6vw, 96px);
+  align-items: start;
+  margin-bottom: 0px;
+}
+
+.top-split-left-col,
+.top-split-right-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.category-giant-title-box {
+  height: 168px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+.category-giant-title-box.title-align-left {
+  align-items: flex-start;
+  text-align: left;
+}
+
+.category-giant-title-box.title-align-right {
+  align-items: flex-end;
+  text-align: right;
+}
+
+.category-giant-title {
+  font-family: var(--font-serif-heading);
+  font-size: clamp(3.6rem, 5.6vw, 5.2rem);
+  font-weight: 700;
+  color: #c8823b;
+  line-height: 0.88;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  display: flex;
+  flex-direction: column;
+  white-space: nowrap;
+  margin: 0;
+}
+
+.category-giant-title-box.title-align-right .category-giant-title {
+  align-items: flex-end;
+  text-align: right;
+}
+
+.title-word-line1,
+.title-word-line2 {
+  display: block;
+  white-space: nowrap;
+}
+
+.category-giant-title-box.title-align-right .title-word-line1,
+.category-giant-title-box.title-align-right .title-word-line2 {
+  text-align: right;
+}
+
+.category-top-items-box {
+  height: 168px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-sizing: border-box;
+}
+
+.menu-category-bottom-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(48px, 6vw, 96px);
+  align-items: start;
+  margin-top: 0px;
+}
+
+.menu-col-subgrid {
+  display: flex;
+  flex-direction: column;
+}
+
+.menu-single-item-row {
+  position: relative;
+  height: 44px;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 8px 0 7px;
+  border-bottom: 1.5px solid #333834;
+  box-sizing: border-box;
+  cursor: pointer;
+  user-select: none;
+  transition: border-color 0.2s, background-color 0.2s;
+}
+
+.menu-single-item-row:hover,
+.menu-single-item-row.active-preview-row,
+.menu-single-item-row.is-active-row {
+  border-bottom-color: #c8823b;
+}
+
+.menu-single-item-row:focus-visible {
+  outline: 2px solid #df9039;
+  outline-offset: 2px;
+}
+
+.item-name-text {
+  font-family: var(--font-sans-ui);
+  font-size: clamp(1.02rem, 1.25vw, 1.18rem);
+  font-weight: 600;
+  color: #1f2421;
+  line-height: 1.35;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.item-price-text {
+  font-family: var(--font-sans-ui);
+  font-size: clamp(0.92rem, 1.12vw, 1.05rem);
+  font-weight: 600;
+  color: #1f2421;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  margin-left: 14px;
+}
+
+/* Desktop Anchored Overlapping Image Card (Positioned directly below the clicked item line) */
+.item-anchored-card,
+.desktop-menu-float-card {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 6px);
+  z-index: 1000;
+  width: 270px;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.38), 0 4px 12px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(223, 144, 57, 0.35);
+  background-color: #1a201c;
+  pointer-events: auto;
+  animation: menuFloatIn 180ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes menuFloatIn {
+  from {
+    opacity: 0;
+    transform: scale(0.94) translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.anchored-card-img-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background-color: #0f1411;
+}
+
+.anchored-card-img,
+.menu-float-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.anchored-card-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  padding: 4px 10px;
+  background: rgba(15, 20, 17, 0.85);
+  border: 1px solid rgba(223, 144, 57, 0.4);
+  border-radius: 9999px;
+  color: #df9039;
+  font-family: var(--font-sans-ui);
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.anchored-card-details {
+  padding: 14px 16px;
+  background: #1a201c;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.card-dish-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.card-dish-name {
+  font-family: var(--font-sans-ui);
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.card-dish-price {
+  font-family: var(--font-sans-ui);
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #df9039;
+}
+
+.card-dish-desc {
+  font-family: var(--font-sans-ui);
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: #a3ad9f;
+  margin: 0;
+}
+
+/* Mobile Modal (<640px) */
+@media (min-width: 640px) {
+  .mobile-food-modal-backdrop {
+    display: none !important;
+  }
+}
+
+@media (max-width: 639px) {
+  .item-anchored-card,
+  .desktop-menu-float-card {
+    display: none !important;
+  }
+
+  .food-catalog-container {
+    padding: 0 20px;
+  }
+
+  .category-giant-title-box,
+  .category-top-items-box {
+    height: auto;
+  }
+
+  .category-giant-title-box.title-align-right,
+  .category-giant-title-box.title-align-right .category-giant-title,
+  .category-giant-title-box.title-align-right .title-word-line1,
+  .category-giant-title-box.title-align-right .title-word-line2 {
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .menu-single-item-row {
+    height: auto;
+    padding: 8px 0;
+  }
+
+  .menu-category-top-split,
+  .menu-category-bottom-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .mobile-food-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 999999;
+    background: rgba(9, 13, 11, 0.82);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    animation: mobileFadeIn 180ms ease forwards;
+  }
+
+  @keyframes mobileFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  .mobile-food-modal-card {
+    position: relative;
+    width: 100%;
+    max-width: 340px;
+    background: #151b17;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid rgba(223, 144, 57, 0.35);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+    animation: mobileCardIn 200ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  @keyframes mobileCardIn {
+    from {
+      opacity: 0;
+      transform: scale(0.92) translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+  }
+
+  .mobile-modal-close-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 10;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+
+  .mobile-modal-image-wrap {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    background-color: #0b0f0c;
+  }
+
+  .mobile-modal-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .mobile-modal-info {
+    padding: 14px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .mobile-modal-info h4 {
+    font-family: var(--font-sans-ui);
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0;
+  }
+
+  .mobile-modal-info span {
+    font-family: var(--font-sans-ui);
+    font-size: 0.90rem;
+    font-weight: 700;
+    color: #df9039;
+  }
+}
