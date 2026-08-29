@@ -27,7 +27,7 @@ export function CategoryOpeningHero({
 
       const diff = targetProgressRef.current - currentProgressRef.current;
       if (Math.abs(diff) > 0.0005) {
-        currentProgressRef.current += diff * 0.10; // smooth easing
+        currentProgressRef.current += diff * 0.12; // smooth easing
         setProgress(currentProgressRef.current);
       } else if (currentProgressRef.current !== targetProgressRef.current) {
         currentProgressRef.current = targetProgressRef.current;
@@ -45,32 +45,35 @@ export function CategoryOpeningHero({
     };
   }, []);
 
-  // Wheel & touch listener: Frame stays 100% stationary, ONLY text and image animate
+  // Wheel & touch listener
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
 
     const handleWheel = (e) => {
-      const isAtTop = window.scrollY <= 10;
-      
-      // If we are at the top of the page:
+      const isAtTop = window.scrollY <= 5;
+
       if (isAtTop) {
-        // If scrolling down and not yet fully expanded, capture and expand
-        if (e.deltaY > 0 && targetProgressRef.current < 0.98) {
-          e.preventDefault();
-          const delta = e.deltaY * 0.0012;
-          targetProgressRef.current = Math.min(1, targetProgressRef.current + delta);
+        // 1. Scrolling DOWN:
+        if (e.deltaY > 0) {
+          if (targetProgressRef.current < 0.98) {
+            // Not fully expanded yet: capture scroll and expand picture in place
+            e.preventDefault();
+            const delta = e.deltaY * 0.0015;
+            targetProgressRef.current = Math.min(1, targetProgressRef.current + delta);
+          } else {
+            // Fully expanded: DO NOT prevent default -> allows natural browser scrolling into the full menu!
+            targetProgressRef.current = 1;
+          }
         } 
-        // If scrolling down and ALREADY fully expanded on a page with content below, allow natural document scroll
-        else if (e.deltaY > 0 && targetProgressRef.current >= 0.98 && hasContentBelow) {
-          // Allow natural scroll to menu
-          return;
-        }
-        // If scrolling up at the very top of document, shrink back towards 0
-        else if (e.deltaY < 0 && targetProgressRef.current > 0) {
-          e.preventDefault();
-          const delta = e.deltaY * 0.0012;
-          targetProgressRef.current = Math.max(0, targetProgressRef.current + delta);
+        // 2. Scrolling UP:
+        else if (e.deltaY < 0) {
+          if (targetProgressRef.current > 0) {
+            // Shrink the hero picture back
+            e.preventDefault();
+            const delta = e.deltaY * 0.0015;
+            targetProgressRef.current = Math.max(0, targetProgressRef.current + delta);
+          }
         }
       }
     };
@@ -82,18 +85,26 @@ export function CategoryOpeningHero({
     };
 
     const handleTouchMove = (e) => {
-      const isAtTop = window.scrollY <= 10;
+      const isAtTop = window.scrollY <= 5;
       if (e.touches.length > 0 && isAtTop) {
         const touchY = e.touches[0].clientY;
-        const delta = (touchStartYRef.current - touchY) * 0.003;
+        const delta = (touchStartYRef.current - touchY) * 0.0035;
         touchStartYRef.current = touchY;
 
-        if (delta > 0 && targetProgressRef.current < 0.98) {
-          e.preventDefault();
-          targetProgressRef.current = Math.min(1, targetProgressRef.current + delta);
-        } else if (delta < 0 && targetProgressRef.current > 0) {
-          e.preventDefault();
-          targetProgressRef.current = Math.max(0, targetProgressRef.current + delta);
+        if (delta > 0) {
+          // Swiping UP (scrolling DOWN)
+          if (targetProgressRef.current < 0.98) {
+            e.preventDefault();
+            targetProgressRef.current = Math.min(1, targetProgressRef.current + delta);
+          } else {
+            targetProgressRef.current = 1;
+          }
+        } else if (delta < 0) {
+          // Swiping DOWN (scrolling UP)
+          if (targetProgressRef.current > 0) {
+            e.preventDefault();
+            targetProgressRef.current = Math.max(0, targetProgressRef.current + delta);
+          }
         }
       }
     };
@@ -107,7 +118,7 @@ export function CategoryOpeningHero({
       el.removeEventListener('touchstart', handleTouchStart);
       el.removeEventListener('touchmove', handleTouchMove);
     };
-  }, [hasContentBelow]);
+  }, []);
 
   // Smooth interpolation calculations
   const p = Math.min(1, Math.max(0, progress));
@@ -190,12 +201,12 @@ export function CategoryOpeningHero({
         />
 
         {/* Action Button to scroll down to Menu / Content if present */}
-        {hasContentBelow && p >= 0.75 && (
+        {hasContentBelow && p >= 0.85 && (
           <button 
             className="opening-explore-menu-btn"
             onClick={onExploreBelow}
           >
-            <span>VIEW FOOD MENU CATALOG</span>
+            <span>SCROLL TO VIEW FULL MENU</span>
             <ArrowDown size={15} />
           </button>
         )}
