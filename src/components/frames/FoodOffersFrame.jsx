@@ -97,9 +97,6 @@ export function FoodOffersFrame({ onNavigate }) {
                 className="anchored-card-img" 
                 loading="lazy"
               />
-              <div className="anchored-card-badge">
-                <span>AUTHENTIC PARK CUISINE</span>
-              </div>
             </div>
             <div className="anchored-card-details">
               <div className="card-dish-header">
