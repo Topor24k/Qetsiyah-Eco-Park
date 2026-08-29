@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { ArrowDown } from 'lucide-react';
 
 export function CategoryOpeningHero({
@@ -13,132 +13,47 @@ export function CategoryOpeningHero({
 }) {
   const [progress, setProgress] = useState(0);
   const containerRef = useRef(null);
-  const targetProgressRef = useRef(0);
-  const currentProgressRef = useRef(0);
-  const animFrameRef = useRef(null);
-  const touchStartYRef = useRef(0);
 
-  // Smooth lerp animation loop
-  useEffect(() => {
-    let isRunning = true;
+  const handleScroll = useCallback(() => {
+    if (!containerRef.current) return;
+    const container = containerRef.current;
+    const rect = container.getBoundingClientRect();
+    const scrollDistance = container.offsetHeight - window.innerHeight;
 
-    const animate = () => {
-      if (!isRunning) return;
-
-      const diff = targetProgressRef.current - currentProgressRef.current;
-      if (Math.abs(diff) > 0.0005) {
-        currentProgressRef.current += diff * 0.12; // smooth easing
-        setProgress(currentProgressRef.current);
-      } else if (currentProgressRef.current !== targetProgressRef.current) {
-        currentProgressRef.current = targetProgressRef.current;
-        setProgress(targetProgressRef.current);
-      }
-
-      animFrameRef.current = requestAnimationFrame(animate);
-    };
-
-    animFrameRef.current = requestAnimationFrame(animate);
-
-    return () => {
-      isRunning = false;
-      if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
-    };
+    if (scrollDistance > 0) {
+      const currentScroll = -rect.top;
+      const rawProgress = currentScroll / scrollDistance;
+      const clamped = Math.min(1, Math.max(0, rawProgress));
+      setProgress(clamped);
+    }
   }, []);
 
-  // Wheel & touch listener
   useEffect(() => {
-    const el = containerRef.current;
-    if (!el) return;
-
-    const handleWheel = (e) => {
-      const isAtTop = window.scrollY <= 5;
-
-      if (isAtTop) {
-        // 1. Scrolling DOWN:
-        if (e.deltaY > 0) {
-          if (targetProgressRef.current < 0.98) {
-            // Not fully expanded yet: capture scroll and expand picture in place
-            e.preventDefault();
-            const delta = e.deltaY * 0.0015;
-            targetProgressRef.current = Math.min(1, targetProgressRef.current + delta);
-          } else {
-            // Fully expanded: DO NOT prevent default -> allows natural browser scrolling into the full menu!
-            targetProgressRef.current = 1;
-          }
-        } 
-        // 2. Scrolling UP:
-        else if (e.deltaY < 0) {
-          if (targetProgressRef.current > 0) {
-            // Shrink the hero picture back
-            e.preventDefault();
-            const delta = e.deltaY * 0.0015;
-            targetProgressRef.current = Math.max(0, targetProgressRef.current + delta);
-          }
-        }
-      }
-    };
-
-    const handleTouchStart = (e) => {
-      if (e.touches.length > 0) {
-        touchStartYRef.current = e.touches[0].clientY;
-      }
-    };
-
-    const handleTouchMove = (e) => {
-      const isAtTop = window.scrollY <= 5;
-      if (e.touches.length > 0 && isAtTop) {
-        const touchY = e.touches[0].clientY;
-        const delta = (touchStartYRef.current - touchY) * 0.0035;
-        touchStartYRef.current = touchY;
-
-        if (delta > 0) {
-          // Swiping UP (scrolling DOWN)
-          if (targetProgressRef.current < 0.98) {
-            e.preventDefault();
-            targetProgressRef.current = Math.min(1, targetProgressRef.current + delta);
-          } else {
-            targetProgressRef.current = 1;
-          }
-        } else if (delta < 0) {
-          // Swiping DOWN (scrolling UP)
-          if (targetProgressRef.current > 0) {
-            e.preventDefault();
-            targetProgressRef.current = Math.max(0, targetProgressRef.current + delta);
-          }
-        }
-      }
-    };
-
-    el.addEventListener('wheel', handleWheel, { passive: false });
-    el.addEventListener('touchstart', handleTouchStart, { passive: true });
-    el.addEventListener('touchmove', handleTouchMove, { passive: false });
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('resize', handleScroll);
+    handleScroll();
 
     return () => {
-      el.removeEventListener('wheel', handleWheel);
-      el.removeEventListener('touchstart', handleTouchStart);
-      el.removeEventListener('touchmove', handleTouchMove);
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', handleScroll);
     };
-  }, []);
+  }, [handleScroll]);
 
-  // Smooth interpolation calculations
-  const p = Math.min(1, Math.max(0, progress));
-  
   // Power easing for cinematic acceleration matching Animated Opening.mp4
+  const p = progress;
   const eased = p < 0.5 
     ? 2 * p * p 
     : 1 - Math.pow(-2 * p + 2, 2) / 2;
 
   // Text translations (0px at start, parting smoothly up & down on scroll)
-  const textTranslateY = eased * 360;
-  const textOpacity = Math.max(0, 1 - p * 1.25);
+  const textTranslateY = eased * 380;
+  const textOpacity = Math.max(0, 1 - p * 1.35);
 
   // Flank text translations
-  const flankTranslateX = eased * 140;
-  const flankOpacity = Math.max(0, 1 - p * 2.0);
+  const flankTranslateX = eased * 160;
+  const flankOpacity = Math.max(0, 1 - p * 2.2);
 
   // Image dimensions: starts small in center gap, expands to 100vw x 100vh
-  const initialWidth = 220;
-  const initialHeight = 120;
   const imageWidthPercent = Math.min(100, 15 + eased * 85);
   const imageHeightPercent = Math.min(100, eased * 100);
 
@@ -147,100 +62,105 @@ export function CategoryOpeningHero({
 
   return (
     <div 
-      className="activities-opening-hero-frame" 
+      className={`activities-opening-hero-frame ${hasContentBelow ? 'has-content-below' : 'standalone-hero'}`}
       ref={containerRef} 
       id={id}
     >
-      {/* Subtle Marbled Warm Background with Fine Veins */}
-      <div className="opening-parchment-backdrop"></div>
-
-      {/* Left Flank Subtitle */}
-      <div 
-        className="opening-flank-text left"
-        style={{
-          transform: `translate3d(${-flankTranslateX}px, -50%, 0)`,
-          opacity: flankOpacity
-        }}
-      >
-        <span>{flankLeft}</span>
-      </div>
-
-      {/* Right Flank Subtitle */}
-      <div 
-        className="opening-flank-text right"
-        style={{
-          transform: `translate3d(${flankTranslateX}px, -50%, 0)`,
-          opacity: flankOpacity
-        }}
-      >
-        <span>{flankRight}</span>
-      </div>
-
-      {/* Center Expanding Image (Behind/Between the text) */}
-      <div 
-        className="expanding-image-container"
-        style={{
-          width: `${imageWidthPercent}vw`,
-          height: `${imageHeightPercent}vh`,
-          borderRadius: `${borderRadius}px`,
-          opacity: p > 0.005 ? 1 : 0
-        }}
-      >
-        <img 
-          src={image} 
-          alt={titleBottom} 
-          className="expanding-image-content"
-        />
+      {/* Sticky 100vh Viewport Stage */}
+      <div className="sticky-opening-stage">
         
-        {/* Subtle atmospheric vignette when fully expanded */}
+        {/* Subtle Marbled Warm Background with Fine Veins */}
+        <div className="opening-parchment-backdrop"></div>
+
+        {/* Left Flank Subtitle */}
         <div 
-          className="expanding-image-scrim"
+          className="opening-flank-text left"
           style={{
-            opacity: Math.min(0.35, Math.max(0, (p - 0.7) / 0.3))
-          }}
-        />
-
-        {/* Action Button to scroll down to Menu / Content if present */}
-        {hasContentBelow && p >= 0.85 && (
-          <button 
-            className="opening-explore-menu-btn"
-            onClick={onExploreBelow}
-          >
-            <span>SCROLL TO VIEW FULL MENU</span>
-            <ArrowDown size={15} />
-          </button>
-        )}
-      </div>
-
-      {/* Main Center Display Typography */}
-      <div className="opening-hero-text-block">
-        <h2 
-          className="opening-title-top"
-          style={{
-            transform: `translate3d(0, ${-textTranslateY}px, 0)`,
-            opacity: textOpacity
+            transform: `translate3d(${-flankTranslateX}px, -50%, 0)`,
+            opacity: flankOpacity
           }}
         >
-          {titleTop}
-        </h2>
-
-        <h2 
-          className="opening-title-bottom"
-          style={{
-            transform: `translate3d(0, ${textTranslateY}px, 0)`,
-            opacity: textOpacity
-          }}
-        >
-          {titleBottom}
-        </h2>
-      </div>
-
-      {/* Subtle Scroll Hint Indicator at 0% */}
-      {p < 0.05 && (
-        <div className="opening-scroll-hint">
-          <span>SCROLL DOWN TO REVEAL</span>
+          <span>{flankLeft}</span>
         </div>
-      )}
+
+        {/* Right Flank Subtitle */}
+        <div 
+          className="opening-flank-text right"
+          style={{
+            transform: `translate3d(${flankTranslateX}px, -50%, 0)`,
+            opacity: flankOpacity
+          }}
+        >
+          <span>{flankRight}</span>
+        </div>
+
+        {/* Center Expanding Image (Behind/Between the text) */}
+        <div 
+          className="expanding-image-container"
+          style={{
+            width: `${imageWidthPercent}vw`,
+            height: `${imageHeightPercent}vh`,
+            borderRadius: `${borderRadius}px`,
+            opacity: p > 0.005 ? 1 : 0
+          }}
+        >
+          <img 
+            src={image} 
+            alt={titleBottom} 
+            className="expanding-image-content"
+          />
+          
+          {/* Subtle atmospheric vignette when fully expanded */}
+          <div 
+            className="expanding-image-scrim"
+            style={{
+              opacity: Math.min(0.35, Math.max(0, (p - 0.7) / 0.3))
+            }}
+          />
+
+          {/* Action Button to scroll down to Menu / Content if present */}
+          {hasContentBelow && p >= 0.85 && (
+            <button 
+              className="opening-explore-menu-btn"
+              onClick={onExploreBelow}
+            >
+              <span>EXPLORE FULL MENU</span>
+              <ArrowDown size={15} />
+            </button>
+          )}
+        </div>
+
+        {/* Main Center Display Typography */}
+        <div className="opening-hero-text-block">
+          <h2 
+            className="opening-title-top"
+            style={{
+              transform: `translate3d(0, ${-textTranslateY}px, 0)`,
+              opacity: textOpacity
+            }}
+          >
+            {titleTop}
+          </h2>
+
+          <h2 
+            className="opening-title-bottom"
+            style={{
+              transform: `translate3d(0, ${textTranslateY}px, 0)`,
+              opacity: textOpacity
+            }}
+          >
+            {titleBottom}
+          </h2>
+        </div>
+
+        {/* Subtle Scroll Hint Indicator at 0% */}
+        {p < 0.05 && (
+          <div className="opening-scroll-hint">
+            <span>SCROLL DOWN TO REVEAL</span>
+          </div>
+        )}
+
+      </div>
     </div>
   );
 }

@@ -4354,15 +4354,29 @@ body::-webkit-scrollbar,
 .activities-opening-hero-frame {
   position: relative;
   width: 100%;
+  box-sizing: border-box;
+}
+
+.activities-opening-hero-frame.has-content-below {
+  height: 200vh;
+}
+
+.activities-opening-hero-frame.standalone-hero {
+  height: 160vh;
+}
+
+.sticky-opening-stage {
+  position: sticky;
+  top: 0;
+  left: 0;
+  width: 100vw;
   height: 100vh;
-  min-height: 100vh;
   overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
   background-color: #eae3d4;
   user-select: none;
-  box-sizing: border-box;
 }
 
 /* Subtle Marbled Stone Backdrop */
