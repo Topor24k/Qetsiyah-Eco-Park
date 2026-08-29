@@ -1,4 +1,4 @@
-﻿:root {
+:root {
   /* Colors */
   --accent-gold: #df9039;
   --accent-gold-hover: #b45309;
@@ -4469,19 +4469,11 @@ body::-webkit-scrollbar,
 }
 
 .waypoint-dot {
-  width: 12px;
-  height: 12px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
-  background: #c8823b;
-  box-shadow: 0 0 0 4px rgba(200, 130, 59, 0.25);
-}
-
-.waypoint-number {
-  font-family: var(--font-sans-ui);
-  font-size: 0.72rem;
-  font-weight: 800;
-  color: #c8823b;
-  letter-spacing: 0.08em;
+  background: #c84b31;
+  box-shadow: 0 0 0 5px rgba(200, 75, 49, 0.22);
 }
 
 /* Organic Feathered Photo Card */

@@ -167,9 +167,7 @@ export function ActivitiesFrame({ onNavigate }) {
                 >
                   {/* Waypoint Pin on the Trail */}
                   <div className="trail-waypoint-pin">
-                    <span className="waypoint-ring"></span>
                     <span className="waypoint-dot"></span>
-                    <span className="waypoint-number">{index + 1}</span>
                   </div>
 
                   {/* Organic Feathered Photo Card */}
