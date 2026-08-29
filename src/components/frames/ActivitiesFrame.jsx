@@ -165,11 +165,6 @@ export function ActivitiesFrame({ onNavigate }) {
                   key={item.id} 
                   className={`activity-trail-row ${isImageLeft ? 'image-left-layout' : 'image-right-layout'}`}
                 >
-                  {/* Waypoint Pin on the Trail */}
-                  <div className="trail-waypoint-pin">
-                    <span className="waypoint-dot"></span>
-                  </div>
-
                   {/* Organic Feathered Photo Card */}
                   <div className="activity-cloud-image-wrapper">
                     <div className="activity-cloud-glow"></div>

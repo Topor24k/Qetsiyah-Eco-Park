@@ -4447,34 +4447,7 @@ body::-webkit-scrollbar,
   order: 1;
 }
 
-/* Waypoint Pin on the Journey Trail */
-.trail-waypoint-pin {
-  position: absolute;
-  top: -24px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  z-index: 5;
-  pointer-events: none;
-}
 
-.image-left-layout .trail-waypoint-pin {
-  left: 48%;
-}
-
-.image-right-layout .trail-waypoint-pin {
-  left: 52%;
-}
-
-.waypoint-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: #c84b31;
-  box-shadow: 0 0 0 5px rgba(200, 75, 49, 0.22);
-}
 
 /* Organic Feathered Photo Card */
 .activity-cloud-image-wrapper {
