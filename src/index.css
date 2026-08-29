@@ -360,6 +360,27 @@ button {
   color: #df9039;
 }
 
+/* Light Hero Transparent State (Top of What We Offer Categories) */
+.primary-nav-header.on-light-hero .qetsiyah-brand-logo,
+.primary-nav-header.on-light-hero .brand-letter-q,
+.primary-nav-header.on-light-hero .brand-letters-rest,
+.primary-nav-header.on-light-hero .brand-eco-row span,
+.primary-nav-header.on-light-hero .primary-nav-link {
+  color: #3d3830 !important;
+  text-shadow: none !important;
+}
+
+.primary-nav-header.on-light-hero .brand-underline {
+  background-color: #3d3830 !important;
+  box-shadow: none !important;
+}
+
+.primary-nav-header.on-light-hero .primary-nav-link:hover,
+.primary-nav-header.on-light-hero .primary-nav-link.active,
+.primary-nav-header.on-light-hero .primary-nav-link.dropdown-trigger.active {
+  color: #b45309 !important;
+}
+
 .chevron-arrow {
   color: rgba(255, 255, 255, 0.7);
   transition: transform 0.25s ease;
@@ -4347,28 +4368,97 @@ body::-webkit-scrollbar,
 
 
 
-
-
-
-
 /* ==========================================================================
-   WHAT WE OFFER: STATIONARY HERO OPENING (STARTS BELOW HEADER, EXPANDS WITHIN FRAME)
+   WHAT WE OFFER: STATIONARY HERO OPENING (EXACT MATCH TO ANIMATED OPENING.MP4)
    ========================================================================== */
 
-:root {
-  --site-header-height: 74px;
-}
-
-@media (max-width: 768px) {
-  :root {
-    --site-header-height: 68px;
-  }
-}
-
-.category-frame-view {
-  padding-top: var(--site-header-height);
+.activities-opening-hero-frame {
+  position: relative;
+  width: 100%;
+  height: 100vh;
   min-height: 100vh;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #eae3d4;
+  user-select: none;
   box-sizing: border-box;
+}
+
+/* Subtle Marbled Stone Backdrop */
+.opening-parchment-backdrop {
+  position: absolute;
+  inset: 0;
+  background-color: #eae3d4;
+  background-image: 
+    radial-gradient(ellipse at 50% 50%, #f3ede2 0%, #eae3d4 100%),
+    radial-gradient(ellipse at 25% 25%, rgba(85, 78, 64, 0.04) 0%, transparent 50%),
+    radial-gradient(ellipse at 75% 75%, rgba(85, 78, 64, 0.04) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Left & Right Flank Subtitles */
+.opening-flank-text {
+  position: absolute;
+  top: 50%;
+  z-index: 10;
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
+.opening-flank-text.left {
+  left: clamp(24px, 4.5vw, 64px);
+  text-align: left;
+}
+
+.opening-flank-text.right {
+  right: clamp(24px, 4.5vw, 64px);
+  text-align: right;
+}
+
+.opening-flank-text span {
+  font-family: var(--font-sans-ui);
+  font-size: clamp(0.68rem, 0.85vw, 0.80rem);
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  color: #7a7262;
+  text-transform: uppercase;
+  line-height: 1.5;
+  display: block;
+  max-width: 140px;
+}
+
+/* Center Display Text Block (DISCOVER on top, ALL OUR ACTIVITIES on bottom) */
+.opening-hero-text-block {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  pointer-events: none;
+  gap: 6px; /* Natural line gap between the two title lines */
+}
+
+.opening-title-top,
+.opening-title-bottom {
+  font-family: var(--font-serif-heading);
+  font-weight: 700;
+  color: #3d3830;
+  font-size: clamp(2.8rem, 6.8vw, 6.4rem);
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+  margin: 0;
+  padding: 0 16px;
+  will-change: transform, opacity;
+}
+
+.opening-title-top {
+  display: block;
 }
 
 .opening-title-bottom {
@@ -4389,8 +4479,8 @@ body::-webkit-scrollbar,
 }
 
 .expanding-image-content {
-  width: 100%;
-  height: 100%;
+  width: 100vw;
+  height: 100vh;
   object-fit: cover;
   position: absolute;
   top: 50%;
@@ -4404,38 +4494,6 @@ body::-webkit-scrollbar,
   inset: 0;
   background: linear-gradient(180deg, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.35) 100%);
   pointer-events: none;
-}
-
-/* Explore Menu Floating CTA Button */
-.opening-explore-menu-btn {
-  position: absolute;
-  bottom: 36px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 20;
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  padding: 13px 28px;
-  background-color: #df9039;
-  color: #ffffff;
-  font-family: var(--font-sans-ui);
-  font-size: 0.76rem;
-  font-weight: 800;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  border: 1.5px solid rgba(255, 255, 255, 0.3);
-  border-radius: 9999px;
-  cursor: pointer;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
-  transition: all 0.24s cubic-bezier(0.16, 1, 0.3, 1);
-  pointer-events: auto;
-}
-
-.opening-explore-menu-btn:hover {
-  background-color: #b45309;
-  transform: translateX(-50%) translateY(-2px);
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.55);
 }
 
 /* Subtle Scroll Indicator at Start */

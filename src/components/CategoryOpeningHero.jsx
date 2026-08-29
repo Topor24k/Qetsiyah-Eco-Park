@@ -204,8 +204,8 @@ export function CategoryOpeningHero({
       <div 
         className="expanding-image-container"
         style={{
-          width: `${imageWidthPercent}%`,
-          height: `${imageHeightPercent}%`,
+          width: `${imageWidthPercent}vw`,
+          height: `${imageHeightPercent}vh`,
           borderRadius: `${borderRadius}px`,
           opacity: p > 0.005 ? 1 : 0
         }}

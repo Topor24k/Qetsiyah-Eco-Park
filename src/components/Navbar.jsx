@@ -70,17 +70,17 @@ export function Navbar({ activeFrame, onNavigate }) {
 
   const isHome = activeFrame === 'home';
   const isScrolled = scrollRatio > 0.05;
-  const showSolidNav = !isHome || isScrolled;
+  const showSolidNav = isScrolled; // Header ONLY floats and sticks once scrolled out of the hero section
 
   return (
     <header
       ref={navRef}
-      className={`primary-nav-header ${showSolidNav ? 'is-scrolled' : 'is-at-top'}`}
+      className={`primary-nav-header ${showSolidNav ? 'is-scrolled' : 'is-at-top'} ${!showSolidNav && !isHome ? 'on-light-hero' : ''}`}
       style={{
-        backgroundColor: showSolidNav ? '#383e24' : `rgba(56, 62, 36, ${scrollRatio})`,
-        borderBottomColor: showSolidNav ? 'rgba(255, 255, 255, 0.12)' : `rgba(255, 255, 255, ${0.12 * scrollRatio})`,
+        backgroundColor: showSolidNav ? '#383e24' : 'transparent',
+        borderBottomColor: showSolidNav ? 'rgba(255, 255, 255, 0.12)' : 'transparent',
         boxShadow: showSolidNav ? '0 4px 20px rgba(0, 0, 0, 0.35)' : 'none',
-        padding: showSolidNav ? '14px 0' : '24px 0 10px'
+        padding: showSolidNav ? '14px 0' : '22px 0 10px'
       }}
       onMouseLeave={() => setActiveMegaMenu(null)}
     >
