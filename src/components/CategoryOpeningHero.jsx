@@ -39,6 +39,7 @@ export function CategoryOpeningHero({
   // Control playback & audio:
   // 1. Play with sound ONLY when expanded (progress >= 0.85) AND still in hero section (windowScrollY <= 40).
   // 2. TURN OFF SOUND & PAUSE when scrolled up (progress < 0.85) OR scrolled down to menu (windowScrollY > 40).
+  // 3. When video shrinks to original size, restart to the very first frame (currentTime = 0).
   useEffect(() => {
     if (isVideo && videoRef.current) {
       const isHeroActive = progress >= 0.85 && windowScrollY <= 40;
@@ -55,9 +56,11 @@ export function CategoryOpeningHero({
       } else {
         videoRef.current.pause();
         videoRef.current.muted = true;
-        // When shrunk out (progress < 0.85), restart video to beginning so it plays from the first part when shown again
+        // Whenever shrunk below expanded size or at original size, reset to first part of video
         if (progress < 0.85) {
-          videoRef.current.currentTime = 0;
+          try {
+            videoRef.current.currentTime = 0;
+          } catch (err) {}
         }
       }
     }
