@@ -1,6 +1,6 @@
 import React from 'react';
 import { HeroCarousel } from '../HeroCarousel';
-import { ArrowRight } from 'lucide-react';
+import { Compass, ShieldCheck, ArrowRight, Clock, Users, Award } from 'lucide-react';
 
 export function ActivitiesFrame({ onNavigate }) {
   const carouselItems = [
@@ -132,10 +132,10 @@ export function ActivitiesFrame({ onNavigate }) {
         onNavigate={onNavigate} 
       />
 
-      {/* 2. Adventure Exploration Trail */}
+      {/* 2. Adventure Exploration Trail (Matches Reference Poster Journey) */}
       <section className="activities-story-trail-section">
         
-        {/* Section Header */}
+        {/* Subtle Section Header */}
         <div className="activities-trail-header">
           <span className="trail-subtitle">EXPLORATION & ADVENTURE</span>
           <h2 className="trail-title">DISCOVER OUR PARK ACTIVITIES</h2>
@@ -157,7 +157,7 @@ export function ActivitiesFrame({ onNavigate }) {
 
           {/* Activity Cards along the Winding Trail */}
           <div className="activities-trail-items">
-            {activitiesList.map((item) => {
+            {activitiesList.map((item, index) => {
               const isImageLeft = item.side === 'left';
 
               return (
@@ -167,7 +167,7 @@ export function ActivitiesFrame({ onNavigate }) {
                 >
                   {/* Organic Feathered Photo Card */}
                   <div className="activity-cloud-image-wrapper">
-                    <div className="activity-cloud-glow" />
+                    <div className="activity-cloud-glow"></div>
                     <div className={`activity-cloud-mask ${item.shapeClass}`}>
                       <img 
                         src={item.image} 

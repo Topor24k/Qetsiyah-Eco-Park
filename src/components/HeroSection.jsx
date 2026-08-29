@@ -1,5 +1,5 @@
 import React from 'react';
-import { Calendar, Compass } from 'lucide-react';
+import { Calendar } from 'lucide-react';
 
 export function HeroSection({ onNavigate }) {
   const handleCtaClick = (e, frameOrHash) => {
@@ -9,8 +9,6 @@ export function HeroSection({ onNavigate }) {
       if (el) {
         el.scrollIntoView({ behavior: 'smooth' });
       }
-    } else if (frameOrHash === 'activities') {
-      if (onNavigate) onNavigate('activities');
     }
   };
 
@@ -39,7 +37,7 @@ export function HeroSection({ onNavigate }) {
             A relaxing wide place that is perfect for all events and occasions
           </p>
 
-          {/* Call-to-Action Buttons */}
+          {/* Call-to-Action Button */}
           <div className="hero-cta-button-group">
             <a
               href="#contact"
@@ -48,14 +46,6 @@ export function HeroSection({ onNavigate }) {
             >
               <Calendar size={16} />
               <span>BOOK YOUR EVENT</span>
-            </a>
-            <a
-              href="#activities"
-              className="hero-cta-btn hero-cta-secondary"
-              onClick={(e) => handleCtaClick(e, 'activities')}
-            >
-              <Compass size={16} />
-              <span>EXPLORE WHAT WE OFFER</span>
             </a>
           </div>
         </div>
