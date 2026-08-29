@@ -16,6 +16,7 @@ export function CategoryOpeningHero({
   const [windowScrollY, setWindowScrollY] = useState(0);
   const containerRef = useRef(null);
   const videoRef = useRef(null);
+  const wasActiveRef = useRef(false);
   const targetProgressRef = useRef(0);
   const currentProgressRef = useRef(0);
   const animFrameRef = useRef(null);
@@ -24,7 +25,7 @@ export function CategoryOpeningHero({
   const isVideo = Boolean(video || (typeof image === 'string' && image.toLowerCase().endsWith('.mp4')));
   const mediaSrc = video || image;
 
-  // Track window scroll to know when user scrolled down to the menu section
+  // Track window scroll to detect when user scrolled down to menu
   useEffect(() => {
     const handleWindowScroll = () => {
       setWindowScrollY(window.scrollY || window.pageYOffset || 0);
@@ -36,35 +37,51 @@ export function CategoryOpeningHero({
     return () => window.removeEventListener('scroll', handleWindowScroll);
   }, []);
 
-  // Control playback & audio:
-  // 1. Play with sound ONLY when expanded (progress >= 0.85) AND still in hero section (windowScrollY <= 40).
-  // 2. TURN OFF SOUND & PAUSE when scrolled up (progress < 0.85) OR scrolled down to menu (windowScrollY > 40).
-  // 3. When video shrinks to original size, restart to the very first frame (currentTime = 0).
+  // Control playback & audio state machine:
+  // - Plays with unmuted audio ONLY when expanded (progress >= 0.85) AND still in hero section (windowScrollY <= 40).
+  // - Turns OFF sound & pauses when scrolled up (progress < 0.85) OR scrolled down to menu (windowScrollY > 40).
+  // - When shrunk to original size, resets to beginning (currentTime = 0).
   useEffect(() => {
-    if (isVideo && videoRef.current) {
-      const isHeroActive = progress >= 0.85 && windowScrollY <= 40;
+    if (!isVideo || !videoRef.current) return;
 
-      if (isHeroActive) {
+    const isHeroActive = progress >= 0.85 && windowScrollY <= 40;
+
+    if (isHeroActive) {
+      if (!wasActiveRef.current) {
+        wasActiveRef.current = true;
         videoRef.current.muted = false;
         videoRef.current.play().catch(() => {
-          // If browser requires muted initial trigger before user gesture
+          // If browser policy requires user interaction before unmuted playback
           if (videoRef.current) {
-            videoRef.current.muted = true;
             videoRef.current.play().catch(() => {});
           }
         });
       } else {
+        videoRef.current.muted = false;
+      }
+    } else {
+      if (wasActiveRef.current) {
+        wasActiveRef.current = false;
         videoRef.current.pause();
         videoRef.current.muted = true;
-        // Whenever shrunk below expanded size or at original size, reset to first part of video
         if (progress < 0.85) {
           try {
             videoRef.current.currentTime = 0;
-          } catch (err) {}
+          } catch (e) {}
         }
       }
     }
   }, [progress, windowScrollY, isVideo]);
+
+  // Unlock browser audio context on any user interaction
+  const unlockAudio = () => {
+    if (isVideo && videoRef.current) {
+      videoRef.current.muted = false;
+      if (currentProgressRef.current >= 0.85 && (window.scrollY || 0) <= 40) {
+        videoRef.current.play().catch(() => {});
+      }
+    }
+  };
 
   // Smooth lerp animation loop for 60fps/120fps buttery easing
   useEffect(() => {
@@ -96,6 +113,7 @@ export function CategoryOpeningHero({
   // Intercept scroll, keys, and touch: FRAME STAYS 100% STATIONARY until image is FULL SIZE
   useEffect(() => {
     const handleWheel = (e) => {
+      unlockAudio();
       const isAtTop = window.scrollY <= 2;
 
       if (isAtTop) {
@@ -124,6 +142,7 @@ export function CategoryOpeningHero({
     };
 
     const handleKeyDown = (e) => {
+      unlockAudio();
       const isAtTop = window.scrollY <= 2;
 
       if (isAtTop) {
@@ -148,6 +167,7 @@ export function CategoryOpeningHero({
     };
 
     const handleTouchStart = (e) => {
+      unlockAudio();
       if (e.touches.length > 0) {
         touchStartYRef.current = e.touches[0].clientY;
       }
@@ -183,12 +203,16 @@ export function CategoryOpeningHero({
     window.addEventListener('keydown', handleKeyDown, { passive: false });
     window.addEventListener('touchstart', handleTouchStart, { passive: true });
     window.addEventListener('touchmove', handleTouchMove, { passive: false });
+    window.addEventListener('pointerdown', unlockAudio);
+    window.addEventListener('click', unlockAudio);
 
     return () => {
       window.removeEventListener('wheel', handleWheel);
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('touchstart', handleTouchStart);
       window.removeEventListener('touchmove', handleTouchMove);
+      window.removeEventListener('pointerdown', unlockAudio);
+      window.removeEventListener('click', unlockAudio);
     };
   }, []);
 
