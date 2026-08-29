@@ -33,23 +33,26 @@ export function CategoryOpeningHero({
     }
   };
 
-  // Try playing sound immediately and fallback gracefully
+  // Control playback and sound: ONLY play when expanded to certain full size (progress >= 0.85)
   useEffect(() => {
     if (isVideo && videoRef.current) {
-      videoRef.current.muted = false;
-      const playPromise = videoRef.current.play();
-      if (playPromise !== undefined) {
-        playPromise.catch(() => {
-          // If browser policy requires initial user gesture before unmuted audio:
-          if (videoRef.current) {
+      const isCertainSize = progress >= 0.85;
+
+      if (isCertainSize) {
+        videoRef.current.muted = isMuted;
+        videoRef.current.play().catch(() => {
+          // If browser requires muted initial trigger before sound:
+          if (videoRef.current && !isMuted) {
             videoRef.current.muted = true;
             setIsMuted(true);
-            videoRef.current.play();
+            videoRef.current.play().catch(() => {});
           }
         });
+      } else {
+        videoRef.current.pause();
       }
     }
-  }, [isVideo]);
+  }, [progress, isVideo, isMuted]);
 
   // Smooth lerp animation loop for 60fps/120fps buttery easing
   useEffect(() => {
@@ -265,7 +268,6 @@ export function CategoryOpeningHero({
           <video 
             ref={videoRef}
             src={mediaSrc} 
-            autoPlay 
             loop 
             playsInline 
             preload="auto"
