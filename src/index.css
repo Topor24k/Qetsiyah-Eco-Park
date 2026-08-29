@@ -1,4 +1,4 @@
-﻿:root {
+:root {
   /* Colors */
   --accent-gold: #df9039;
   --accent-gold-hover: #b45309;
@@ -4420,36 +4420,30 @@ body::-webkit-scrollbar,
   align-items: center;
   justify-content: center;
   text-align: center;
+  gap: clamp(24px, 4.0vw, 48px); /* Clean, generous gap between top and bottom lines */
 }
 
 /* Top & Bottom Moving Text Lines */
 .opening-text-line {
-  position: absolute;
-  left: 0;
-  right: 0;
-  text-align: center;
+  position: relative;
   z-index: 10;
   pointer-events: none;
   will-change: transform, opacity;
-}
-
-.opening-text-line.line-top {
-  top: calc(50% - clamp(2.4rem, 5.8vw, 5.0rem));
-}
-
-.opening-text-line.line-bottom {
-  bottom: calc(50% - clamp(2.4rem, 5.8vw, 5.0rem));
+  display: flex;
+  justify-content: center;
+  width: 100%;
 }
 
 .opening-text-line h2 {
   font-family: var(--font-serif-heading);
   font-weight: 700;
   color: #3d3830;
-  font-size: clamp(2.8rem, 6.8vw, 6.4rem);
-  line-height: 1.0;
+  font-size: clamp(2.6rem, 6.2vw, 5.8rem);
+  line-height: 1.05;
   letter-spacing: -0.01em;
   text-transform: uppercase;
   margin: 0;
+  padding: 0 16px;
 }
 
 /* Center Expanding Image Container */
