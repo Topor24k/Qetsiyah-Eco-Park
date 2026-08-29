@@ -1,20 +1,24 @@
-import React, { useState, useEffect } from 'react';
-import { X, ArrowRight, Compass, Sparkles, Shield, ChevronLeft, ChevronRight } from 'lucide-react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { X, ArrowRight, ChevronLeft, ChevronRight, Compass, ShieldCheck } from 'lucide-react';
 
 export function ActivitiesFrame({ onNavigate }) {
   const [selectedActivity, setSelectedActivity] = useState(null);
+  const [scrollProgress, setScrollProgress] = useState(0);
   const [activeChapterIndex, setActiveChapterIndex] = useState(1);
+
+  const containerRef = useRef(null);
+  const horizontalTrackRef = useRef(null);
 
   const activities = [
     {
       id: 'zipline',
       number: '01',
-      kicker: 'AERIAL ADVENTURES',
+      kicker: 'AERIAL ADVENTURE',
       title: 'CANOPY ZIP LINING',
       subtitle: 'SOAR ABOVE EMERALD CANOPIES',
-      desc: 'Feel the exhilarating rush of flying high above the lush rainforest canopies. With high-tension dual cables spanning across the park, experience panoramic 360-degree views of Sultan Kudarat’s vibrant botanical flora and rolling landscapes.',
+      desc: 'Feel the exhilarating rush of flying high above lush rainforest canopies. High-tension dual cables span across the park, delivering 360° panoramic views of vibrant botanical gardens and rolling mountain horizons.',
       image: '/Activities/Zip Lining.jpg',
-      badgeTag: 'AERIAL THRILL',
+      badgeTag: 'ZIP LINE',
       location: 'Park High Canopy Station',
       elevation: 'High-Altitude Cable Flight',
       safety: 'Full Double-Harness & Helmet Provided',
@@ -23,15 +27,15 @@ export function ActivitiesFrame({ onNavigate }) {
     {
       id: 'skybike',
       number: '02',
-      kicker: 'SIGNATURE ATTRACTION',
+      kicker: 'SIGNATURE RIDE',
       title: 'HIGH-WIRE SKY BIKING',
-      subtitle: 'PEDAL ACROSS THE HORIZON',
-      desc: 'A signature heart-pumping feat combining cycling with aerial thrill. Pedal specialized suspended bicycles across overhead steel cables high above the tranquil waters of the park lagoon, backed by breathtaking mountain horizons.',
+      subtitle: 'PEDAL ACROSS THE SKY',
+      desc: 'A signature heart-pumping adventure combining cycling with aerial thrill. Pedal specialized suspended bicycles across overhead steel cables high above the tranquil waters of the lagoon.',
       image: '/Activities/Sky Biking.jpg',
-      badgeTag: 'HIGH WIRE',
+      badgeTag: 'SKY BIKE',
       location: 'Lagoon Skyway Crossing',
       elevation: 'Suspended Mid-Air Track',
-      safety: 'Dual Anchor Lock & Attendant Assist',
+      safety: 'Dual Anchor Lock & Guide Support',
       capacity: '1 to 2 Tandem Riders'
     },
     {
@@ -39,13 +43,13 @@ export function ActivitiesFrame({ onNavigate }) {
       number: '03',
       kicker: 'LAGOON WATERS',
       title: 'LAGOON PADDLE BOATS',
-      subtitle: 'SERENE WATERFRONT MOMENTS',
-      desc: 'Glide peacefully across the shimmering park lagoon aboard colorful pedal boats. Surrounded by lotus blooms, weeping willows, and cool tropical breezes, it is the quintessential relaxing water retreat for couples and families.',
+      subtitle: 'SERENE WATERFRONT RETREAT',
+      desc: 'Glide peacefully across the shimmering park lagoon aboard colorful pedal boats. Surrounded by lotus blooms and cool breezes, it is the quintessential relaxing water retreat for couples and families.',
       image: '/Activities/Paddle Boats.jpg',
-      badgeTag: 'LAGOON CRUISE',
+      badgeTag: 'PADDLE BOAT',
       location: 'Central Freshwater Lagoon',
       elevation: 'Water Level Cruise',
-      safety: 'Life Vests & On-Dock Lifeguards',
+      safety: 'Life Vests & On-Dock Attendants',
       capacity: 'Up to 4 Guests per Boat'
     },
     {
@@ -54,9 +58,9 @@ export function ActivitiesFrame({ onNavigate }) {
       kicker: 'EQUESTRIAN TRAILS',
       title: 'SCENIC HORSE RIDING',
       subtitle: 'JOURNEY THROUGH NATURE PATHS',
-      desc: 'Embark on a guided horseback tour through gentle shaded trails, coconut groves, and open green pastures. Accompanied by experienced animal caretakers, this gentle trek lets you connect deeply with nature.',
+      desc: 'Embark on a guided horseback tour through gentle shaded trails, coconut groves, and open green pastures. Accompanied by experienced animal caretakers, connect deeply with nature.',
       image: '/Activities/Horse Riding.jpg',
-      badgeTag: 'EQUESTRIAN',
+      badgeTag: 'HORSE RIDE',
       location: 'Meadow Trail Head',
       elevation: 'Ground Trail Trek',
       safety: 'Guided by Trained Caretakers',
@@ -65,12 +69,12 @@ export function ActivitiesFrame({ onNavigate }) {
     {
       id: 'playground',
       number: '05',
-      kicker: 'FAMILY & RECREATION',
+      kicker: 'FAMILY RECREATION',
       title: 'PARK PLAYGROUND',
-      subtitle: 'LAUGHTER & OPEN-AIR PLAY',
-      desc: 'A vibrant open-air lawn playground equipped with swings, slides, climbing sets, and soft grassy lawns where children can run freely in a safe, nature-enclosed environment while parents relax nearby under shaded gazebos.',
+      subtitle: 'OUTDOOR LAUGHTER & PLAY',
+      desc: 'A vibrant open-air lawn playground equipped with swings, slides, climbing sets, and soft grassy lawns where children can run freely in a safe, nature-enclosed environment.',
       image: '/Activities/Playground.jpg',
-      badgeTag: 'FAMILY FUN',
+      badgeTag: 'PLAYGROUND',
       location: 'Central Recreation Green',
       elevation: 'Park Grounds',
       safety: 'Kid-Friendly Soft Turf Area',
@@ -82,9 +86,9 @@ export function ActivitiesFrame({ onNavigate }) {
       kicker: 'AQUATIC REFRESHMENT',
       title: 'KIDDY SPLASH POOL',
       subtitle: 'COOL TROPICAL SPLASH',
-      desc: 'A dedicated shallow splash wading pool designed for young adventurers. Featuring crystal-clear treated waters, gentle water showers, and perimeter shaded seating, providing refreshing relief on warm tropical afternoons.',
+      desc: 'A dedicated shallow splash wading pool designed for young adventurers. Featuring crystal-clear treated waters, gentle water showers, and perimeter shaded seating for warm afternoons.',
       image: '/Activities/Kiddy Pool.jpg',
-      badgeTag: 'SPLASH POOL',
+      badgeTag: 'KIDDY POOL',
       location: 'Poolside Pavilion Area',
       elevation: 'Ground Level Pool',
       safety: 'Shallow Depth & Pool Attendant',
@@ -92,40 +96,92 @@ export function ActivitiesFrame({ onNavigate }) {
     }
   ];
 
-  // Track active chapter on scroll
-  useEffect(() => {
-    const handleScroll = () => {
-      const storyCards = document.querySelectorAll('.storyboard-block');
-      storyCards.forEach((card, index) => {
-        const rect = card.getBoundingClientRect();
-        if (rect.top <= window.innerHeight * 0.5 && rect.bottom >= window.innerHeight * 0.2) {
-          setActiveChapterIndex(index + 1);
-        }
-      });
-    };
+  // Scroll listener for sticky horizontal progression
+  const handleScroll = useCallback(() => {
+    if (!containerRef.current) return;
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+    const container = containerRef.current;
+    const rect = container.getBoundingClientRect();
+    const totalScrollable = container.scrollHeight - window.innerHeight;
+
+    if (totalScrollable > 0) {
+      // Calculate scroll progress from 0 (top) to 1 (end)
+      const currentScroll = -rect.top;
+      const progress = Math.min(1, Math.max(0, currentScroll / totalScrollable));
+      setScrollProgress(progress);
+
+      // Active Chapter calculation (1 to 6)
+      if (progress < 0.15) {
+        setActiveChapterIndex(1);
+      } else {
+        const horizProgress = (progress - 0.15) / 0.85;
+        const chapter = Math.min(6, Math.max(1, Math.floor(horizProgress * 6) + 1));
+        setActiveChapterIndex(chapter);
+      }
+    }
   }, []);
 
-  const scrollToActivity = (index) => {
-    const el = document.getElementById(`activity-story-${index}`);
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
+  useEffect(() => {
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('resize', handleScroll);
+    handleScroll();
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', handleScroll);
+    };
+  }, [handleScroll]);
+
+  // Jump to specific chapter
+  const jumpToChapter = (chapIdx) => {
+    if (!containerRef.current) return;
+    const container = containerRef.current;
+    const totalScrollable = container.scrollHeight - window.innerHeight;
+    const targetProgress = chapIdx === 0 ? 0 : 0.15 + ((chapIdx - 1) / 5) * 0.85;
+    const containerTop = container.offsetTop;
+    
+    window.scrollTo({
+      top: containerTop + targetProgress * totalScrollable,
+      behavior: 'smooth'
+    });
   };
 
+  // Phase Calculations for the 2-Stage Cinematic Animation
+  // Phase 1: 0 -> 0.18 (Arch Expansion / Morph Zoom)
+  const zoomProgress = Math.min(1, Math.max(0, scrollProgress / 0.16));
+  
+  // Phase 2: 0.16 -> 1.0 (Smooth Horizontal Storyboard Pan)
+  const horizProgress = Math.min(1, Math.max(0, (scrollProgress - 0.14) / 0.86));
+
+  // Compute horizontal translation
+  // Total horizontal track width is ~5000px, screen width is window.innerWidth
+  const totalHorizontalTravel = typeof window !== 'undefined' ? Math.max(1600, window.innerWidth * 3.6) : 3600;
+  const translateX = horizProgress * totalHorizontalTravel;
+
   return (
-    <div className="frame-view-wrapper activities-cinematic-page">
+    <div className="activities-cinematic-wrapper" ref={containerRef}>
       
-      {/* =========================================================================
-          1. TRIPTYCH ARCHWAY HERO (Based on Video Hero Header & 3 Arches)
-          ========================================================================= */}
-      <section className="triptych-hero-section">
-        <div className="triptych-hero-container">
-          
-          {/* Top Classical Header Frame */}
-          <div className="triptych-top-header">
+      {/* Pinned 100vh Viewport Stage */}
+      <div className="cinematic-sticky-stage">
+        
+        {/* =========================================================================
+            STAGE 1: TRIPTYCH ARCHWAY HERO (Morphs & Zooms on Initial Scroll)
+            ========================================================================= */}
+        <div 
+          className="cinematic-triptych-layer"
+          style={{
+            opacity: Math.max(0, 1 - (scrollProgress / 0.20)),
+            pointerEvents: scrollProgress > 0.18 ? 'none' : 'auto'
+          }}
+        >
+          {/* Top Classical Header Lockup */}
+          <div 
+            className="triptych-top-header"
+            style={{
+              opacity: Math.max(0, 1 - zoomProgress * 1.8),
+              transform: `translateY(${-zoomProgress * 50}px)`
+            }}
+          >
             <div className="triptych-header-flank">
               <span className="flank-line"></span>
               <span className="flank-text">ECO-PARK EXPERIENCES</span>
@@ -146,22 +202,20 @@ export function ActivitiesFrame({ onNavigate }) {
             </div>
           </div>
 
-          {/* 3 Arched Panoramic Portals (Triptych Layout) */}
+          {/* 3 Arches Triptych Stage with Zoom & Morph */}
           <div className="triptych-arches-stage">
             
-            {/* Left Arch Portal */}
+            {/* Left Arch Portal (Recedes and slides left) */}
             <div 
               className="triptych-arch-card arch-left"
-              onClick={() => scrollToActivity(1)}
-              role="button"
-              tabIndex={0}
+              style={{
+                transform: `translateX(${-zoomProgress * 240}px) scale(${1 - zoomProgress * 0.3})`,
+                opacity: Math.max(0, 1 - zoomProgress * 1.5)
+              }}
+              onClick={() => jumpToChapter(2)}
             >
               <div className="arch-frame-inner">
-                <img 
-                  src="/Activities/Sky Biking.jpg" 
-                  alt="Sky Biking at Qetsiyah" 
-                  className="arch-img" 
-                />
+                <img src="/Activities/Sky Biking.jpg" alt="Sky Biking" className="arch-img" />
                 <div className="arch-overlay-scrim"></div>
                 <div className="arch-floating-label">
                   <span>HIGH-WIRE SKY BIKING</span>
@@ -169,41 +223,51 @@ export function ActivitiesFrame({ onNavigate }) {
               </div>
             </div>
 
-            {/* Center Grand Dominant Arch */}
+            {/* Center Grand Arch (Zooms in and expands into the wide panorama) */}
             <div 
               className="triptych-arch-card arch-center"
-              onClick={() => scrollToActivity(0)}
-              role="button"
-              tabIndex={0}
+              style={{
+                transform: `scale(${1 + zoomProgress * 1.5}) translateY(${zoomProgress * 30}px)`,
+                borderRadius: `${Math.max(0, (1 - zoomProgress) * 260)}px ${Math.max(0, (1 - zoomProgress) * 260)}px 4px 4px`
+              }}
+              onClick={() => jumpToChapter(1)}
             >
-              <div className="arch-frame-inner grand-arch">
-                <img 
-                  src="/Activities/Zip Lining.jpg" 
-                  alt="Canopy Zip Lining at Qetsiyah" 
-                  className="arch-img" 
-                />
-                <div className="arch-overlay-scrim center-scrim"></div>
-                <div className="arch-center-caption">
+              <div 
+                className="arch-frame-inner grand-arch"
+                style={{
+                  borderRadius: `${Math.max(0, (1 - zoomProgress) * 260)}px ${Math.max(0, (1 - zoomProgress) * 260)}px 4px 4px`
+                }}
+              >
+                <img src="/Activities/Zip Lining.jpg" alt="Canopy Zip Lining" className="arch-img" />
+                <div 
+                  className="arch-overlay-scrim center-scrim"
+                  style={{ opacity: Math.max(0, 1 - zoomProgress * 2) }}
+                ></div>
+                <div 
+                  className="arch-center-caption"
+                  style={{
+                    opacity: Math.max(0, 1 - zoomProgress * 2),
+                    transform: `translateY(${zoomProgress * 30}px)`
+                  }}
+                >
                   <span className="arch-kicker">FEATURED ADVENTURE</span>
                   <h3>CANOPY ZIP LINING</h3>
-                  <p>Soar 360° Across Emerald Tree-Tops</p>
+                  <p>Scroll to Explore The Journey</p>
                 </div>
               </div>
             </div>
 
-            {/* Right Arch Portal */}
+            {/* Right Arch Portal (Recedes and slides right) */}
             <div 
               className="triptych-arch-card arch-right"
-              onClick={() => scrollToActivity(2)}
-              role="button"
-              tabIndex={0}
+              style={{
+                transform: `translateX(${zoomProgress * 240}px) scale(${1 - zoomProgress * 0.3})`,
+                opacity: Math.max(0, 1 - zoomProgress * 1.5)
+              }}
+              onClick={() => jumpToChapter(3)}
             >
               <div className="arch-frame-inner">
-                <img 
-                  src="/Activities/Paddle Boats.jpg" 
-                  alt="Lagoon Paddle Boats" 
-                  className="arch-img" 
-                />
+                <img src="/Activities/Paddle Boats.jpg" alt="Lagoon Paddle Boats" className="arch-img" />
                 <div className="arch-overlay-scrim"></div>
                 <div className="arch-floating-label">
                   <span>LAGOON PADDLE BOATS</span>
@@ -211,171 +275,171 @@ export function ActivitiesFrame({ onNavigate }) {
               </div>
             </div>
 
-            {/* Flowing Script Accent Typography across the base */}
-            <div className="triptych-script-overlay">
+            {/* Flowing Script Accent Typography across base */}
+            <div 
+              className="triptych-script-overlay"
+              style={{
+                transform: `translateX(${-zoomProgress * 320}px)`,
+                opacity: Math.max(0, 1 - zoomProgress * 1.2)
+              }}
+            >
               <span className="script-accent-text">Power Your Adventure in Nature</span>
             </div>
           </div>
 
         </div>
-      </section>
 
-      {/* =========================================================================
-          2. STAGGERED EDITORIAL STORYBOARD GALLERY (Scroll Flow from Video)
-          ========================================================================= */}
-      <section className="editorial-storyboard-section">
-        <div className="storyboard-container">
+        {/* =========================================================================
+            STAGE 2: HORIZONTAL EDITORIAL STORYBOARD TRACK (Glides on Scroll)
+            ========================================================================= */}
+        <div 
+          className="cinematic-horizontal-layer"
+          style={{
+            opacity: Math.min(1, Math.max(0, (scrollProgress - 0.08) / 0.10)),
+            pointerEvents: scrollProgress < 0.10 ? 'none' : 'auto'
+          }}
+        >
+          {/* Subtle Parallax Textured Backdrop */}
+          <div className="horizontal-marbled-backdrop"></div>
 
-          {/* Block 1: Zip Lining (Wide Left Photo + Right Story Card) */}
-          <div className="storyboard-block block-layout-split" id="activity-story-0">
-            <div className="storyboard-photo-col">
-              <div className="framed-photo-card large-card">
-                <img src="/Activities/Zip Lining.jpg" alt="Canopy Zip Lining" className="framed-photo-img" />
+          {/* Horizontally Translating Gallery Track */}
+          <div 
+            className="horizontal-storyboard-track"
+            ref={horizontalTrackRef}
+            style={{
+              transform: `translate3d(${-translateX}px, 0, 0)`
+            }}
+          >
+
+            {/* Scene 1: Canopy Zip Lining (Grand Entry Pane) */}
+            <div className="storyboard-scene-pane scene-zipline">
+              <div className="scene-framed-photo wide-hero-photo">
+                <img src="/Activities/Zip Lining.jpg" alt="Canopy Zip Lining" className="pane-img" />
                 <button 
-                  className="framed-photo-plus-badge" 
+                  className="scene-photo-plus-badge" 
                   onClick={() => setSelectedActivity(activities[0])}
-                  aria-label="View Canopy Zip Lining details"
+                  aria-label="View Zip Line details"
                 >
                   <span className="plus-badge-tag">ZIP LINE</span>
                   <span className="plus-badge-icon">+</span>
                 </button>
               </div>
-            </div>
 
-            <div className="storyboard-text-col">
-              <div className="framed-story-card">
-                <div className="framed-story-header">
-                  <span className="story-card-number">01</span>
-                  <h3 className="story-card-title">CANOPY ZIP LINING</h3>
+              <div className="scene-framed-card">
+                <div className="framed-card-header">
+                  <span className="card-number">01</span>
+                  <h3 className="card-title">CANOPY ZIP LINING</h3>
                 </div>
-                <p className="story-card-body">
-                  Feel the rush of flying across high-elevation cables with breathtaking panoramic views of Tacurong's lush landscapes, botanical gardens, and tropical tree-tops.
+                <p className="card-body">
+                  Feel the exhilarating rush of flying high above emerald canopies. Experience 360-degree panoramic vistas across Tacurong’s lush landscapes and vibrant gardens.
                 </p>
-                <div className="story-card-specs">
-                  <div className="spec-row">
-                    <span className="spec-name">Track:</span>
-                    <span className="spec-detail">High Canopy Cable Flight</span>
+                <div className="card-specs">
+                  <div className="spec-item">
+                    <strong>Flight Track:</strong>
+                    <span>High Canopy Cable Run</span>
                   </div>
-                  <div className="spec-row">
-                    <span className="spec-name">Safety:</span>
-                    <span className="spec-detail">Full Harness & Helmet Included</span>
-                  </div>
-                </div>
-                <button 
-                  className="story-card-cta"
-                  onClick={() => setSelectedActivity(activities[0])}
-                >
-                  <span>EXPLORE EXPERIENCE</span>
-                  <ArrowRight size={14} />
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Block 2: Sky Biking (Right Large Photo + Left Story Card) */}
-          <div className="storyboard-block block-layout-split reverse" id="activity-story-1">
-            <div className="storyboard-text-col">
-              <div className="framed-story-card">
-                <div className="framed-story-header">
-                  <span className="story-card-number">02</span>
-                  <h3 className="story-card-title">HIGH-WIRE SKY BIKING</h3>
-                </div>
-                <p className="story-card-body">
-                  A high-adrenaline signature experience combining cycling with aerial thrill. Pedal suspended bicycles along overhead cables high above the lagoon with 360-degree vistas.
-                </p>
-                <div className="story-card-specs">
-                  <div className="spec-row">
-                    <span className="spec-name">Elevation:</span>
-                    <span className="spec-detail">Overhead Lagoon Crossing</span>
-                  </div>
-                  <div className="spec-row">
-                    <span className="spec-name">Setup:</span>
-                    <span className="spec-detail">Dual Anchor Safety Lock</span>
+                  <div className="spec-item">
+                    <strong>Safety Gear:</strong>
+                    <span>Double-Lock Harness & Helmet</span>
                   </div>
                 </div>
-                <button 
-                  className="story-card-cta"
-                  onClick={() => setSelectedActivity(activities[1])}
-                >
+                <button className="card-explore-btn" onClick={() => setSelectedActivity(activities[0])}>
                   <span>EXPLORE EXPERIENCE</span>
                   <ArrowRight size={14} />
                 </button>
               </div>
             </div>
 
-            <div className="storyboard-photo-col">
-              <div className="framed-photo-card large-card">
-                <img src="/Activities/Sky Biking.jpg" alt="High-Wire Sky Biking" className="framed-photo-img" />
+            {/* Scene 2: High-Wire Sky Biking */}
+            <div className="storyboard-scene-pane scene-skybike">
+              <div className="scene-framed-card">
+                <div className="framed-card-header">
+                  <span className="card-number">02</span>
+                  <h3 className="card-title">HIGH-WIRE SKY BIKING</h3>
+                </div>
+                <p className="card-body">
+                  A high-adrenaline signature experience combining cycling with aerial thrill. Pedal specialized bicycles suspended high above the tranquil waters of the lagoon.
+                </p>
+                <div className="card-specs">
+                  <div className="spec-item">
+                    <strong>Elevation:</strong>
+                    <span>Overhead Cable Crossing</span>
+                  </div>
+                  <div className="spec-item">
+                    <strong>Setup:</strong>
+                    <span>Dual Anchor Safety Rig</span>
+                  </div>
+                </div>
+                <button className="card-explore-btn" onClick={() => setSelectedActivity(activities[1])}>
+                  <span>EXPLORE EXPERIENCE</span>
+                  <ArrowRight size={14} />
+                </button>
+              </div>
+
+              <div className="scene-framed-photo medium-photo offset-down">
+                <img src="/Activities/Sky Biking.jpg" alt="High-Wire Sky Biking" className="pane-img" />
                 <button 
-                  className="framed-photo-plus-badge"
+                  className="scene-photo-plus-badge" 
                   onClick={() => setSelectedActivity(activities[1])}
-                  aria-label="View High-Wire Sky Biking details"
+                  aria-label="View Sky Biking details"
                 >
                   <span className="plus-badge-tag">SKY BIKE</span>
                   <span className="plus-badge-icon">+</span>
                 </button>
               </div>
             </div>
-          </div>
 
-          {/* Block 3 & 4: Paddle Boats & Horse Riding (Staggered Editorial Pair) */}
-          <div className="storyboard-block block-layout-staggered-pair">
-            
-            {/* Paddle Boats Card */}
-            <div className="staggered-item item-left" id="activity-story-2">
-              <div className="framed-photo-card medium-card">
-                <img src="/Activities/Paddle Boats.jpg" alt="Lagoon Paddle Boats" className="framed-photo-img" />
+            {/* Scene 3: Lagoon Paddle Boats */}
+            <div className="storyboard-scene-pane scene-paddle">
+              <div className="scene-framed-photo medium-photo offset-up">
+                <img src="/Activities/Paddle Boats.jpg" alt="Lagoon Paddle Boats" className="pane-img" />
                 <button 
-                  className="framed-photo-plus-badge"
+                  className="scene-photo-plus-badge" 
                   onClick={() => setSelectedActivity(activities[2])}
-                  aria-label="View Lagoon Paddle Boats details"
+                  aria-label="View Paddle Boat details"
                 >
                   <span className="plus-badge-tag">PADDLE BOAT</span>
                   <span className="plus-badge-icon">+</span>
                 </button>
               </div>
-              <div className="framed-story-card compact">
-                <div className="framed-story-header">
-                  <span className="story-card-number">03</span>
-                  <h3 className="story-card-title">LAGOON PADDLE BOATS</h3>
+
+              <div className="scene-framed-card compact">
+                <div className="framed-card-header">
+                  <span className="card-number">03</span>
+                  <h3 className="card-title">LAGOON PADDLE BOATS</h3>
                 </div>
-                <p className="story-card-body">
-                  Glide peacefully across the shimmering park lagoon. A calming, scenic cruise perfect for family bonding, romantic dates, and waterfront photography.
+                <p className="card-body">
+                  Glide peacefully across the shimmering park lagoon. A serene, picturesque cruise perfect for family bonding, romantic dates, and photography.
                 </p>
-                <button 
-                  className="story-card-cta"
-                  onClick={() => setSelectedActivity(activities[2])}
-                >
+                <button className="card-explore-btn" onClick={() => setSelectedActivity(activities[2])}>
                   <span>VIEW DETAILS</span>
                   <ArrowRight size={14} />
                 </button>
               </div>
             </div>
 
-            {/* Horse Riding Card */}
-            <div className="staggered-item item-right" id="activity-story-3">
-              <div className="framed-story-card compact">
-                <div className="framed-story-header">
-                  <span className="story-card-number">04</span>
-                  <h3 className="story-card-title">SCENIC HORSE RIDING</h3>
+            {/* Scene 4: Scenic Horse Riding */}
+            <div className="storyboard-scene-pane scene-horse">
+              <div className="scene-framed-card compact">
+                <div className="framed-card-header">
+                  <span className="card-number">04</span>
+                  <h3 className="card-title">SCENIC HORSE RIDING</h3>
                 </div>
-                <p className="story-card-body">
+                <p className="card-body">
                   Gentle horseback treks through coconut trails, blooming pathways, and open green meadows guided by trained park animal caretakers.
                 </p>
-                <button 
-                  className="story-card-cta"
-                  onClick={() => setSelectedActivity(activities[3])}
-                >
+                <button className="card-explore-btn" onClick={() => setSelectedActivity(activities[3])}>
                   <span>VIEW DETAILS</span>
                   <ArrowRight size={14} />
                 </button>
               </div>
-              <div className="framed-photo-card medium-card">
-                <img src="/Activities/Horse Riding.jpg" alt="Scenic Horse Riding" className="framed-photo-img" />
+
+              <div className="scene-framed-photo medium-photo offset-down">
+                <img src="/Activities/Horse Riding.jpg" alt="Scenic Horse Riding" className="pane-img" />
                 <button 
-                  className="framed-photo-plus-badge"
+                  className="scene-photo-plus-badge" 
                   onClick={() => setSelectedActivity(activities[3])}
-                  aria-label="View Scenic Horse Riding details"
+                  aria-label="View Horse Riding details"
                 >
                   <span className="plus-badge-tag">HORSE RIDE</span>
                   <span className="plus-badge-icon">+</span>
@@ -383,114 +447,129 @@ export function ActivitiesFrame({ onNavigate }) {
               </div>
             </div>
 
-          </div>
-
-          {/* Block 5 & 6: Playground & Kiddy Pool */}
-          <div className="storyboard-block block-layout-staggered-pair second-pair">
-            
-            {/* Playground Card */}
-            <div className="staggered-item item-left" id="activity-story-4">
-              <div className="framed-photo-card medium-card">
-                <img src="/Activities/Playground.jpg" alt="Park Playground" className="framed-photo-img" />
-                <button 
-                  className="framed-photo-plus-badge"
-                  onClick={() => setSelectedActivity(activities[4])}
-                  aria-label="View Playground details"
-                >
-                  <span className="plus-badge-tag">PLAYGROUND</span>
-                  <span className="plus-badge-icon">+</span>
-                </button>
-              </div>
-              <div className="framed-story-card compact">
-                <div className="framed-story-header">
-                  <span className="story-card-number">05</span>
-                  <h3 className="story-card-title">PARK PLAYGROUND</h3>
+            {/* Scene 5: Playground & Kiddy Pool */}
+            <div className="storyboard-scene-pane scene-family-pair">
+              
+              {/* Playground */}
+              <div className="staggered-pair-col">
+                <div className="scene-framed-photo small-photo">
+                  <img src="/Activities/Playground.jpg" alt="Playground" className="pane-img" />
+                  <button 
+                    className="scene-photo-plus-badge" 
+                    onClick={() => setSelectedActivity(activities[4])}
+                    aria-label="View Playground details"
+                  >
+                    <span className="plus-badge-tag">PLAYGROUND</span>
+                    <span className="plus-badge-icon">+</span>
+                  </button>
                 </div>
-                <p className="story-card-body">
-                  An expansive outdoor recreation area where kids can swing, climb, and laugh in the shade of lush tropical trees.
+                <div className="scene-framed-card mini">
+                  <div className="framed-card-header">
+                    <span className="card-number">05</span>
+                    <h3 className="card-title">PARK PLAYGROUND</h3>
+                  </div>
+                  <p className="card-body">
+                    Expansive open-air grass playground equipped with swings, slides, and climbing sets under shaded trees.
+                  </p>
+                </div>
+              </div>
+
+              {/* Kiddy Pool */}
+              <div className="staggered-pair-col offset-down">
+                <div className="scene-framed-card mini">
+                  <div className="framed-card-header">
+                    <span className="card-number">06</span>
+                    <h3 className="card-title">KIDDY SPLASH POOL</h3>
+                  </div>
+                  <p className="card-body">
+                    A refreshing shallow splash pool with clean waters and shaded pavilions for safe family water recreation.
+                  </p>
+                </div>
+                <div className="scene-framed-photo small-photo">
+                  <img src="/Activities/Kiddy Pool.jpg" alt="Kiddy Pool" className="pane-img" />
+                  <button 
+                    className="scene-photo-plus-badge" 
+                    onClick={() => setSelectedActivity(activities[5])}
+                    aria-label="View Kiddy Pool details"
+                  >
+                    <span className="plus-badge-tag">KIDDY POOL</span>
+                    <span className="plus-badge-icon">+</span>
+                  </button>
+                </div>
+              </div>
+
+            </div>
+
+            {/* Scene 6: Grand Finale Sanctuary Showcase */}
+            <div className="storyboard-scene-pane scene-grand-finale">
+              <div className="scene-framed-photo grand-architecture-photo">
+                <img src="/Background Pictures/Background Hero Section II.jpg" alt="Qetsiyah Eco Park Grounds" className="pane-img" />
+              </div>
+
+              <div className="scene-framed-card finale-card">
+                <span className="finale-kicker">WHERE ADVENTURE AWAITS</span>
+                <h3 className="finale-title">THE HEART OF NATURE & HOSPITALITY</h3>
+                <p className="card-body">
+                  Every trail, ride, and corner of Qetsiyah Eco Park is designed to inspire wonder, relaxation, and lasting memories with the people who matter most.
                 </p>
                 <button 
-                  className="story-card-cta"
-                  onClick={() => setSelectedActivity(activities[4])}
+                  className="finale-book-cta"
+                  onClick={() => {
+                    onNavigate('home');
+                    setTimeout(() => {
+                      const el = document.querySelector('#contact');
+                      if (el) el.scrollIntoView({ behavior: 'smooth' });
+                    }, 120);
+                  }}
                 >
-                  <span>VIEW DETAILS</span>
-                  <ArrowRight size={14} />
+                  <span>BOOK YOUR VISIT NOW</span>
+                  <ArrowRight size={16} />
                 </button>
               </div>
             </div>
 
-            {/* Kiddy Pool Card */}
-            <div className="staggered-item item-right" id="activity-story-5">
-              <div className="framed-story-card compact">
-                <div className="framed-story-header">
-                  <span className="story-card-number">06</span>
-                  <h3 className="story-card-title">KIDDY SPLASH POOL</h3>
-                </div>
-                <p className="story-card-body">
-                  A refreshing shallow splash pool with crystal clean waters and shaded pavilions for safe family water recreation.
-                </p>
-                <button 
-                  className="story-card-cta"
-                  onClick={() => setSelectedActivity(activities[5])}
-                >
-                  <span>VIEW DETAILS</span>
-                  <ArrowRight size={14} />
-                </button>
-              </div>
-              <div className="framed-photo-card medium-card">
-                <img src="/Activities/Kiddy Pool.jpg" alt="Kiddy Splash Pool" className="framed-photo-img" />
-                <button 
-                  className="framed-photo-plus-badge"
-                  onClick={() => setSelectedActivity(activities[5])}
-                  aria-label="View Kiddy Splash Pool details"
-                >
-                  <span className="plus-badge-tag">KIDDY POOL</span>
-                  <span className="plus-badge-icon">+</span>
-                </button>
-              </div>
+          </div>
+        </div>
+
+        {/* =========================================================================
+            STAGE 3: FLOATING BOTTOM CHAPTER CONTROLLER (Matching Video Pill)
+            ========================================================================= */}
+        <div className="floating-chapter-dock">
+          <div className="chapter-dock-pill">
+            <button 
+              className="dock-nav-arrow prev" 
+              onClick={() => {
+                const prev = activeChapterIndex > 1 ? activeChapterIndex - 1 : 1;
+                jumpToChapter(prev);
+              }}
+              aria-label="Previous Chapter"
+            >
+              <ChevronLeft size={16} />
+            </button>
+
+            <div className="dock-chapter-info">
+              <span className="dock-label">ACTIVITIES</span>
+              <span className="dock-divider">|</span>
+              <span className="dock-counter">{activeChapterIndex} / 6</span>
             </div>
 
+            <button 
+              className="dock-nav-arrow next" 
+              onClick={() => {
+                const next = activeChapterIndex < 6 ? activeChapterIndex + 1 : 6;
+                jumpToChapter(next);
+              }}
+              aria-label="Next Chapter"
+            >
+              <ChevronRight size={16} />
+            </button>
           </div>
-
         </div>
-      </section>
 
-      {/* =========================================================================
-          3. FLOATING BOTTOM CHAPTER DOCK (Matching Video Bottom Pill)
-          ========================================================================= */}
-      <div className="floating-chapter-dock">
-        <div className="chapter-dock-pill">
-          <button 
-            className="dock-nav-arrow prev" 
-            onClick={() => {
-              const prevIdx = activeChapterIndex > 1 ? activeChapterIndex - 2 : activities.length - 1;
-              scrollToActivity(prevIdx);
-            }}
-            aria-label="Previous Activity"
-          >
-            <ChevronLeft size={16} />
-          </button>
-
-          <div className="dock-chapter-info">
-            <span className="dock-label">ACTIVITIES</span>
-            <span className="dock-counter">{activeChapterIndex} / {activities.length}</span>
-          </div>
-
-          <button 
-            className="dock-nav-arrow next" 
-            onClick={() => {
-              const nextIdx = activeChapterIndex < activities.length ? activeChapterIndex : 0;
-              scrollToActivity(nextIdx);
-            }}
-            aria-label="Next Activity"
-          >
-            <ChevronRight size={16} />
-          </button>
-        </div>
       </div>
 
       {/* =========================================================================
-          4. INTERACTIVE ACTIVITY MODAL / LIGHTBOX (Opened via '+' Badge)
+          STAGE 4: INTERACTIVE LIGHTBOX MODAL (Opened via '+' Badges)
           ========================================================================= */}
       {selectedActivity && (
         <div className="activity-detail-modal-overlay" onClick={() => setSelectedActivity(null)}>
