@@ -4343,875 +4343,178 @@ body::-webkit-scrollbar,
 
 
 
+
 /* ==========================================================================
-   WHAT WE OFFER: 2-STAGE CINEMATIC PINNED SCROLL & HORIZONTAL GALLERY
-   (100% Exact match to animation & layout in What We Offer Design.mp4)
+   WHAT WE OFFER: CLASSICAL ARCHITECTURAL HERO SECTION
+   (Exact 1:1 match to reference design in media_1788000867824.png)
    ========================================================================== */
 
-.activities-cinematic-wrapper {
+.collection-hero-page {
   position: relative;
   width: 100%;
-  height: 520vh; /* Scroll runway driving the 2-stage cinematic transitions */
-  background-color: #232a1e;
-}
-
-.cinematic-sticky-stage {
-  position: sticky;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
+  min-height: 100vh;
+  background-color: #eae3d4;
+  background-image: 
+    radial-gradient(ellipse at 50% 50%, #f3ede2 0%, #eae3d4 100%);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 28px;
   overflow: hidden;
+  box-sizing: border-box;
 }
 
-/* --------------------------------------------------------------------------
-   STAGE 1: TRIPTYCH ARCH HERO LAYER (MORPHS & ZOOMS ON INITIAL SCROLL)
-   -------------------------------------------------------------------------- */
-.cinematic-triptych-layer {
+/* Subtle Marbled Stone Veining Texture */
+.collection-hero-page::before {
+  content: '';
   position: absolute;
   inset: 0;
+  background-image: 
+    radial-gradient(ellipse at 25% 25%, rgba(85, 78, 64, 0.04) 0%, transparent 50%),
+    radial-gradient(ellipse at 75% 75%, rgba(85, 78, 64, 0.04) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 80%, rgba(85, 78, 64, 0.02) 0%, transparent 40%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Top Architectural Double Border Bar */
+.collection-top-border-bar {
   width: 100%;
-  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
   z-index: 10;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  background-color: #2b3121;
-  background-image: radial-gradient(circle at 50% 30%, #3e462f 0%, #171c12 100%);
-  color: #ffffff;
-  padding: 100px 0 40px;
-  will-change: opacity, transform;
+  margin-top: 8px;
 }
 
-.triptych-top-header {
-  width: 100%;
-  max-width: 1440px;
-  margin: 0 auto 30px;
-  padding: 14px clamp(20px, 3.5vw, 44px);
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  align-items: center;
-  gap: 20px;
-  border-top: 1.5px solid rgba(223, 144, 57, 0.4);
-  border-bottom: 1.5px solid rgba(223, 144, 57, 0.4);
-  will-change: opacity, transform;
-}
-
-.triptych-header-flank {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.triptych-header-flank.right {
-  justify-content: flex-end;
-}
-
-.flank-line {
+.border-line-left,
+.border-line-right {
   flex: 1;
-  height: 1px;
-  background: rgba(223, 144, 57, 0.35);
-  max-width: 120px;
-}
-
-.flank-text {
-  font-family: var(--font-sans-ui);
-  font-size: clamp(0.68rem, 0.85vw, 0.78rem);
-  font-weight: 700;
-  letter-spacing: 0.22em;
-  color: #df9039;
-  text-transform: uppercase;
-  white-space: nowrap;
-}
-
-.triptych-header-center {
-  text-align: center;
   display: flex;
   flex-direction: column;
-  align-items: center;
   gap: 3px;
 }
 
-.triptych-main-title {
-  font-family: var(--font-serif-heading);
-  font-size: clamp(2.2rem, 4.2vw, 3.8rem);
-  font-weight: 700;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: #ffffff;
-  line-height: 1;
-  margin: 0;
-}
-
-.triptych-chapter-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  font-family: var(--font-sans-ui);
-  font-size: clamp(0.65rem, 0.75vw, 0.72rem);
-  font-weight: 800;
-  letter-spacing: 0.24em;
-  color: #df9039;
-  text-transform: uppercase;
-  margin-top: 3px;
-}
-
-.chapter-ornament {
-  color: #df9039;
-  font-size: 0.65rem;
-}
-
-/* 3 Arches Triptych Stage */
-.triptych-arches-stage {
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  gap: clamp(16px, 2.5vw, 32px);
-  position: relative;
-  height: clamp(420px, 55vh, 560px);
-  max-width: 1440px;
-  margin: 0 auto;
-  padding: 0 clamp(20px, 3.5vw, 44px) 20px;
+.line-outer {
+  height: 2px;
+  background-color: #4a4539;
   width: 100%;
 }
 
-.triptych-arch-card {
-  height: 100%;
-  cursor: pointer;
-  outline: none;
-  will-change: transform, opacity;
-}
-
-.triptych-arch-card.arch-left,
-.triptych-arch-card.arch-right {
-  width: 28%;
-  height: 82%;
-}
-
-.triptych-arch-card.arch-center {
-  width: 44%;
-  height: 100%;
-  z-index: 2;
-}
-
-.arch-frame-inner {
-  position: relative;
+.line-inner {
+  height: 1px;
+  background-color: #4a4539;
   width: 100%;
-  height: 100%;
-  border-radius: 200px 200px 4px 4px;
-  overflow: hidden;
-  border: 2px solid rgba(223, 144, 57, 0.4);
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.55);
-  transition: border-color 0.3s ease;
 }
 
-.arch-frame-inner.grand-arch {
-  border-radius: 260px 260px 4px 4px;
-  border: 2.5px solid #df9039;
-  box-shadow: 0 25px 65px rgba(0, 0, 0, 0.65), 0 0 35px rgba(223, 144, 57, 0.25);
-}
-
-.arch-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-.arch-overlay-scrim {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, rgba(0, 0, 0, 0.1) 0%, rgba(20, 26, 17, 0.8) 100%);
-  pointer-events: none;
-}
-
-.arch-overlay-scrim.center-scrim {
-  background: linear-gradient(180deg, rgba(0, 0, 0, 0.1) 0%, rgba(20, 26, 17, 0.85) 100%);
-}
-
-.arch-floating-label {
-  position: absolute;
-  bottom: 20px;
-  left: 0;
-  right: 0;
-  text-align: center;
-  padding: 0 16px;
-  pointer-events: none;
-}
-
-.arch-floating-label span {
-  font-family: var(--font-sans-ui);
-  font-size: 0.76rem;
-  font-weight: 800;
-  letter-spacing: 0.18em;
-  color: #ffffff;
-  text-transform: uppercase;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
-}
-
-.arch-center-caption {
-  position: absolute;
-  bottom: 26px;
-  left: 0;
-  right: 0;
-  text-align: center;
-  padding: 0 24px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  pointer-events: none;
-}
-
-.arch-kicker {
-  font-family: var(--font-sans-ui);
-  font-size: 0.70rem;
-  font-weight: 800;
-  letter-spacing: 0.2em;
-  color: #df9039;
-  text-transform: uppercase;
-}
-
-.arch-center-caption h3 {
-  font-family: var(--font-serif-heading);
-  font-size: clamp(1.4rem, 2.2vw, 2.1rem);
-  font-weight: 700;
-  color: #ffffff;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-
-.arch-center-caption p {
-  font-family: var(--font-sans-ui);
-  font-size: 0.90rem;
-  color: #d1d8c4;
-}
-
-/* Script Typography Overlay Across Base of Arches */
-.triptych-script-overlay {
-  position: absolute;
-  bottom: -15px;
-  left: 0;
-  right: 0;
-  text-align: center;
-  pointer-events: none;
-  z-index: 10;
-  will-change: transform, opacity;
-}
-
-.script-accent-text {
-  font-family: 'Great Vibes', 'Playfair Display', cursive, serif;
-  font-size: clamp(3.0rem, 5.8vw, 5.4rem);
-  color: rgba(246, 192, 106, 0.92);
-  text-shadow: 0 4px 24px rgba(0, 0, 0, 0.9);
-  white-space: nowrap;
-}
-
-/* --------------------------------------------------------------------------
-   STAGE 2: HORIZONTAL EDITORIAL STORYBOARD LAYER (SMOOTH HORIZONTAL PAN)
-   -------------------------------------------------------------------------- */
-.cinematic-horizontal-layer {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 5;
-  background-color: #faf7f0;
+/* Top Center 3-Compartment Emblem Badge */
+.collection-center-emblem-badge {
   display: flex;
   align-items: center;
-  overflow: hidden;
-  will-change: opacity;
-}
-
-/* Subtle Marbled Warm Background with Fine Veins */
-.horizontal-marbled-backdrop {
-  position: absolute;
-  inset: 0;
-  background-color: #f7f4ec;
-  background-image: 
-    radial-gradient(ellipse at 30% 40%, rgba(223, 144, 57, 0.04) 0%, transparent 60%),
-    radial-gradient(ellipse at 70% 60%, rgba(56, 62, 36, 0.04) 0%, transparent 60%);
-  pointer-events: none;
-}
-
-.horizontal-storyboard-track {
-  display: flex;
-  align-items: center;
-  gap: clamp(70px, 8vw, 130px);
-  height: 100%;
-  padding: 0 clamp(60px, 8vw, 120px);
-  will-change: transform;
-}
-
-.storyboard-scene-pane {
-  display: flex;
-  align-items: center;
-  gap: clamp(40px, 5vw, 70px);
+  border: 1.5px solid #4a4539;
+  background: #e2dbce;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
   flex-shrink: 0;
 }
 
-/* Framed Photo Cards */
-.scene-framed-photo {
-  position: relative;
-  background: #ffffff;
-  border: 2px solid #232a1e;
-  border-radius: 4px;
-  padding: 8px;
-  box-shadow: 0 20px 48px rgba(35, 42, 30, 0.14);
-  overflow: hidden;
-  flex-shrink: 0;
-  transition: transform 0.35s ease, box-shadow 0.35s ease;
-}
-
-.scene-framed-photo:hover {
-  transform: translateY(-4px) scale(1.01);
-  box-shadow: 0 26px 58px rgba(35, 42, 30, 0.20);
-}
-
-.wide-hero-photo {
-  width: clamp(500px, 44vw, 680px);
-  aspect-ratio: 16 / 10;
-}
-
-.medium-photo {
-  width: clamp(380px, 32vw, 480px);
-  aspect-ratio: 4 / 3;
-}
-
-.small-photo {
-  width: clamp(300px, 24vw, 360px);
-  aspect-ratio: 4 / 3;
-}
-
-.grand-architecture-photo {
-  width: clamp(540px, 46vw, 720px);
-  aspect-ratio: 16 / 10;
-}
-
-.offset-down {
-  transform: translateY(48px);
-}
-
-.offset-up {
-  transform: translateY(-48px);
-}
-
-.pane-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-  border-radius: 2px;
-}
-
-/* Circular Action '+' Badge on Photo Cards */
-.scene-photo-plus-badge {
-  position: absolute;
-  bottom: 20px;
-  right: 20px;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 18px;
-  border-radius: 9999px;
-  background: #df9039;
-  color: #ffffff;
-  border: 2px solid #ffffff;
-  box-shadow: 0 8px 24px rgba(223, 144, 57, 0.55);
-  cursor: pointer;
-  transition: all 0.24s cubic-bezier(0.16, 1, 0.3, 1);
-  outline: none;
-}
-
-.scene-photo-plus-badge:hover {
-  background: #b45309;
-  transform: scale(1.08);
-  box-shadow: 0 12px 30px rgba(180, 83, 9, 0.65);
-}
-
-/* Framed Editorial Story Callout Card */
-.scene-framed-card {
-  width: clamp(360px, 30vw, 440px);
-  background: #ffffff;
-  border: 1.5px solid #232a1e;
-  border-radius: 4px;
-  padding: 38px 36px;
-  box-shadow: 0 14px 35px rgba(35, 42, 30, 0.08);
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  flex-shrink: 0;
-}
-
-.scene-framed-card.compact {
-  padding: 32px 30px;
-}
-
-.scene-framed-card.mini {
-  width: clamp(300px, 24vw, 360px);
-  padding: 26px 24px;
-}
-
-.framed-card-header {
-  display: flex;
-  align-items: baseline;
-  gap: 12px;
-  border-bottom: 1.5px solid #232a1e;
-  padding-bottom: 12px;
-}
-
-.card-number {
-  font-family: var(--font-sans-ui);
-  font-size: 0.85rem;
-  font-weight: 800;
-  letter-spacing: 0.14em;
-  color: #df9039;
-}
-
-.card-title {
-  font-family: var(--font-serif-heading);
-  font-size: clamp(1.35rem, 1.9vw, 1.8rem);
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: #1f2421;
-  margin: 0;
-}
-
-.card-body {
-  font-family: var(--font-sans-ui);
-  font-size: 0.96rem;
-  line-height: 1.62;
-  color: #4a544d;
-  margin: 0;
-}
-
-.card-specs {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: 12px 0;
-  border-top: 1px dashed rgba(35, 42, 30, 0.2);
-  border-bottom: 1px dashed rgba(35, 42, 30, 0.2);
-}
-
-.spec-item {
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
-  font-family: var(--font-sans-ui);
-  font-size: 0.88rem;
-}
-
-.spec-item strong {
-  font-weight: 700;
-  color: #1f2421;
-  min-width: 80px;
-}
-
-.spec-item span {
-  color: #555e56;
-}
-
-.card-explore-btn {
-  align-self: flex-start;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 11px 22px;
-  background-color: #232a1e;
-  color: #ffffff;
-  font-family: var(--font-sans-ui);
-  font-size: 0.72rem;
-  font-weight: 800;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  border: none;
-  border-radius: 2px;
-  cursor: pointer;
-  transition: all 0.22s ease;
-  margin-top: 4px;
-}
-
-.card-explore-btn:hover {
-  background-color: #df9039;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 18px rgba(223, 144, 57, 0.35);
-}
-
-/* Staggered Pair Column Layout */
-.staggered-pair-col {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-}
-
-/* Finale Card */
-.scene-framed-card.finale-card {
-  width: clamp(380px, 32vw, 480px);
-  padding: 42px 38px;
-}
-
-.finale-kicker {
-  font-family: var(--font-sans-ui);
-  font-size: 0.75rem;
-  font-weight: 800;
-  letter-spacing: 0.2em;
-  color: #df9039;
-  text-transform: uppercase;
-}
-
-.finale-title {
-  font-family: var(--font-serif-heading);
-  font-size: clamp(1.5rem, 2.2vw, 2.0rem);
-  font-weight: 700;
-  color: #1f2421;
-  line-height: 1.2;
-}
-
-.finale-book-cta {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  padding: 14px 28px;
-  background-color: #df9039;
-  color: #ffffff;
-  font-family: var(--font-sans-ui);
-  font-size: 0.76rem;
-  font-weight: 800;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  border: none;
-  border-radius: 2px;
-  cursor: pointer;
-  transition: all 0.22s ease;
-  margin-top: 8px;
-}
-
-.finale-book-cta:hover {
-  background-color: #b45309;
-  transform: translateY(-2px);
-  box-shadow: 0 8px 22px rgba(223, 144, 57, 0.45);
-}
-
-/* --------------------------------------------------------------------------
-   STAGE 3: FLOATING BOTTOM CHAPTER DOCK (MATCHING VIDEO BOTTOM PILL)
-   -------------------------------------------------------------------------- */
-.floating-chapter-dock {
-  position: absolute;
-  bottom: 26px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 100;
-  pointer-events: auto;
-}
-
-.chapter-dock-pill {
-  background: #ffffff;
-  border: 1.5px solid #232a1e;
-  border-radius: 9999px;
-  padding: 8px 18px;
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.22);
-}
-
-.dock-nav-arrow {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  border: 1px solid rgba(35, 42, 30, 0.2);
-  background: transparent;
-  color: #1f2421;
+.badge-cell {
+  width: 54px;
+  height: 54px;
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
-  transition: all 0.2s ease;
+  border-right: 1.5px solid #4a4539;
+  padding: 6px;
+  box-sizing: border-box;
 }
 
-.dock-nav-arrow:hover {
-  background: #df9039;
-  border-color: #df9039;
-  color: #ffffff;
+.badge-cell:last-child {
+  border-right: none;
 }
 
-.dock-chapter-info {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.dock-label {
-  font-family: var(--font-sans-ui);
-  font-size: 0.70rem;
-  font-weight: 800;
-  letter-spacing: 0.16em;
-  color: #1f2421;
-  text-transform: uppercase;
-}
-
-.dock-divider {
-  color: #c8823b;
-  font-size: 0.75rem;
-}
-
-.dock-counter {
-  font-family: var(--font-sans-ui);
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  color: #df9039;
-  background: #faf7f0;
-  padding: 2px 8px;
-  border-radius: 9999px;
-  border: 1px solid rgba(223, 144, 57, 0.3);
-}
-
-/* --------------------------------------------------------------------------
-   STAGE 4: INTERACTIVE LIGHTBOX MODAL (OPENED VIA '+' BADGE)
-   -------------------------------------------------------------------------- */
-.activity-detail-modal-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 9999999;
-  background: rgba(9, 13, 11, 0.82);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
-  animation: fadeInModal 0.22s ease forwards;
-}
-
-.activity-detail-modal-card {
-  position: relative;
-  width: 100%;
-  max-width: 860px;
-  max-height: 90vh;
-  overflow-y: auto;
-  background: #ffffff;
-  border: 2px solid #232a1e;
-  border-radius: 8px;
-  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
-  animation: scaleUpCard 0.26s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-.modal-close-button {
-  position: absolute;
-  top: 14px;
-  right: 14px;
-  z-index: 10;
+.seal-svg,
+.shield-svg {
   width: 36px;
   height: 36px;
-  border-radius: 50%;
-  background: #ffffff;
-  border: 1px solid #232a1e;
-  color: #1f2421;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.modal-close-button:hover {
-  background: #df9039;
-  color: #ffffff;
-  border-color: #df9039;
-  transform: rotate(90deg);
-}
-
-.modal-content-grid {
-  display: grid;
-  grid-template-columns: 1fr 1.15fr;
-}
-
-.modal-photo-pane {
-  position: relative;
-  height: 100%;
-  min-height: 360px;
-  background: #111713;
-}
-
-.modal-photo-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
   display: block;
 }
 
-.modal-photo-badge {
-  position: absolute;
-  top: 16px;
-  left: 16px;
-  padding: 6px 14px;
-  background: rgba(9, 13, 11, 0.75);
-  backdrop-filter: blur(6px);
-  border: 1px solid rgba(223, 144, 57, 0.5);
-  border-radius: 9999px;
-  color: #df9039;
-  font-family: var(--font-sans-ui);
-  font-size: 0.65rem;
-  font-weight: 800;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-}
-
-.modal-details-pane {
-  padding: 36px 32px;
+.menu-bars-icon {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 4px;
+  width: 18px;
 }
 
-.modal-kicker {
-  font-family: var(--font-sans-ui);
-  font-size: 0.72rem;
-  font-weight: 800;
-  letter-spacing: 0.18em;
-  color: #df9039;
-  text-transform: uppercase;
+.menu-bars-icon .bar {
+  height: 2px;
+  width: 100%;
+  background-color: #4a4539;
+  border-radius: 1px;
 }
 
-.modal-title {
-  font-family: var(--font-serif-heading);
-  font-size: clamp(1.6rem, 2.2vw, 2.1rem);
-  font-weight: 700;
-  color: #1f2421;
-  line-height: 1.15;
-}
-
-.modal-subtitle {
-  font-family: var(--font-sans-ui);
-  font-size: 0.90rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: #232a1e;
-}
-
-.modal-desc {
-  font-family: var(--font-sans-ui);
-  font-size: 0.95rem;
-  line-height: 1.6;
-  color: #4a544d;
-}
-
-.modal-specs-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  padding: 14px 0;
-  border-top: 1px solid #eae3d5;
-  border-bottom: 1px solid #eae3d5;
-  margin-top: 4px;
-}
-
-.modal-spec-cell {
+/* Main Center Display Typography */
+.collection-hero-content {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 2px;
-}
-
-.cell-label {
-  font-family: var(--font-sans-ui);
-  font-size: 0.68rem;
-  font-weight: 800;
-  letter-spacing: 0.12em;
-  color: #7b8577;
-  text-transform: uppercase;
-}
-
-.cell-value {
-  font-family: var(--font-sans-ui);
-  font-size: 0.88rem;
-  font-weight: 600;
-  color: #1f2421;
-}
-
-.modal-action-footer {
-  margin-top: 8px;
-}
-
-.modal-book-cta {
-  display: inline-flex;
   align-items: center;
-  gap: 10px;
-  padding: 14px 28px;
-  background-color: #df9039;
-  color: #ffffff;
-  font-family: var(--font-sans-ui);
-  font-size: 0.76rem;
+  justify-content: center;
+  text-align: center;
+  position: relative;
+  z-index: 5;
+  padding: 40px 20px;
+  width: 100%;
+}
+
+.collection-hero-title {
+  font-family: 'Oswald', 'Cinzel', 'Playfair Display', sans-serif;
   font-weight: 800;
-  letter-spacing: 0.14em;
+  color: #4a4539;
+  line-height: 1.06;
   text-transform: uppercase;
-  border: none;
-  border-radius: 2px;
-  cursor: pointer;
-  transition: all 0.22s ease;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-.modal-book-cta:hover {
-  background-color: #b45309;
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(223, 144, 57, 0.4);
+.title-line-top {
+  display: block;
+  font-size: clamp(3.0rem, 6.8vw, 6.2rem);
+  letter-spacing: 0.08em;
 }
 
-/* RESPONSIVE DESIGN */
-@media (max-width: 991px) {
-  .activities-cinematic-wrapper {
-    height: auto;
+.title-line-bottom {
+  display: block;
+  font-size: clamp(2.8rem, 6.2vw, 5.6rem);
+  letter-spacing: 0.04em;
+}
+
+/* Bottom Architectural Double Border Bar */
+.collection-bottom-border-bar {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  position: relative;
+  z-index: 10;
+  margin-bottom: 8px;
+}
+
+@media (max-width: 768px) {
+  .collection-hero-page {
+    padding: 12px 16px;
   }
-  .cinematic-sticky-stage {
-    position: relative;
-    height: auto;
-    overflow: visible;
+  .badge-cell {
+    width: 44px;
+    height: 44px;
   }
-  .cinematic-triptych-layer {
-    position: relative;
-    height: auto;
-    min-height: 80vh;
-  }
-  .cinematic-horizontal-layer {
-    position: relative;
-    height: auto;
-    overflow-x: auto;
-    padding: 60px 0;
-  }
-  .horizontal-storyboard-track {
-    flex-direction: column;
-    width: 100%;
-    padding: 0 20px;
-    gap: 50px;
-    transform: none !important;
-  }
-  .storyboard-scene-pane {
-    flex-direction: column;
-    width: 100%;
-    gap: 24px;
-  }
-  .wide-hero-photo,
-  .medium-photo,
-  .small-photo,
-  .grand-architecture-photo,
-  .scene-framed-card,
-  .scene-framed-card.compact,
-  .scene-framed-card.mini,
-  .scene-framed-card.finale-card {
-    width: 100%;
-    transform: none;
-  }
-  .floating-chapter-dock {
-    display: none;
-  }
-  .modal-content-grid {
-    grid-template-columns: 1fr;
-  }
-  .modal-photo-pane {
-    min-height: 220px;
+  .seal-svg,
+  .shield-svg {
+    width: 28px;
+    height: 28px;
   }
 }
