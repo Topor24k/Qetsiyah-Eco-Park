@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { HeroCarousel } from '../HeroCarousel';
+import { CategoryOpeningHero } from '../CategoryOpeningHero';
 import { foodMenuCatalog } from '../../data/foodMenuCatalog';
 import { X } from 'lucide-react';
 
@@ -53,80 +53,56 @@ export function FoodOffersFrame({ onNavigate }) {
     }
   }
 
-  const carouselItems = [
-    { 
-      id: 1, 
-      label: 'BEEF MEALS', 
-      image: '/Food Menu/Beef Meals.jpg' 
-    },
-    { 
-      id: 2, 
-      label: 'CHICKEN MEALS', 
-      image: '/Food Menu/Chicken Meals.jpg' 
-    },
-    { 
-      id: 3, 
-      label: 'COMBO MEALS', 
-      image: '/Food Menu/Combo Meals.jpg' 
-    },
-    { 
-      id: 4, 
-      label: 'SIZZLING & GRILL', 
-      image: '/Food Menu/Sizzling and Grill Meals.jpg' 
-    },
-    { 
-      id: 5, 
-      label: 'SOUP MEALS', 
-      image: '/Food Menu/Soup Meals.jpg' 
-    },
-    { 
-      id: 6, 
-      label: 'PASTA & NOODLES', 
-      image: '/Food Menu/Pasta and Noodles Meals.jpg' 
-    },
-    { 
-      id: 7, 
-      label: 'SHORT ORDERS', 
-      image: '/Food Menu/Short Orders.jpg' 
-    },
-    { 
-      id: 8, 
-      label: 'SNACKS & BURGERS', 
-      image: '/Food Menu/Snacks Meals.jpg' 
-    },
-    { 
-      id: 9, 
-      label: 'DRINKS & BEVERAGES', 
-      image: '/Food Menu/Drinks.jpg' 
-    }
-  ];
-
-  const renderRow = (item, itemId) => {
-    const isOpen = openItemId === itemId;
+  // Row Renderer with anchored floating card directly below underline
+  const renderRow = (item, uniqueId) => {
+    const isOpen = openItemId === uniqueId;
 
     return (
       <div 
-        key={itemId}
-        className={`menu-single-item-row ${isOpen ? 'is-active-row' : ''}`}
-        onClick={(e) => handleToggleItem(e, itemId)}
-        onKeyDown={(e) => handleKeyDownRow(e, itemId)}
+        key={uniqueId}
+        className={`menu-single-item-row ${isOpen ? 'active-preview-row' : ''}`}
+        onClick={(e) => handleToggleItem(e, uniqueId)}
+        onKeyDown={(e) => handleKeyDownRow(e, uniqueId)}
         role="button"
         tabIndex={0}
         aria-expanded={isOpen}
-        aria-label={`Toggle image for ${item.name}`}
       >
-        <span className="item-name-text">{item.name}</span>
-        <span className="item-price-text">{item.price}</span>
+        <div className="item-name-col">
+          <span className="item-name-text">{item.name}</span>
+        </div>
 
-        {/* Desktop Overlapping Floating Image (~240px wide, anchored right) */}
+        <div className="item-dots-leader"></div>
+
+        <div className="item-price-col">
+          <span className="item-price-text">{item.price}</span>
+        </div>
+
+        {/* Anchored Floating Food Photo Dropdown */}
         {isOpen && (
-          <div className="desktop-menu-float-card" onClick={(e) => e.stopPropagation()}>
-            <img 
-              src={item.image} 
-              alt={item.name} 
-              className="menu-float-img" 
-              loading="eager"
-            />
+          <div 
+            className="item-anchored-card" 
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="anchored-card-img-wrap">
+              <img 
+                src={item.image} 
+                alt={item.name} 
+                className="anchored-card-img" 
+                loading="lazy"
+              />
+              <div className="anchored-card-badge">
+                <span>AUTHENTIC PARK CUISINE</span>
+              </div>
+            </div>
+            <div className="anchored-card-details">
+              <div className="card-dish-header">
+                <span className="card-dish-name">{item.name}</span>
+                <span className="card-dish-price">{item.price}</span>
+              </div>
+              <p className="card-dish-desc">
+                Freshly prepared with authentic countryside spices and farm-fresh ingredients at Qetsiyah Eco Park.
+              </p>
+            </div>
           </div>
         )}
       </div>
@@ -135,11 +111,14 @@ export function FoodOffersFrame({ onNavigate }) {
 
   return (
     <div className="frame-view-wrapper food-offers-page">
-      {/* 1. Top Hero Carousel */}
-      <HeroCarousel 
-        title="FOOD OFFERS" 
-        items={carouselItems} 
-        onNavigate={onNavigate} 
+      {/* 1. Scroll-Driven Expanding Hero Opening */}
+      <CategoryOpeningHero 
+        titleTop="DISCOVER" 
+        titleBottom="OUR FOOD OFFERS" 
+        flankLeft="FINE DINING & MEALS"
+        flankRight="TACURONG CITY"
+        image="/Food Menu/Beef Meals.jpg"
+        id="food-offers"
       />
 
       {/* 2. Editorial Menu Section */}

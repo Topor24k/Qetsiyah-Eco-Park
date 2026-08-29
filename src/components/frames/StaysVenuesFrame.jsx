@@ -1,36 +1,19 @@
 import React from 'react';
-import { HeroCarousel } from '../HeroCarousel';
+import { CategoryOpeningHero } from '../CategoryOpeningHero';
 
 export function StaysVenuesFrame({ onNavigate }) {
-  const items = [
-    { 
-      id: 1, 
-      label: 'VERDE VILLA', 
-      image: 'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80' 
-    },
-    { 
-      id: 2, 
-      label: 'LAKESIDE COTTAGES', 
-      image: 'https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?auto=format&fit=crop&w=800&q=80' 
-    },
-    { 
-      id: 3, 
-      label: 'QETSIYAH CAFÉ', 
-      image: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=800&q=80' 
-    },
-    { 
-      id: 4, 
-      label: 'GRAND FUNCTION HALL', 
-      image: 'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&w=800&q=80' 
-    },
-    { 
-      id: 5, 
-      label: 'NATURE CAMP', 
-      image: 'https://images.unsplash.com/photo-1510312305653-8ed496efae75?auto=format&fit=crop&w=800&q=80' 
-    }
-  ];
-
-  return <HeroCarousel title="VENUES" items={items} onNavigate={onNavigate} />;
+  return (
+    <div className="frame-view-wrapper stays-venues-page">
+      <CategoryOpeningHero 
+        titleTop="DISCOVER" 
+        titleBottom="STAYS & VENUES" 
+        flankLeft="VERDE VILLA & HALLS"
+        flankRight="SULTAN KUDARAT"
+        image="https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=1600&q=85"
+        id="stays-venues"
+      />
+    </div>
+  );
 }
 
 export default StaysVenuesFrame;
