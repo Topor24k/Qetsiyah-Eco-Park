@@ -51,13 +51,13 @@ export function CategoryOpeningHero({
         wasActiveRef.current = true;
         videoRef.current.muted = false;
         videoRef.current.play().catch(() => {
-          // If browser policy requires user interaction before unmuted playback
+          // If browser blocks unmuted audio on hard refresh before click:
+          // Immediately set muted=true so the video ALWAYS plays on scroll without requiring a click!
           if (videoRef.current) {
+            videoRef.current.muted = true;
             videoRef.current.play().catch(() => {});
           }
         });
-      } else {
-        videoRef.current.muted = false;
       }
     } else {
       if (wasActiveRef.current) {
@@ -73,12 +73,19 @@ export function CategoryOpeningHero({
     }
   }, [progress, windowScrollY, isVideo]);
 
-  // Unlock browser audio context on any user interaction
+  // Unlock audio on any user interaction
   const unlockAudio = () => {
     if (isVideo && videoRef.current) {
-      videoRef.current.muted = false;
+      if (videoRef.current.muted) {
+        videoRef.current.muted = false;
+      }
       if (currentProgressRef.current >= 0.85 && (window.scrollY || 0) <= 40) {
-        videoRef.current.play().catch(() => {});
+        videoRef.current.play().catch(() => {
+          if (videoRef.current) {
+            videoRef.current.muted = true;
+            videoRef.current.play().catch(() => {});
+          }
+        });
       }
     }
   };
