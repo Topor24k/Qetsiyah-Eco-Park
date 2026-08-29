@@ -1,4 +1,4 @@
-:root {
+﻿:root {
   /* Colors */
   --accent-gold: #df9039;
   --accent-gold-hover: #b45309;
@@ -2790,7 +2790,7 @@ button {
 
 
 /* ==========================================================================
-   SHOWCASE HERO ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â CATEGORY FRAMES (HERO CAROUSEL)
+   SHOWCASE HERO ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â CATEGORY FRAMES (HERO CAROUSEL)
    ========================================================================== */
 .showcase-hero {
   position: relative;
@@ -3366,7 +3366,7 @@ button {
   padding: 0 44px;
 }
 
-/* Ã¢â‚¬â€Ã¢â‚¬â€Ã¢â‚¬â€ Section Header Ã¢â‚¬â€Ã¢â‚¬â€Ã¢â‚¬â€ */
+/* ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬ÂÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬ÂÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Section Header ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬ÂÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬ÂÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â */
 .editorial-food-header {
   text-align: center;
   margin-bottom: 64px;
@@ -3423,7 +3423,7 @@ button {
   margin-top: 22px;
 }
 
-/* Ã¢â‚¬â€Ã¢â‚¬â€Ã¢â‚¬â€ Equal Size 3-Column Grid Ã¢â‚¬â€Ã¢â‚¬â€Ã¢â‚¬â€ */
+/* ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬ÂÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬ÂÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Equal Size 3-Column Grid ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬ÂÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬ÂÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â */
 .equal-food-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -3449,7 +3449,7 @@ button {
   border-radius: 14px;
 }
 
-/* Image Containers Ã¢â‚¬â€ Equal Proportions, Soft Corners, No Plain Text Box */
+/* Image Containers ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Equal Proportions, Soft Corners, No Plain Text Box */
 .equal-food-media {
   position: relative;
   width: 100%;
@@ -3500,7 +3500,7 @@ button {
   white-space: nowrap;
 }
 
-/* Ã¢â‚¬â€Ã¢â‚¬â€Ã¢â‚¬â€ Editorial Centered CTA Ã¢â‚¬â€Ã¢â‚¬â€Ã¢â‚¬â€ */
+/* ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬ÂÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬ÂÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Editorial Centered CTA ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬ÂÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬ÂÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â */
 .editorial-food-footer {
   text-align: center;
   margin-top: 64px;
@@ -4346,9 +4346,9 @@ body::-webkit-scrollbar,
 
 
 
+
 /* ==========================================================================
-   WHAT WE OFFER: STATIONARY HERO OPENING (ONLY TEXT & IMAGE ANIMATE)
-   (Exact 1:1 match to Animated Opening.mp4 - Zero frame movement)
+   WHAT WE OFFER: STATIONARY HERO OPENING (EXACT MATCH TO ANIMATED OPENING.MP4)
    ========================================================================== */
 
 .activities-opening-hero-frame {
@@ -4409,41 +4409,39 @@ body::-webkit-scrollbar,
   max-width: 140px;
 }
 
-/* Center Display Lockup */
-.opening-center-lockup {
+/* Center Display Text Block (DISCOVER on top, ALL OUR ACTIVITIES on bottom) */
+.opening-hero-text-block {
   position: relative;
-  z-index: 5;
-  width: 100%;
-  height: 100%;
+  z-index: 10;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
-  gap: clamp(24px, 4.0vw, 48px); /* Clean, generous gap between top and bottom lines */
-}
-
-/* Top & Bottom Moving Text Lines */
-.opening-text-line {
-  position: relative;
-  z-index: 10;
   pointer-events: none;
-  will-change: transform, opacity;
-  display: flex;
-  justify-content: center;
-  width: 100%;
+  gap: 6px; /* Natural line gap between the two title lines */
 }
 
-.opening-text-line h2 {
+.opening-title-top,
+.opening-title-bottom {
   font-family: var(--font-serif-heading);
   font-weight: 700;
   color: #3d3830;
-  font-size: clamp(2.6rem, 6.2vw, 5.8rem);
+  font-size: clamp(2.8rem, 6.8vw, 6.4rem);
   line-height: 1.05;
   letter-spacing: -0.01em;
   text-transform: uppercase;
   margin: 0;
   padding: 0 16px;
+  will-change: transform, opacity;
+}
+
+.opening-title-top {
+  display: block;
+}
+
+.opening-title-bottom {
+  display: block;
 }
 
 /* Center Expanding Image Container */
@@ -4452,10 +4450,11 @@ body::-webkit-scrollbar,
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  z-index: 6;
+  z-index: 5;
   overflow: hidden;
   will-change: width, height, border-radius;
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+  pointer-events: none;
 }
 
 .expanding-image-content {
@@ -4491,11 +4490,6 @@ body::-webkit-scrollbar,
   text-transform: uppercase;
   pointer-events: none;
   animation: pulseHint 2s infinite ease-in-out;
-}
-
-@keyframes pulseHint {
-  0%, 100% { opacity: 0.45; transform: translate(-50%, 0); }
-  50% { opacity: 0.95; transform: translate(-50%, 4px); }
 }
 
 @media (max-width: 768px) {

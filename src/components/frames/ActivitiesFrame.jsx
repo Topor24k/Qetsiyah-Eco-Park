@@ -35,13 +35,13 @@ export function ActivitiesFrame({ onNavigate }) {
     };
   }, []);
 
-  // Wheel listener: Frame stays 100% stationary, ONLY text and image animate
+  // Wheel & touch listener: Frame stays 100% stationary, ONLY text and image animate
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
 
     const handleWheel = (e) => {
-      // Prevent browser document scrolling so the frame NEVER shifts
+      // Prevent browser page scrolling so the frame NEVER shifts
       e.preventDefault();
       
       const delta = e.deltaY * 0.0012; // smooth scroll sensitivity
@@ -83,18 +83,17 @@ export function ActivitiesFrame({ onNavigate }) {
     ? 2 * p * p 
     : 1 - Math.pow(-2 * p + 2, 2) / 2;
 
-  // Initial slit dimensions at 0%: 220px width, 120px height
-  // Expanding to 100vw and 100vh at 100%
-  const initialWidth = 220;
-  const initialHeight = 120;
-
-  // Text translations
-  const textTranslateY = eased * 420;
+  // Text translations (0px at start, parting smoothly up & down on scroll)
+  const textTranslateY = eased * 360;
   const textOpacity = Math.max(0, 1 - p * 1.25);
 
   // Flank text translations
-  const flankTranslateX = eased * 160;
+  const flankTranslateX = eased * 140;
   const flankOpacity = Math.max(0, 1 - p * 2.0);
+
+  // Image dimensions: starts small in center gap, expands to 100vw x 100vh
+  const imageWidthPercent = Math.min(100, 15 + eased * 85);
+  const imageHeightPercent = Math.min(100, eased * 100);
 
   // Border radius: 4px down to 0px
   const borderRadius = Math.max(0, (1 - eased) * 4);
@@ -130,56 +129,52 @@ export function ActivitiesFrame({ onNavigate }) {
         <span>SULTAN KUDARAT</span>
       </div>
 
-      {/* Center Display Layout */}
-      <div className="opening-center-lockup">
+      {/* Center Expanding Image (Behind/Between the text) */}
+      <div 
+        className="expanding-image-container"
+        style={{
+          width: `${imageWidthPercent}vw`,
+          height: `${imageHeightPercent}vh`,
+          borderRadius: `${borderRadius}px`,
+          opacity: p > 0.005 ? 1 : 0
+        }}
+      >
+        <img 
+          src="/Background Pictures/Background Hero Section II.jpg" 
+          alt="Qetsiyah Eco Park Landscape" 
+          className="expanding-image-content"
+        />
         
-        {/* Top Line: DISCOVER (Pushes upwards on scroll) */}
+        {/* Subtle atmospheric vignette when fully expanded */}
         <div 
-          className="opening-text-line line-top"
+          className="expanding-image-scrim"
+          style={{
+            opacity: Math.min(0.35, Math.max(0, (p - 0.7) / 0.3))
+          }}
+        />
+      </div>
+
+      {/* Main Center Display Typography (DISCOVER on top, ALL OUR ACTIVITIES on bottom) */}
+      <div className="opening-hero-text-block">
+        <h2 
+          className="opening-title-top"
           style={{
             transform: `translate3d(0, ${-textTranslateY}px, 0)`,
             opacity: textOpacity
           }}
         >
-          <h2>DISCOVER</h2>
-        </div>
+          DISCOVER
+        </h2>
 
-        {/* Center Expanding Image (Emerges between lines & grows to fullscreen) */}
-        <div 
-          className="expanding-image-container"
-          style={{
-            width: `calc(${initialWidth}px + (100vw - ${initialWidth}px) * ${eased})`,
-            height: `calc(${initialHeight}px + (100vh - ${initialHeight}px) * ${eased})`,
-            borderRadius: `${borderRadius}px`,
-            opacity: p > 0.005 ? 1 : 0
-          }}
-        >
-          <img 
-            src="/Background Pictures/Background Hero Section II.jpg" 
-            alt="Qetsiyah Eco Park Landscape" 
-            className="expanding-image-content"
-          />
-          
-          {/* Subtle atmospheric vignette when fully expanded */}
-          <div 
-            className="expanding-image-scrim"
-            style={{
-              opacity: Math.min(0.35, Math.max(0, (p - 0.7) / 0.3))
-            }}
-          />
-        </div>
-
-        {/* Bottom Line: ALL OUR ACTIVITIES (Pushes downwards on scroll) */}
-        <div 
-          className="opening-text-line line-bottom"
+        <h2 
+          className="opening-title-bottom"
           style={{
             transform: `translate3d(0, ${textTranslateY}px, 0)`,
             opacity: textOpacity
           }}
         >
-          <h2>ALL OUR ACTIVITIES</h2>
-        </div>
-
+          ALL OUR ACTIVITIES
+        </h2>
       </div>
 
       {/* Subtle Scroll Hint Indicator at 0% */}
