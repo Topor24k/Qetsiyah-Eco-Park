@@ -40,6 +40,13 @@ export function FoodOffersFrame({ onNavigate }) {
     }
   };
 
+  const scrollToMenu = () => {
+    const el = document.querySelector('.food-catalog-sheet-section');
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   // Find currently open item for mobile modal rendering
   let currentOpenItem = null;
   if (openItemId) {
@@ -111,17 +118,19 @@ export function FoodOffersFrame({ onNavigate }) {
 
   return (
     <div className="frame-view-wrapper food-offers-page">
-      {/* 1. Scroll-Driven Expanding Hero Opening */}
+      {/* 1. Scroll-Driven Expanding Hero Opening with Authentic Restaurant Dining Photo */}
       <CategoryOpeningHero 
         titleTop="DISCOVER" 
         titleBottom="OUR FOOD OFFERS" 
         flankLeft="FINE DINING & MEALS"
         flankRight="TACURONG CITY"
-        image="/Food Menu/Beef Meals.jpg"
+        image="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1600&q=85"
         id="food-offers"
+        hasContentBelow={true}
+        onExploreBelow={scrollToMenu}
       />
 
-      {/* 2. Editorial Menu Section */}
+      {/* 2. Editorial Menu Catalog Section (Preserved in Full) */}
       <section className="food-catalog-sheet-section">
         <div className="food-catalog-container">
           

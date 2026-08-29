@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { ArrowDown } from 'lucide-react';
 
 export function CategoryOpeningHero({
   titleTop = 'DISCOVER',
@@ -6,7 +7,9 @@ export function CategoryOpeningHero({
   flankLeft = 'ECO-PARK EXPERIENCES',
   flankRight = 'SULTAN KUDARAT',
   image = '/Background Pictures/Background Hero Section II.jpg',
-  id = 'opening-hero'
+  id = 'opening-hero',
+  hasContentBelow = false,
+  onExploreBelow = null
 }) {
   const [progress, setProgress] = useState(0);
   const containerRef = useRef(null);
@@ -48,11 +51,28 @@ export function CategoryOpeningHero({
     if (!el) return;
 
     const handleWheel = (e) => {
-      // Prevent browser page scrolling so the frame NEVER shifts
-      e.preventDefault();
+      const isAtTop = window.scrollY <= 10;
       
-      const delta = e.deltaY * 0.0012; // smooth scroll sensitivity
-      targetProgressRef.current = Math.min(1, Math.max(0, targetProgressRef.current + delta));
+      // If we are at the top of the page:
+      if (isAtTop) {
+        // If scrolling down and not yet fully expanded, capture and expand
+        if (e.deltaY > 0 && targetProgressRef.current < 0.98) {
+          e.preventDefault();
+          const delta = e.deltaY * 0.0012;
+          targetProgressRef.current = Math.min(1, targetProgressRef.current + delta);
+        } 
+        // If scrolling down and ALREADY fully expanded on a page with content below, allow natural document scroll
+        else if (e.deltaY > 0 && targetProgressRef.current >= 0.98 && hasContentBelow) {
+          // Allow natural scroll to menu
+          return;
+        }
+        // If scrolling up at the very top of document, shrink back towards 0
+        else if (e.deltaY < 0 && targetProgressRef.current > 0) {
+          e.preventDefault();
+          const delta = e.deltaY * 0.0012;
+          targetProgressRef.current = Math.max(0, targetProgressRef.current + delta);
+        }
+      }
     };
 
     const handleTouchStart = (e) => {
@@ -62,12 +82,19 @@ export function CategoryOpeningHero({
     };
 
     const handleTouchMove = (e) => {
-      if (e.touches.length > 0) {
-        e.preventDefault();
+      const isAtTop = window.scrollY <= 10;
+      if (e.touches.length > 0 && isAtTop) {
         const touchY = e.touches[0].clientY;
         const delta = (touchStartYRef.current - touchY) * 0.003;
         touchStartYRef.current = touchY;
-        targetProgressRef.current = Math.min(1, Math.max(0, targetProgressRef.current + delta));
+
+        if (delta > 0 && targetProgressRef.current < 0.98) {
+          e.preventDefault();
+          targetProgressRef.current = Math.min(1, targetProgressRef.current + delta);
+        } else if (delta < 0 && targetProgressRef.current > 0) {
+          e.preventDefault();
+          targetProgressRef.current = Math.max(0, targetProgressRef.current + delta);
+        }
       }
     };
 
@@ -80,7 +107,7 @@ export function CategoryOpeningHero({
       el.removeEventListener('touchstart', handleTouchStart);
       el.removeEventListener('touchmove', handleTouchMove);
     };
-  }, []);
+  }, [hasContentBelow]);
 
   // Smooth interpolation calculations
   const p = Math.min(1, Math.max(0, progress));
@@ -161,6 +188,17 @@ export function CategoryOpeningHero({
             opacity: Math.min(0.35, Math.max(0, (p - 0.7) / 0.3))
           }}
         />
+
+        {/* Action Button to scroll down to Menu / Content if present */}
+        {hasContentBelow && p >= 0.75 && (
+          <button 
+            className="opening-explore-menu-btn"
+            onClick={onExploreBelow}
+          >
+            <span>VIEW FOOD MENU CATALOG</span>
+            <ArrowDown size={15} />
+          </button>
+        )}
       </div>
 
       {/* Main Center Display Typography */}

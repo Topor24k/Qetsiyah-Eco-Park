@@ -1,4 +1,4 @@
-﻿:root {
+:root {
   /* Colors */
   --accent-gold: #df9039;
   --accent-gold-hover: #b45309;
@@ -4473,6 +4473,38 @@ body::-webkit-scrollbar,
   inset: 0;
   background: linear-gradient(180deg, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.35) 100%);
   pointer-events: none;
+}
+
+/* Explore Menu Floating CTA Button */
+.opening-explore-menu-btn {
+  position: absolute;
+  bottom: 36px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 28px;
+  background-color: #df9039;
+  color: #ffffff;
+  font-family: var(--font-sans-ui);
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
+  border-radius: 9999px;
+  cursor: pointer;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+  transition: all 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: auto;
+}
+
+.opening-explore-menu-btn:hover {
+  background-color: #b45309;
+  transform: translateX(-50%) translateY(-2px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.55);
 }
 
 /* Subtle Scroll Indicator at Start */
