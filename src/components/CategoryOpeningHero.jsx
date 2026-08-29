@@ -41,7 +41,6 @@ export function CategoryOpeningHero({
       if (isCertainSize) {
         videoRef.current.muted = isMuted;
         videoRef.current.play().catch(() => {
-          // If browser requires muted initial trigger before sound:
           if (videoRef.current && !isMuted) {
             videoRef.current.muted = true;
             setIsMuted(true);
@@ -268,6 +267,7 @@ export function CategoryOpeningHero({
           <video 
             ref={videoRef}
             src={mediaSrc} 
+            autoPlay 
             loop 
             playsInline 
             preload="auto"
