@@ -1,4 +1,4 @@
-:root {
+﻿:root {
   /* Colors */
   --accent-gold: #df9039;
   --accent-gold-hover: #b45309;
@@ -2790,7 +2790,7 @@ button {
 
 
 /* ==========================================================================
-   SHOWCASE HERO Ã¢â‚¬â€ CATEGORY FRAMES (HERO CAROUSEL)
+   SHOWCASE HERO ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â CATEGORY FRAMES (HERO CAROUSEL)
    ========================================================================== */
 .showcase-hero {
   position: relative;
@@ -3366,7 +3366,7 @@ button {
   padding: 0 44px;
 }
 
-/* â€”â€”â€” Section Header â€”â€”â€” */
+/* Ã¢â‚¬â€Ã¢â‚¬â€Ã¢â‚¬â€ Section Header Ã¢â‚¬â€Ã¢â‚¬â€Ã¢â‚¬â€ */
 .editorial-food-header {
   text-align: center;
   margin-bottom: 64px;
@@ -3423,7 +3423,7 @@ button {
   margin-top: 22px;
 }
 
-/* â€”â€”â€” Equal Size 3-Column Grid â€”â€”â€” */
+/* Ã¢â‚¬â€Ã¢â‚¬â€Ã¢â‚¬â€ Equal Size 3-Column Grid Ã¢â‚¬â€Ã¢â‚¬â€Ã¢â‚¬â€ */
 .equal-food-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -3449,7 +3449,7 @@ button {
   border-radius: 14px;
 }
 
-/* Image Containers â€” Equal Proportions, Soft Corners, No Plain Text Box */
+/* Image Containers Ã¢â‚¬â€ Equal Proportions, Soft Corners, No Plain Text Box */
 .equal-food-media {
   position: relative;
   width: 100%;
@@ -3500,7 +3500,7 @@ button {
   white-space: nowrap;
 }
 
-/* â€”â€”â€” Editorial Centered CTA â€”â€”â€” */
+/* Ã¢â‚¬â€Ã¢â‚¬â€Ã¢â‚¬â€ Editorial Centered CTA Ã¢â‚¬â€Ã¢â‚¬â€Ã¢â‚¬â€ */
 .editorial-food-footer {
   text-align: center;
   margin-top: 64px;
@@ -4344,178 +4344,151 @@ body::-webkit-scrollbar,
 
 
 
+
 /* ==========================================================================
-   WHAT WE OFFER: CLASSICAL ARCHITECTURAL HERO SECTION
-   (Exact 1:1 match to reference design in media_1788000867824.png)
+   WHAT WE OFFER: SCROLL-DRIVEN EXPANDING HERO OPENING ANIMATION
+   (100% Exact match to Animated Opening.mp4)
    ========================================================================== */
 
-.collection-hero-page {
+.activities-scroll-opening-container {
   position: relative;
   width: 100%;
-  min-height: 100vh;
+  height: 260vh; /* Smooth scroll runway driving the expansion */
   background-color: #eae3d4;
-  background-image: 
-    radial-gradient(ellipse at 50% 50%, #f3ede2 0%, #eae3d4 100%);
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: center;
-  padding: 16px 28px;
-  overflow: hidden;
-  box-sizing: border-box;
 }
 
-/* Subtle Marbled Stone Veining Texture */
-.collection-hero-page::before {
-  content: '';
+.sticky-opening-stage {
+  position: sticky;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Subtle Marbled Stone Backdrop */
+.opening-parchment-backdrop {
   position: absolute;
   inset: 0;
+  background-color: #eae3d4;
   background-image: 
+    radial-gradient(ellipse at 50% 50%, #f3ede2 0%, #eae3d4 100%),
     radial-gradient(ellipse at 25% 25%, rgba(85, 78, 64, 0.04) 0%, transparent 50%),
-    radial-gradient(ellipse at 75% 75%, rgba(85, 78, 64, 0.04) 0%, transparent 50%),
-    radial-gradient(ellipse at 50% 80%, rgba(85, 78, 64, 0.02) 0%, transparent 40%);
+    radial-gradient(ellipse at 75% 75%, rgba(85, 78, 64, 0.04) 0%, transparent 50%);
   pointer-events: none;
   z-index: 1;
 }
 
-/* Top Architectural Double Border Bar */
-.collection-top-border-bar {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  position: relative;
+/* Left & Right Flank Subtitles */
+.opening-flank-text {
+  position: absolute;
+  top: 50%;
   z-index: 10;
-  margin-top: 8px;
+  pointer-events: none;
+  will-change: transform, opacity;
 }
 
-.border-line-left,
-.border-line-right {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
+.opening-flank-text.left {
+  left: clamp(24px, 4.5vw, 64px);
+  text-align: left;
 }
 
-.line-outer {
-  height: 2px;
-  background-color: #4a4539;
-  width: 100%;
+.opening-flank-text.right {
+  right: clamp(24px, 4.5vw, 64px);
+  text-align: right;
 }
 
-.line-inner {
-  height: 1px;
-  background-color: #4a4539;
-  width: 100%;
-}
-
-/* Top Center 3-Compartment Emblem Badge */
-.collection-center-emblem-badge {
-  display: flex;
-  align-items: center;
-  border: 1.5px solid #4a4539;
-  background: #e2dbce;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
-  flex-shrink: 0;
-}
-
-.badge-cell {
-  width: 54px;
-  height: 54px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-right: 1.5px solid #4a4539;
-  padding: 6px;
-  box-sizing: border-box;
-}
-
-.badge-cell:last-child {
-  border-right: none;
-}
-
-.seal-svg,
-.shield-svg {
-  width: 36px;
-  height: 36px;
+.opening-flank-text span {
+  font-family: var(--font-sans-ui);
+  font-size: clamp(0.68rem, 0.85vw, 0.80rem);
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  color: #7a7262;
+  text-transform: uppercase;
+  line-height: 1.5;
   display: block;
+  max-width: 140px;
 }
 
-.menu-bars-icon {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  width: 18px;
-}
-
-.menu-bars-icon .bar {
-  height: 2px;
+/* Center Display Lockup */
+.opening-center-lockup {
+  position: relative;
+  z-index: 5;
   width: 100%;
-  background-color: #4a4539;
-  border-radius: 1px;
-}
-
-/* Main Center Display Typography */
-.collection-hero-content {
-  flex: 1;
+  height: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
-  position: relative;
-  z-index: 5;
-  padding: 40px 20px;
-  width: 100%;
 }
 
-.collection-hero-title {
+/* Top & Bottom Moving Text Lines */
+.opening-text-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  text-align: center;
+  z-index: 10;
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
+.opening-text-line.line-top {
+  top: calc(50% - clamp(2.6rem, 6.2vw, 5.4rem));
+}
+
+.opening-text-line.line-bottom {
+  bottom: calc(50% - clamp(2.6rem, 6.2vw, 5.4rem));
+}
+
+.opening-text-line h2 {
   font-family: var(--font-serif-heading);
   font-weight: 700;
   color: #3d3830;
-  line-height: 1.04;
+  font-size: clamp(2.8rem, 6.8vw, 6.4rem);
+  line-height: 1.0;
+  letter-spacing: -0.01em;
   text-transform: uppercase;
   margin: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  letter-spacing: -0.01em;
 }
 
-.title-line-top {
+/* Center Expanding Image Container */
+.expanding-image-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 6;
+  overflow: hidden;
+  will-change: width, height, border-radius;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.3);
+}
+
+.expanding-image-content {
+  width: 100vw;
+  height: 100vh;
+  object-fit: cover;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   display: block;
-  font-size: clamp(3.0rem, 7.2vw, 6.6rem);
-  letter-spacing: -0.01em;
 }
 
-.title-line-bottom {
-  display: block;
-  font-size: clamp(2.8rem, 6.6vw, 6.0rem);
-  letter-spacing: -0.01em;
-}
-
-/* Bottom Architectural Double Border Bar */
-.collection-bottom-border-bar {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  position: relative;
-  z-index: 10;
-  margin-bottom: 8px;
+.expanding-image-scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.35) 100%);
+  pointer-events: none;
+  transition: opacity 0.3s ease;
 }
 
 @media (max-width: 768px) {
-  .collection-hero-page {
-    padding: 12px 16px;
-  }
-  .badge-cell {
-    width: 44px;
-    height: 44px;
-  }
-  .seal-svg,
-  .shield-svg {
-    width: 28px;
-    height: 28px;
+  .opening-flank-text {
+    display: none;
   }
 }
