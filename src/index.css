@@ -4496,6 +4496,72 @@ body::-webkit-scrollbar,
   pointer-events: none;
 }
 
+/* Audio Toggle Floating Pill */
+.hero-video-audio-toggle-btn {
+  position: absolute;
+  top: 28px;
+  right: 28px;
+  z-index: 25;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: rgba(15, 20, 17, 0.75);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: #ffffff;
+  font-family: var(--font-sans-ui);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  border: 1px solid rgba(223, 144, 57, 0.45);
+  border-radius: 9999px;
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+  transition: all 0.2s ease;
+  pointer-events: auto;
+}
+
+.hero-video-audio-toggle-btn:hover {
+  background: rgba(223, 144, 57, 0.9);
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.55);
+}
+
+/* Explore Menu Floating CTA Button */
+.opening-explore-menu-btn {
+  position: absolute;
+  bottom: 36px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 28px;
+  background-color: #df9039;
+  color: #ffffff;
+  font-family: var(--font-sans-ui);
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
+  border-radius: 9999px;
+  cursor: pointer;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+  transition: all 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: auto;
+}
+
+.opening-explore-menu-btn:hover {
+  background-color: #b45309;
+  transform: translateX(-50%) translateY(-2px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.55);
+}
+
 /* Subtle Scroll Indicator at Start */
 .opening-scroll-hint {
   position: absolute;

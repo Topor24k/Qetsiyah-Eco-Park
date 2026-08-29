@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ArrowDown } from 'lucide-react';
+import { ArrowDown, Volume2, VolumeX } from 'lucide-react';
 
 export function CategoryOpeningHero({
   titleTop = 'DISCOVER',
@@ -13,11 +13,43 @@ export function CategoryOpeningHero({
   onExploreBelow = null
 }) {
   const [progress, setProgress] = useState(0);
+  const [isMuted, setIsMuted] = useState(false);
   const containerRef = useRef(null);
+  const videoRef = useRef(null);
   const targetProgressRef = useRef(0);
   const currentProgressRef = useRef(0);
   const animFrameRef = useRef(null);
   const touchStartYRef = useRef(0);
+
+  const isVideo = Boolean(video || (typeof image === 'string' && image.toLowerCase().endsWith('.mp4')));
+  const mediaSrc = video || image;
+
+  // Attempt unmuted audio playback on user interaction
+  const enableSound = () => {
+    if (videoRef.current) {
+      videoRef.current.muted = false;
+      setIsMuted(false);
+      videoRef.current.play().catch(() => {});
+    }
+  };
+
+  // Try playing sound immediately and fallback gracefully
+  useEffect(() => {
+    if (isVideo && videoRef.current) {
+      videoRef.current.muted = false;
+      const playPromise = videoRef.current.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(() => {
+          // If browser policy requires initial user gesture before unmuted audio:
+          if (videoRef.current) {
+            videoRef.current.muted = true;
+            setIsMuted(true);
+            videoRef.current.play();
+          }
+        });
+      }
+    }
+  }, [isVideo]);
 
   // Smooth lerp animation loop for 60fps/120fps buttery easing
   useEffect(() => {
@@ -49,6 +81,7 @@ export function CategoryOpeningHero({
   // Intercept scroll, keys, and touch: FRAME STAYS 100% STATIONARY until image is FULL SIZE
   useEffect(() => {
     const handleWheel = (e) => {
+      enableSound();
       const isAtTop = window.scrollY <= 2;
 
       if (isAtTop) {
@@ -77,6 +110,7 @@ export function CategoryOpeningHero({
     };
 
     const handleKeyDown = (e) => {
+      enableSound();
       const isAtTop = window.scrollY <= 2;
 
       if (isAtTop) {
@@ -101,6 +135,7 @@ export function CategoryOpeningHero({
     };
 
     const handleTouchStart = (e) => {
+      enableSound();
       if (e.touches.length > 0) {
         touchStartYRef.current = e.touches[0].clientY;
       }
@@ -136,14 +171,29 @@ export function CategoryOpeningHero({
     window.addEventListener('keydown', handleKeyDown, { passive: false });
     window.addEventListener('touchstart', handleTouchStart, { passive: true });
     window.addEventListener('touchmove', handleTouchMove, { passive: false });
+    window.addEventListener('click', enableSound);
 
     return () => {
       window.removeEventListener('wheel', handleWheel);
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('touchstart', handleTouchStart);
       window.removeEventListener('touchmove', handleTouchMove);
+      window.removeEventListener('click', enableSound);
     };
   }, []);
+
+  // Toggle sound handler
+  const handleToggleSound = (e) => {
+    e.stopPropagation();
+    if (videoRef.current) {
+      const nextMuted = !videoRef.current.muted;
+      videoRef.current.muted = nextMuted;
+      setIsMuted(nextMuted);
+      if (!nextMuted) {
+        videoRef.current.play().catch(() => {});
+      }
+    }
+  };
 
   // Smooth interpolation calculations
   const p = Math.min(1, Math.max(0, progress));
@@ -201,7 +251,7 @@ export function CategoryOpeningHero({
         <span>{flankRight}</span>
       </div>
 
-      {/* Center Expanding Image (Behind/Between the text) */}
+      {/* Center Expanding Media (Behind/Between the text) */}
       <div 
         className="expanding-image-container"
         style={{
@@ -211,12 +261,12 @@ export function CategoryOpeningHero({
           opacity: p > 0.005 ? 1 : 0
         }}
       >
-        {video || (typeof image === 'string' && image.toLowerCase().endsWith('.mp4')) ? (
+        {isVideo ? (
           <video 
-            src={video || image} 
+            ref={videoRef}
+            src={mediaSrc} 
             autoPlay 
             loop 
-            muted 
             playsInline 
             preload="auto"
             className="expanding-image-content expanding-video-content"
@@ -236,6 +286,19 @@ export function CategoryOpeningHero({
             opacity: Math.min(0.35, Math.max(0, (p - 0.7) / 0.3))
           }}
         />
+
+        {/* Audio Toggle Pill on Video */}
+        {isVideo && p > 0.05 && (
+          <button 
+            className="hero-video-audio-toggle-btn"
+            onClick={handleToggleSound}
+            aria-label={isMuted ? "Unmute Audio" : "Mute Audio"}
+            title={isMuted ? "Unmute Audio" : "Mute Audio"}
+          >
+            {isMuted ? <VolumeX size={15} /> : <Volume2 size={15} />}
+            <span>{isMuted ? "UNMUTE AUDIO" : "SOUND ON"}</span>
+          </button>
+        )}
 
         {/* Action Button to scroll down to Menu / Content if present */}
         {hasContentBelow && p >= 0.85 && (
