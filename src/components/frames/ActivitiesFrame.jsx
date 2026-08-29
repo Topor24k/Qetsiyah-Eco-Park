@@ -1,142 +1,193 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 export function ActivitiesFrame({ onNavigate }) {
   const [progress, setProgress] = useState(0);
   const containerRef = useRef(null);
+  const targetProgressRef = useRef(0);
+  const currentProgressRef = useRef(0);
+  const animFrameRef = useRef(null);
+  const touchStartYRef = useRef(0);
 
-  const handleScroll = useCallback(() => {
-    if (!containerRef.current) return;
-    const container = containerRef.current;
-    const rect = container.getBoundingClientRect();
-    const totalScrollable = container.scrollHeight - window.innerHeight;
-
-    if (totalScrollable > 0) {
-      const currentScroll = -rect.top;
-      const rawProgress = currentScroll / totalScrollable;
-      const clamped = Math.min(1, Math.max(0, rawProgress));
-      setProgress(clamped);
-    }
-  }, []);
-
+  // Smooth lerp animation loop
   useEffect(() => {
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    window.addEventListener('resize', handleScroll);
-    handleScroll();
+    let isRunning = true;
+
+    const animate = () => {
+      if (!isRunning) return;
+
+      const diff = targetProgressRef.current - currentProgressRef.current;
+      if (Math.abs(diff) > 0.0005) {
+        currentProgressRef.current += diff * 0.10; // smooth easing
+        setProgress(currentProgressRef.current);
+      } else if (currentProgressRef.current !== targetProgressRef.current) {
+        currentProgressRef.current = targetProgressRef.current;
+        setProgress(targetProgressRef.current);
+      }
+
+      animFrameRef.current = requestAnimationFrame(animate);
+    };
+
+    animFrameRef.current = requestAnimationFrame(animate);
 
     return () => {
-      window.removeEventListener('scroll', handleScroll);
-      window.removeEventListener('resize', handleScroll);
+      isRunning = false;
+      if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
     };
-  }, [handleScroll]);
+  }, []);
 
-  // Interpolation calculations for smooth animation
-  // Eased progress for smooth expansion
-  const eased = progress < 0.5 
-    ? 2 * progress * progress 
-    : 1 - Math.pow(-2 * progress + 2, 2) / 2;
+  // Wheel listener: Frame stays 100% stationary, ONLY text and image animate
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
 
-  // Initial slit dimensions at 0%: 160px width, 0px height
-  // Max dimensions at 100%: 100vw width, 100vh height
-  const minWidth = 160;
-  const minHeight = 0;
+    const handleWheel = (e) => {
+      // Prevent browser document scrolling so the frame NEVER shifts
+      e.preventDefault();
+      
+      const delta = e.deltaY * 0.0012; // smooth scroll sensitivity
+      targetProgressRef.current = Math.min(1, Math.max(0, targetProgressRef.current + delta));
+    };
 
-  const currentWidthPercent = minWidth + (100 - (minWidth / (typeof window !== 'undefined' ? window.innerWidth : 1440) * 100)) * eased;
-  const currentHeightPercent = eased * 100;
+    const handleTouchStart = (e) => {
+      if (e.touches.length > 0) {
+        touchStartYRef.current = e.touches[0].clientY;
+      }
+    };
+
+    const handleTouchMove = (e) => {
+      if (e.touches.length > 0) {
+        e.preventDefault();
+        const touchY = e.touches[0].clientY;
+        const delta = (touchStartYRef.current - touchY) * 0.003;
+        touchStartYRef.current = touchY;
+        targetProgressRef.current = Math.min(1, Math.max(0, targetProgressRef.current + delta));
+      }
+    };
+
+    el.addEventListener('wheel', handleWheel, { passive: false });
+    el.addEventListener('touchstart', handleTouchStart, { passive: true });
+    el.addEventListener('touchmove', handleTouchMove, { passive: false });
+
+    return () => {
+      el.removeEventListener('wheel', handleWheel);
+      el.removeEventListener('touchstart', handleTouchStart);
+      el.removeEventListener('touchmove', handleTouchMove);
+    };
+  }, []);
+
+  // Smooth interpolation calculations
+  const p = Math.min(1, Math.max(0, progress));
+  
+  // Power easing for cinematic acceleration matching Animated Opening.mp4
+  const eased = p < 0.5 
+    ? 2 * p * p 
+    : 1 - Math.pow(-2 * p + 2, 2) / 2;
+
+  // Initial slit dimensions at 0%: 220px width, 120px height
+  // Expanding to 100vw and 100vh at 100%
+  const initialWidth = 220;
+  const initialHeight = 120;
 
   // Text translations
-  const textTranslateY = eased * 380;
-  const textOpacity = Math.max(0, 1 - progress * 1.3);
+  const textTranslateY = eased * 420;
+  const textOpacity = Math.max(0, 1 - p * 1.25);
 
   // Flank text translations
-  const flankTranslateX = eased * 140;
-  const flankOpacity = Math.max(0, 1 - progress * 2.2);
+  const flankTranslateX = eased * 160;
+  const flankOpacity = Math.max(0, 1 - p * 2.0);
 
   // Border radius: 4px down to 0px
   const borderRadius = Math.max(0, (1 - eased) * 4);
 
   return (
-    <div className="activities-scroll-opening-container" ref={containerRef} id="activities">
-      {/* Sticky 100vh Viewport Stage */}
-      <div className="sticky-opening-stage">
+    <div 
+      className="activities-opening-hero-frame" 
+      ref={containerRef} 
+      id="activities"
+    >
+      {/* Subtle Marbled Warm Background with Fine Veins */}
+      <div className="opening-parchment-backdrop"></div>
+
+      {/* Left Flank Subtitle */}
+      <div 
+        className="opening-flank-text left"
+        style={{
+          transform: `translate3d(${-flankTranslateX}px, -50%, 0)`,
+          opacity: flankOpacity
+        }}
+      >
+        <span>ECO-PARK EXPERIENCES</span>
+      </div>
+
+      {/* Right Flank Subtitle */}
+      <div 
+        className="opening-flank-text right"
+        style={{
+          transform: `translate3d(${flankTranslateX}px, -50%, 0)`,
+          opacity: flankOpacity
+        }}
+      >
+        <span>SULTAN KUDARAT</span>
+      </div>
+
+      {/* Center Display Layout */}
+      <div className="opening-center-lockup">
         
-        {/* Subtle Marbled Warm Background with Fine Veins */}
-        <div className="opening-parchment-backdrop"></div>
-
-        {/* Left Flank Subtitle */}
+        {/* Top Line: DISCOVER (Pushes upwards on scroll) */}
         <div 
-          className="opening-flank-text left"
+          className="opening-text-line line-top"
           style={{
-            transform: `translate3d(${-flankTranslateX}px, -50%, 0)`,
-            opacity: flankOpacity
+            transform: `translate3d(0, ${-textTranslateY}px, 0)`,
+            opacity: textOpacity
           }}
         >
-          <span>ECO-PARK EXPERIENCES</span>
+          <h2>DISCOVER</h2>
         </div>
 
-        {/* Right Flank Subtitle */}
+        {/* Center Expanding Image (Emerges between lines & grows to fullscreen) */}
         <div 
-          className="opening-flank-text right"
+          className="expanding-image-container"
           style={{
-            transform: `translate3d(${flankTranslateX}px, -50%, 0)`,
-            opacity: flankOpacity
+            width: `calc(${initialWidth}px + (100vw - ${initialWidth}px) * ${eased})`,
+            height: `calc(${initialHeight}px + (100vh - ${initialHeight}px) * ${eased})`,
+            borderRadius: `${borderRadius}px`,
+            opacity: p > 0.005 ? 1 : 0
           }}
         >
-          <span>SULTAN KUDARAT</span>
-        </div>
-
-        {/* Center Display Layout */}
-        <div className="opening-center-lockup">
+          <img 
+            src="/Background Pictures/Background Hero Section II.jpg" 
+            alt="Qetsiyah Eco Park Landscape" 
+            className="expanding-image-content"
+          />
           
-          {/* Top Line: DISCOVER (Pushes upwards on scroll) */}
+          {/* Subtle atmospheric vignette when fully expanded */}
           <div 
-            className="opening-text-line line-top"
+            className="expanding-image-scrim"
             style={{
-              transform: `translate3d(0, ${-textTranslateY}px, 0)`,
-              opacity: textOpacity
+              opacity: Math.min(0.35, Math.max(0, (p - 0.7) / 0.3))
             }}
-          >
-            <h2>DISCOVER</h2>
-          </div>
+          />
+        </div>
 
-          {/* Center Expanding Image (Emerges between lines & grows to fullscreen) */}
-          <div 
-            className="expanding-image-container"
-            style={{
-              width: `${Math.min(100, Math.max(minWidth / 14.4, currentWidthPercent))}%`,
-              height: `${Math.min(100, currentHeightPercent)}%`,
-              borderRadius: `${borderRadius}px`,
-              opacity: progress > 0.01 ? 1 : 0
-            }}
-          >
-            <img 
-              src="/Background Pictures/Background Hero Section II.jpg" 
-              alt="Qetsiyah Eco Park Landscape" 
-              className="expanding-image-content"
-            />
-            
-            {/* Subtle atmospheric vignette when fully expanded */}
-            <div 
-              className="expanding-image-scrim"
-              style={{
-                opacity: Math.min(0.4, Math.max(0, (progress - 0.7) / 0.3))
-              }}
-            />
-          </div>
-
-          {/* Bottom Line: ALL OUR ACTIVITIES (Pushes downwards on scroll) */}
-          <div 
-            className="opening-text-line line-bottom"
-            style={{
-              transform: `translate3d(0, ${textTranslateY}px, 0)`,
-              opacity: textOpacity
-            }}
-          >
-            <h2>ALL OUR ACTIVITIES</h2>
-          </div>
-
+        {/* Bottom Line: ALL OUR ACTIVITIES (Pushes downwards on scroll) */}
+        <div 
+          className="opening-text-line line-bottom"
+          style={{
+            transform: `translate3d(0, ${textTranslateY}px, 0)`,
+            opacity: textOpacity
+          }}
+        >
+          <h2>ALL OUR ACTIVITIES</h2>
         </div>
 
       </div>
+
+      {/* Subtle Scroll Hint Indicator at 0% */}
+      {p < 0.05 && (
+        <div className="opening-scroll-hint">
+          <span>SCROLL DOWN TO REVEAL</span>
+        </div>
+      )}
     </div>
   );
 }
