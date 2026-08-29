@@ -55,6 +55,10 @@ export function CategoryOpeningHero({
       } else {
         videoRef.current.pause();
         videoRef.current.muted = true;
+        // When shrunk out (progress < 0.85), restart video to beginning so it plays from the first part when shown again
+        if (progress < 0.85) {
+          videoRef.current.currentTime = 0;
+        }
       }
     }
   }, [progress, windowScrollY, isVideo]);
