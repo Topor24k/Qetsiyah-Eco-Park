@@ -16,7 +16,7 @@ export function CategoryOpeningHero({
   const [windowScrollY, setWindowScrollY] = useState(0);
   const containerRef = useRef(null);
   const videoRef = useRef(null);
-  const wasActiveRef = useRef(false);
+  const audioCtxRef = useRef(null);
   const targetProgressRef = useRef(0);
   const currentProgressRef = useRef(0);
   const animFrameRef = useRef(null);
@@ -24,6 +24,44 @@ export function CategoryOpeningHero({
 
   const isVideo = Boolean(video || (typeof image === 'string' && image.toLowerCase().endsWith('.mp4')));
   const mediaSrc = video || image;
+
+  // Global AudioContext and element sound activator
+  const activateAudioEngine = () => {
+    try {
+      if (!audioCtxRef.current) {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (AudioCtx) {
+          audioCtxRef.current = new AudioCtx();
+        }
+      }
+      if (audioCtxRef.current && audioCtxRef.current.state === 'suspended') {
+        audioCtxRef.current.resume().catch(() => {});
+      }
+    } catch (e) {}
+
+    if (isVideo && videoRef.current) {
+      videoRef.current.muted = false;
+      if (currentProgressRef.current >= 0.85 && (window.scrollY || 0) <= 40) {
+        videoRef.current.play().catch(() => {});
+      }
+    }
+  };
+
+  // Attach multiple global gesture listeners to ensure browser unlocks audio automatically on first scroll/interaction
+  useEffect(() => {
+    const events = ['wheel', 'keydown', 'touchstart', 'touchend', 'pointerdown', 'pointermove', 'scroll', 'click'];
+    events.forEach((evt) => {
+      window.addEventListener(evt, activateAudioEngine, { passive: true });
+      document.addEventListener(evt, activateAudioEngine, { passive: true });
+    });
+
+    return () => {
+      events.forEach((evt) => {
+        window.removeEventListener(evt, activateAudioEngine);
+        document.removeEventListener(evt, activateAudioEngine);
+      });
+    };
+  }, [isVideo]);
 
   // Track window scroll to detect when user scrolled down to menu
   useEffect(() => {
@@ -37,58 +75,30 @@ export function CategoryOpeningHero({
     return () => window.removeEventListener('scroll', handleWindowScroll);
   }, []);
 
-  // Control playback & audio state machine:
-  // - Plays with unmuted audio ONLY when expanded (progress >= 0.85) AND still in hero section (windowScrollY <= 40).
+  // Playback & Sound Control Engine:
+  // - Plays with full audio automatically when expanded (progress >= 0.85) AND in hero frame (windowScrollY <= 40).
   // - Turns OFF sound & pauses when scrolled up (progress < 0.85) OR scrolled down to menu (windowScrollY > 40).
-  // - When shrunk to original size, resets to beginning (currentTime = 0).
+  // - Resets to beginning (currentTime = 0) when shrunk back to original size.
   useEffect(() => {
     if (!isVideo || !videoRef.current) return;
 
     const isHeroActive = progress >= 0.85 && windowScrollY <= 40;
 
     if (isHeroActive) {
-      if (!wasActiveRef.current) {
-        wasActiveRef.current = true;
-        videoRef.current.muted = false;
-        videoRef.current.play().catch(() => {
-          // If browser blocks unmuted audio on hard refresh before click:
-          // Immediately set muted=true so the video ALWAYS plays on scroll without requiring a click!
-          if (videoRef.current) {
-            videoRef.current.muted = true;
-            videoRef.current.play().catch(() => {});
-          }
-        });
-      }
+      videoRef.current.muted = false;
+      videoRef.current.play().catch(() => {
+        activateAudioEngine();
+      });
     } else {
-      if (wasActiveRef.current) {
-        wasActiveRef.current = false;
-        videoRef.current.pause();
-        videoRef.current.muted = true;
-        if (progress < 0.85) {
-          try {
-            videoRef.current.currentTime = 0;
-          } catch (e) {}
-        }
+      videoRef.current.pause();
+      videoRef.current.muted = true;
+      if (progress < 0.85) {
+        try {
+          videoRef.current.currentTime = 0;
+        } catch (e) {}
       }
     }
   }, [progress, windowScrollY, isVideo]);
-
-  // Unlock audio on any user interaction
-  const unlockAudio = () => {
-    if (isVideo && videoRef.current) {
-      if (videoRef.current.muted) {
-        videoRef.current.muted = false;
-      }
-      if (currentProgressRef.current >= 0.85 && (window.scrollY || 0) <= 40) {
-        videoRef.current.play().catch(() => {
-          if (videoRef.current) {
-            videoRef.current.muted = true;
-            videoRef.current.play().catch(() => {});
-          }
-        });
-      }
-    }
-  };
 
   // Smooth lerp animation loop for 60fps/120fps buttery easing
   useEffect(() => {
@@ -120,7 +130,7 @@ export function CategoryOpeningHero({
   // Intercept scroll, keys, and touch: FRAME STAYS 100% STATIONARY until image is FULL SIZE
   useEffect(() => {
     const handleWheel = (e) => {
-      unlockAudio();
+      activateAudioEngine();
       const isAtTop = window.scrollY <= 2;
 
       if (isAtTop) {
@@ -149,7 +159,7 @@ export function CategoryOpeningHero({
     };
 
     const handleKeyDown = (e) => {
-      unlockAudio();
+      activateAudioEngine();
       const isAtTop = window.scrollY <= 2;
 
       if (isAtTop) {
@@ -174,7 +184,7 @@ export function CategoryOpeningHero({
     };
 
     const handleTouchStart = (e) => {
-      unlockAudio();
+      activateAudioEngine();
       if (e.touches.length > 0) {
         touchStartYRef.current = e.touches[0].clientY;
       }
@@ -210,16 +220,12 @@ export function CategoryOpeningHero({
     window.addEventListener('keydown', handleKeyDown, { passive: false });
     window.addEventListener('touchstart', handleTouchStart, { passive: true });
     window.addEventListener('touchmove', handleTouchMove, { passive: false });
-    window.addEventListener('pointerdown', unlockAudio);
-    window.addEventListener('click', unlockAudio);
 
     return () => {
       window.removeEventListener('wheel', handleWheel);
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('touchstart', handleTouchStart);
       window.removeEventListener('touchmove', handleTouchMove);
-      window.removeEventListener('pointerdown', unlockAudio);
-      window.removeEventListener('click', unlockAudio);
     };
   }, []);
 
