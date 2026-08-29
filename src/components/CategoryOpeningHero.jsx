@@ -7,7 +7,6 @@ export function CategoryOpeningHero({
   flankLeft = 'ECO-PARK EXPERIENCES',
   flankRight = 'SULTAN KUDARAT',
   image = '/Background Pictures/Background Hero Section II.jpg',
-  video = null,
   id = 'opening-hero',
   hasContentBelow = false,
   onExploreBelow = null
@@ -205,28 +204,17 @@ export function CategoryOpeningHero({
       <div 
         className="expanding-image-container"
         style={{
-          width: `${imageWidthPercent}vw`,
-          height: `${imageHeightPercent}vh`,
+          width: `${imageWidthPercent}%`,
+          height: `${imageHeightPercent}%`,
           borderRadius: `${borderRadius}px`,
           opacity: p > 0.005 ? 1 : 0
         }}
       >
-        {video || (typeof image === 'string' && image.toLowerCase().endsWith('.mp4')) ? (
-          <video 
-            src={video || image} 
-            autoPlay 
-            loop 
-            muted 
-            playsInline 
-            className="expanding-image-content expanding-video-content"
-          />
-        ) : (
-          <img 
-            src={image} 
-            alt={titleBottom} 
-            className="expanding-image-content"
-          />
-        )}
+        <img 
+          src={image} 
+          alt={titleBottom} 
+          className="expanding-image-content"
+        />
         
         {/* Subtle atmospheric vignette when fully expanded */}
         <div 
