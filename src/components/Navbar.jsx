@@ -127,7 +127,7 @@ export function Navbar({ activeFrame, onNavigate }) {
             onMouseEnter={() => setActiveMegaMenu(null)}
             onClick={(e) => handleNavClick(e, 'about')}
           >
-            ABOUT US
+            ABOUT
           </a>
 
           {/* 3. WHAT WE OFFER (Full Width Mega Menu Trigger) */}
@@ -350,7 +350,7 @@ export function Navbar({ activeFrame, onNavigate }) {
       {mobileMenuOpen && (
         <div className="mobile-nav-panel">
           <a href="#home" className="mobile-nav-item" onClick={(e) => handleNavClick(e, 'home', '#home')}>HOME</a>
-          <a href="#about" className="mobile-nav-item" onClick={(e) => handleNavClick(e, 'about')}>ABOUT US</a>
+          <a href="#about" className="mobile-nav-item" onClick={(e) => handleNavClick(e, 'about')}>ABOUT</a>
 
           {/* Mobile Accordion: WHAT WE OFFER */}
           <div className="mobile-accordion-wrapper">
