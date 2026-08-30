@@ -24,17 +24,18 @@ export function HeroSection({ onNavigate }) {
         <div className="tropical-dusk-overlay" />
       </div>
 
-      {/* Hero Center Layout */}
+      {/* Hero Bottom-Left Corner Layout */}
       <div className="hero-content-container">
-        {/* Center Grand Display Typography & CTA */}
-        <div className="hero-center-box">
+        <div className="hero-left-box">
+          {/* Headline */}
           <h1 className="hero-serif-title">
-            QETSIYAH<br />
-            ECO PARK
+            <span className="hero-title-row">QETSIYAH.</span>
+            <span className="hero-title-row">ECO PARK.</span>
           </h1>
-          
-          <p className="hero-clean-tagline">
-            A relaxing wide place that is perfect for all events and occasions
+
+          {/* Subheadline */}
+          <p className="hero-subheadline">
+            A RELAXING WIDE PLACE. PERFECT FOR ALL EVENTS AND OCCASIONS.
           </p>
 
           {/* Call-to-Action Button */}
