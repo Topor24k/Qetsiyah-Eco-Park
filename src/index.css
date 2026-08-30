@@ -4577,21 +4577,39 @@ body::-webkit-scrollbar,
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.55);
 }
 
-/* Subtle Scroll Indicator at Start */
+.activities-opening-hero-frame.is-collapsed-clickable {
+  cursor: pointer;
+}
+
+/* Subtle Interactive Click / Scroll Indicator at Start */
 .opening-scroll-hint {
   position: absolute;
-  bottom: 24px;
+  bottom: 28px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 10;
   font-family: var(--font-sans-ui);
   font-size: 0.68rem;
-  font-weight: 700;
-  letter-spacing: 0.22em;
-  color: #8c8270;
+  font-weight: 800;
+  letter-spacing: 0.20em;
+  color: #7a7262;
   text-transform: uppercase;
-  pointer-events: none;
-  animation: pulseHint 2s infinite ease-in-out;
+  padding: 6px 18px;
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border: 1px solid rgba(122, 114, 98, 0.28);
+  border-radius: 9999px;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+  animation: pulseHint 2.4s infinite ease-in-out;
+  transition: all 0.2s ease;
+}
+
+.opening-scroll-hint:hover {
+  background: rgba(255, 255, 255, 0.85);
+  color: #3d3830;
+  transform: translateX(-50%) scale(1.04);
 }
 
 @media (max-width: 768px) {

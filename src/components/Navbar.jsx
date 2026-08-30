@@ -103,6 +103,19 @@ export function Navbar({ activeFrame, onNavigate }) {
     lastScrollYRef.current = 0;
   }, [activeFrame]);
 
+  // Listen for custom visibility events from opening hero components
+  useEffect(() => {
+    const handleNavEvent = (e) => {
+      if (typeof e.detail === 'boolean') {
+        if (!e.detail) setActiveMegaMenu(null);
+        setNavVisible(e.detail);
+      }
+    };
+
+    window.addEventListener('nav-visible', handleNavEvent);
+    return () => window.removeEventListener('nav-visible', handleNavEvent);
+  }, []);
+
   // Close mega menu on click outside
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -155,7 +168,11 @@ export function Navbar({ activeFrame, onNavigate }) {
         backgroundColor: showSolidNav ? '#383e24' : 'transparent',
         borderBottomColor: showSolidNav ? 'rgba(255, 255, 255, 0.12)' : 'transparent',
         boxShadow: showSolidNav ? '0 4px 20px rgba(0, 0, 0, 0.35)' : 'none',
-        padding: showSolidNav ? '14px 0' : '22px 0 10px'
+        padding: showSolidNav ? '14px 0' : '22px 0 10px',
+        transform: navVisible ? 'translateY(0)' : 'translateY(-115%)',
+        opacity: navVisible ? 1 : 0,
+        pointerEvents: navVisible ? 'auto' : 'none',
+        transition: 'transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease, padding 0.25s ease, background-color 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease'
       }}
       onMouseLeave={() => setActiveMegaMenu(null)}
     >

@@ -63,16 +63,53 @@ export function CategoryOpeningHero({
     };
   }, [isVideo]);
 
-  // Track window scroll to detect when user scrolled down to menu
+  // Track window scroll & auto-shrink back to initial size on scroll down
   useEffect(() => {
     const handleWindowScroll = () => {
-      setWindowScrollY(window.scrollY || window.pageYOffset || 0);
+      const currentScrollY = window.scrollY || window.pageYOffset || 0;
+      setWindowScrollY(currentScrollY);
+
+      // If user starts scrolling down while video is expanded, automatically shrink it back down
+      if (currentScrollY > 15 && targetProgressRef.current > 0) {
+        targetProgressRef.current = 0;
+      }
+    };
+
+    const handleWheel = (e) => {
+      // If user wheels down while expanded, immediately start shrinking back down
+      if (e.deltaY > 8 && targetProgressRef.current > 0) {
+        targetProgressRef.current = 0;
+      }
+    };
+
+    const handleTouchStart = (e) => {
+      if (e.touches && e.touches.length > 0) {
+        touchStartYRef.current = e.touches[0].clientY;
+      }
+    };
+
+    const handleTouchMove = (e) => {
+      if (!e.touches || e.touches.length === 0) return;
+      const currentY = e.touches[0].clientY;
+      const diff = touchStartYRef.current - currentY;
+      if (diff > 10 && targetProgressRef.current > 0) {
+        targetProgressRef.current = 0;
+      }
+      touchStartYRef.current = currentY;
     };
 
     window.addEventListener('scroll', handleWindowScroll, { passive: true });
+    window.addEventListener('wheel', handleWheel, { passive: true });
+    window.addEventListener('touchstart', handleTouchStart, { passive: true });
+    window.addEventListener('touchmove', handleTouchMove, { passive: true });
     handleWindowScroll();
 
-    return () => window.removeEventListener('scroll', handleWindowScroll);
+    return () => {
+      window.removeEventListener('scroll', handleWindowScroll);
+      window.removeEventListener('wheel', handleWheel);
+      window.removeEventListener('touchstart', handleTouchStart);
+      window.removeEventListener('touchmove', handleTouchMove);
+    };
   }, []);
 
   // Playback & Sound Control Engine:
@@ -100,7 +137,7 @@ export function CategoryOpeningHero({
     }
   }, [progress, windowScrollY, isVideo]);
 
-  // Smooth lerp animation loop for 60fps/120fps buttery easing
+  // Smooth lerp animation loop for 60fps/120fps buttery easing (slower, cinematic pace)
   useEffect(() => {
     let isRunning = true;
 
@@ -109,7 +146,7 @@ export function CategoryOpeningHero({
 
       const diff = targetProgressRef.current - currentProgressRef.current;
       if (Math.abs(diff) > 0.0005) {
-        currentProgressRef.current += diff * 0.14; // smooth easing
+        currentProgressRef.current += diff * 0.055; // slower, cinematic smooth easing
         setProgress(currentProgressRef.current);
       } else if (currentProgressRef.current !== targetProgressRef.current) {
         currentProgressRef.current = targetProgressRef.current;
@@ -127,116 +164,29 @@ export function CategoryOpeningHero({
     };
   }, []);
 
-  // Synchronize header visibility with opening hero expansion
+  // Synchronize header visibility with opening hero expansion (header disappears immediately as video starts showing)
   useEffect(() => {
-    if (progress > 0.03) {
+    if (progress > 0.005 || targetProgressRef.current > 0.01) {
       window.dispatchEvent(new CustomEvent('nav-visible', { detail: false }));
-    } else if (progress <= 0.02 && (window.scrollY || 0) <= 10) {
+    } else if (progress <= 0.005 && targetProgressRef.current === 0 && (window.scrollY || 0) <= 10) {
       window.dispatchEvent(new CustomEvent('nav-visible', { detail: true }));
     }
   }, [progress]);
 
-  // Intercept scroll, keys, and touch: FRAME STAYS 100% STATIONARY until image is FULL SIZE
-  useEffect(() => {
-    const handleWheel = (e) => {
-      activateAudioEngine();
-      const isAtTop = window.scrollY <= 2;
+  // Click to expand / reveal full frame video or image (ONLY triggers on click, NOT on scroll)
+  const handleFrameClick = (e) => {
+    // If clicking on the explore menu button or any interactive button, ignore frame click
+    if (e.target.closest('.opening-explore-menu-btn') || e.target.closest('button.opening-explore-menu-btn')) {
+      return;
+    }
 
-      if (isAtTop) {
-        // Scrolling DOWN
-        if (e.deltaY > 0) {
-          if (currentProgressRef.current < 0.99) {
-            // Frame MUST NOT move: capture scroll & expand image in place
-            e.preventDefault();
-            const delta = e.deltaY * 0.0016;
-            targetProgressRef.current = Math.min(1, targetProgressRef.current + delta);
-          } else {
-            // Image is NOW IN FULL SIZE: let default scroll happen so page moves down to view menu
-            targetProgressRef.current = 1;
-          }
-        } 
-        // Scrolling UP at the very top
-        else if (e.deltaY < 0) {
-          if (currentProgressRef.current > 0.01) {
-            // Frame stays stationary: shrink image & close text
-            e.preventDefault();
-            const delta = e.deltaY * 0.0016;
-            targetProgressRef.current = Math.max(0, targetProgressRef.current + delta);
-          }
-        }
-      }
-    };
+    activateAudioEngine();
 
-    const handleKeyDown = (e) => {
-      activateAudioEngine();
-      const isAtTop = window.scrollY <= 2;
-
-      if (isAtTop) {
-        // Down Arrow / Page Down / Space
-        if (['ArrowDown', 'PageDown', ' '].includes(e.key)) {
-          if (currentProgressRef.current < 0.99) {
-            // Animate expansion first without moving the frame
-            e.preventDefault();
-            targetProgressRef.current = Math.min(1, targetProgressRef.current + 0.20);
-          } else {
-            targetProgressRef.current = 1;
-          }
-        }
-        // Up Arrow / Page Up
-        else if (['ArrowUp', 'PageUp'].includes(e.key)) {
-          if (currentProgressRef.current > 0.01) {
-            e.preventDefault();
-            targetProgressRef.current = Math.max(0, targetProgressRef.current - 0.20);
-          }
-        }
-      }
-    };
-
-    const handleTouchStart = (e) => {
-      activateAudioEngine();
-      if (e.touches.length > 0) {
-        touchStartYRef.current = e.touches[0].clientY;
-      }
-    };
-
-    const handleTouchMove = (e) => {
-      const isAtTop = window.scrollY <= 2;
-      if (e.touches.length > 0 && isAtTop) {
-        const touchY = e.touches[0].clientY;
-        const delta = (touchStartYRef.current - touchY) * 0.0035;
-        touchStartYRef.current = touchY;
-
-        if (delta > 0) {
-          // Swiping UP (scrolling down)
-          if (currentProgressRef.current < 0.99) {
-            e.preventDefault();
-            targetProgressRef.current = Math.min(1, targetProgressRef.current + delta);
-          } else {
-            targetProgressRef.current = 1;
-          }
-        } else if (delta < 0) {
-          // Swiping DOWN (scrolling up)
-          if (currentProgressRef.current > 0.01) {
-            e.preventDefault();
-            targetProgressRef.current = Math.max(0, targetProgressRef.current + delta);
-          }
-        }
-      }
-    };
-
-    // Attach to window so mouse hovering anywhere on screen triggers the animation
-    window.addEventListener('wheel', handleWheel, { passive: false });
-    window.addEventListener('keydown', handleKeyDown, { passive: false });
-    window.addEventListener('touchstart', handleTouchStart, { passive: true });
-    window.addEventListener('touchmove', handleTouchMove, { passive: false });
-
-    return () => {
-      window.removeEventListener('wheel', handleWheel);
-      window.removeEventListener('keydown', handleKeyDown);
-      window.removeEventListener('touchstart', handleTouchStart);
-      window.removeEventListener('touchmove', handleTouchMove);
-    };
-  }, []);
+    if (targetProgressRef.current < 0.5) {
+      targetProgressRef.current = 1;
+      window.dispatchEvent(new CustomEvent('nav-visible', { detail: false }));
+    }
+  };
 
   // Smooth interpolation calculations
   const p = Math.min(1, Math.max(0, progress));
@@ -265,9 +215,10 @@ export function CategoryOpeningHero({
 
   return (
     <div 
-      className="activities-opening-hero-frame" 
+      className={`activities-opening-hero-frame ${p < 0.5 ? 'is-collapsed-clickable' : 'is-expanded'}`} 
       ref={containerRef} 
       id={id}
+      onClick={handleFrameClick}
     >
       {/* Subtle Marbled Warm Background with Fine Veins */}
       <div className="opening-parchment-backdrop"></div>
@@ -333,7 +284,16 @@ export function CategoryOpeningHero({
         {hasContentBelow && p >= 0.85 && (
           <button 
             className="opening-explore-menu-btn"
-            onClick={onExploreBelow}
+            onClick={(e) => {
+              e.stopPropagation();
+              targetProgressRef.current = 0;
+              if (onExploreBelow) {
+                onExploreBelow();
+              } else {
+                const el = document.querySelector('#food-catalog') || document.querySelector('.food-catalog-sheet-section');
+                if (el) el.scrollIntoView({ behavior: 'smooth' });
+              }
+            }}
           >
             <span>SCROLL TO VIEW FULL MENU</span>
             <ArrowDown size={15} />
@@ -364,10 +324,10 @@ export function CategoryOpeningHero({
         </h2>
       </div>
 
-      {/* Subtle Scroll Hint Indicator at 0% */}
+      {/* Click / Scroll Hint Indicator at 0% */}
       {p < 0.05 && (
         <div className="opening-scroll-hint">
-          <span>SCROLL DOWN TO REVEAL</span>
+          <span>CLICK TO REVEAL</span>
         </div>
       )}
     </div>
