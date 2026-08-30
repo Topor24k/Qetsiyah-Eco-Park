@@ -39,6 +39,28 @@ export function Footer({ onNavigate }) {
           <p className="footer-brand-desc">
             A relaxing wide place that is perfect for all events and occasions in Barangay Calean, Tacurong City, Sultan Kudarat. Established October 20, 2023.
           </p>
+
+          {/* Interactive Google Satellite Map Card */}
+          <a
+            href="https://www.google.com/maps/place/Qetsiyah+Ecopark/@6.6567268,124.6805906,433m/data=!3m1!1e3!4m14!1m7!3m6!1s0x32f80d3f87f6d6e5:0xd47b9e3e2d0f4b2a!2sQetsiyah+Ecopark!8m2!3d6.6564972!4d124.6816161!16s%2Fg%2F11khxzgt7r!3m5!1s0x32f80d3f87f6d6e5:0xd47b9e3e2d0f4b2a!8m2!3d6.6564972!4d124.6816161!16s%2Fg%2F11khxzgt7r?entry=ttu"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="footer-map-card"
+            aria-label="View Qetsiyah Ecopark on Google Maps"
+          >
+            <iframe
+              title="Qetsiyah Ecopark Google Satellite Map"
+              src="https://maps.google.com/maps?q=6.6564972,124.6816161+(Qetsiyah+Ecopark)&t=k&z=17&ie=UTF8&iwloc=B&output=embed"
+              className="footer-map-iframe"
+              loading="lazy"
+            />
+            <div className="footer-map-overlay">
+              <span className="footer-map-badge">
+                <MapPin size={11} />
+                <span>VIEW IN MAPS</span>
+              </span>
+            </div>
+          </a>
         </div>
 
         {/* Column 2: Quick Links / Offers */}
