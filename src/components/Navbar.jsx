@@ -3,30 +3,105 @@ import { ChevronDown, Menu, X } from 'lucide-react';
 
 export function Navbar({ activeFrame, onNavigate }) {
   const [scrollRatio, setScrollRatio] = useState(0);
+  const [navVisible, setNavVisible] = useState(true);
   const [activeMegaMenu, setActiveMegaMenu] = useState(null); // 'offers' | 'must-visit' | null
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mobileOffersOpen, setMobileOffersOpen] = useState(false);
   const [mobileMustVisitOpen, setMobileMustVisitOpen] = useState(false);
 
   const navRef = useRef(null);
+  const lastScrollYRef = useRef(0);
 
-  // Calculates smooth fade-in of the olive background only as you scroll away from Home
+  // Calculates smooth fade-in of the background and smart hide-on-scroll-down / reveal-on-scroll-up across ALL frames & hero sections
   useEffect(() => {
+    lastScrollYRef.current = window.pageYOffset || document.documentElement.scrollTop || window.scrollY || 0;
+    let touchStartY = 0;
+
     const handleScroll = () => {
-      const scrollY = window.pageYOffset || document.documentElement.scrollTop || window.scrollY || 0;
+      const currentScrollY = window.pageYOffset || document.documentElement.scrollTop || window.scrollY || 0;
       const fadeDistance = 240;
-      const ratio = Math.min(Math.max((scrollY - 20) / fadeDistance, 0), 1);
+      const ratio = Math.min(Math.max((currentScrollY - 20) / fadeDistance, 0), 1);
       setScrollRatio(ratio);
+
+      const diff = currentScrollY - lastScrollYRef.current;
+
+      if (diff > 4) {
+        // Scrolling DOWN -> immediately hide navbar
+        setActiveMegaMenu(null);
+        setNavVisible(false);
+      } else if (diff < -3) {
+        // Scrolling UP -> immediately reveal navbar
+        setNavVisible(true);
+      }
+
+      lastScrollYRef.current = currentScrollY;
+    };
+
+    const handleWheel = (e) => {
+      if (e.deltaY > 6) {
+        // Wheel scrolling DOWN (even right at the start of hero sections in What We Offer!)
+        setActiveMegaMenu(null);
+        setNavVisible(false);
+      } else if (e.deltaY < -6) {
+        // Wheel scrolling UP (even slightly!) -> reveal navbar
+        setNavVisible(true);
+      }
+    };
+
+    const handleTouchStart = (e) => {
+      if (e.touches && e.touches.length > 0) {
+        touchStartY = e.touches[0].clientY;
+      }
+    };
+
+    const handleTouchMove = (e) => {
+      if (!e.touches || e.touches.length === 0) return;
+      const currentY = e.touches[0].clientY;
+      const diffY = touchStartY - currentY;
+
+      if (diffY > 8) {
+        // Swiping UP (scrolling DOWN) -> immediately hide navbar
+        setActiveMegaMenu(null);
+        setNavVisible(false);
+      } else if (diffY < -8) {
+        // Swiping DOWN (scrolling UP) -> immediately reveal navbar
+        setNavVisible(true);
+      }
+      touchStartY = currentY;
+    };
+
+    const handleKeyDown = (e) => {
+      if (['ArrowDown', 'PageDown', ' '].includes(e.key)) {
+        setActiveMegaMenu(null);
+        setNavVisible(false);
+      } else if (['ArrowUp', 'PageUp', 'Home'].includes(e.key)) {
+        setNavVisible(true);
+      }
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     document.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('wheel', handleWheel, { passive: true });
+    window.addEventListener('touchstart', handleTouchStart, { passive: true });
+    window.addEventListener('touchmove', handleTouchMove, { passive: true });
+    window.addEventListener('keydown', handleKeyDown, { passive: true });
     handleScroll();
+
     return () => {
       window.removeEventListener('scroll', handleScroll);
       document.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('wheel', handleWheel);
+      window.removeEventListener('touchstart', handleTouchStart);
+      window.removeEventListener('touchmove', handleTouchMove);
+      window.removeEventListener('keydown', handleKeyDown);
     };
   }, []);
+
+  // When changing frames, ensure navbar is immediately shown at the top
+  useEffect(() => {
+    setNavVisible(true);
+    lastScrollYRef.current = 0;
+  }, [activeFrame]);
 
   // Close mega menu on click outside
   useEffect(() => {
@@ -75,7 +150,7 @@ export function Navbar({ activeFrame, onNavigate }) {
   return (
     <header
       ref={navRef}
-      className={`primary-nav-header ${showSolidNav ? 'is-scrolled' : 'is-at-top'} ${!showSolidNav && !isHome ? 'on-light-hero' : ''}`}
+      className={`primary-nav-header ${navVisible ? 'is-visible' : 'nav-hidden'} ${showSolidNav ? 'is-scrolled' : 'is-at-top'} ${!showSolidNav && !isHome ? 'on-light-hero' : ''}`}
       style={{
         backgroundColor: showSolidNav ? '#383e24' : 'transparent',
         borderBottomColor: showSolidNav ? 'rgba(255, 255, 255, 0.12)' : 'transparent',

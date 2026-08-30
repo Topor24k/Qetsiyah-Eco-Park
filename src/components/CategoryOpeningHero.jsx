@@ -127,6 +127,15 @@ export function CategoryOpeningHero({
     };
   }, []);
 
+  // Synchronize header visibility with opening hero expansion
+  useEffect(() => {
+    if (progress > 0.03) {
+      window.dispatchEvent(new CustomEvent('nav-visible', { detail: false }));
+    } else if (progress <= 0.02 && (window.scrollY || 0) <= 10) {
+      window.dispatchEvent(new CustomEvent('nav-visible', { detail: true }));
+    }
+  }, [progress]);
+
   // Intercept scroll, keys, and touch: FRAME STAYS 100% STATIONARY until image is FULL SIZE
   useEffect(() => {
     const handleWheel = (e) => {

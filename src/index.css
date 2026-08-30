@@ -261,7 +261,14 @@ button {
   width: 100% !important;
   z-index: 999999 !important;
   border-bottom: 1px solid transparent;
-  transition: padding 0.25s ease, background-color 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  transform: translateY(0);
+  transition: transform 0.38s cubic-bezier(0.16, 1, 0.3, 1), padding 0.25s ease, background-color 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  will-change: transform;
+}
+
+.primary-nav-header.nav-hidden {
+  transform: translateY(-115%) !important;
+  pointer-events: none;
 }
 
 .primary-nav-container {
@@ -2545,120 +2552,114 @@ button {
    6. SITE-WIDE FOOTER
    ========================================================================== */
 .park-site-footer {
-  background-color: #0d120f;
+  background-color: #0b0f0d;
   color: #cbd5e1;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
   margin-top: auto;
+  width: 100%;
 }
 
 .footer-top-container {
   width: 100%;
-  max-width: 1360px;
+  max-width: 1440px;
   margin: 0 auto;
-  padding: 80px 44px 50px;
+  padding: 68px clamp(24px, 3.5vw, 60px) 44px;
   display: grid;
-  grid-template-columns: 1.4fr 1fr 1fr 1.2fr;
-  gap: 48px;
+  grid-template-columns: 1.6fr 1fr 1fr 1.3fr;
+  gap: clamp(28px, 4vw, 56px);
+  align-items: start;
 }
 
-.footer-brand-lockup {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  margin-bottom: 14px;
+.footer-brand-col {
+  max-width: 380px;
 }
 
-.footer-logo-q {
-  font-family: var(--font-serif-heading);
-  font-size: 2.4rem;
-  font-weight: 600;
-  color: #ffffff;
-  line-height: 1;
+.footer-brand-logo-link {
+  display: inline-block;
+  text-decoration: none;
+  margin-bottom: 20px;
+  transition: transform 0.2s ease;
 }
 
-.footer-logo-text {
-  display: flex;
-  flex-direction: column;
-}
-
-.footer-logo-main {
-  font-family: var(--font-serif-heading);
-  font-size: 1.35rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  color: #ffffff;
-  line-height: 1;
-}
-
-.footer-logo-sub {
-  font-size: 0.58rem;
-  font-weight: 800;
-  letter-spacing: 0.28em;
-  color: var(--accent-gold);
+.footer-brand-logo-link:hover {
+  transform: scale(1.02);
 }
 
 .footer-brand-desc {
+  font-family: var(--font-sans-ui);
   font-size: 0.88rem;
   color: #94a3b8;
-  line-height: 1.6;
-  margin-bottom: 20px;
+  line-height: 1.65;
+  margin: 0;
 }
 
-.footer-badge-tag {
-  display: inline-block;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 6px 12px;
-  border-radius: var(--radius-xs);
-  font-size: 0.65rem;
-  font-weight: 800;
-  letter-spacing: 0.12em;
-  color: #f1f5f9;
+.footer-col {
+  display: flex;
+  flex-direction: column;
 }
 
 .footer-col-title {
   font-family: var(--font-sans-ui);
   font-size: 0.74rem;
   font-weight: 800;
-  letter-spacing: 0.20em;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--accent-gold);
-  margin-bottom: 18px;
+  margin-bottom: 20px;
 }
 
-.footer-nav-list {
+.footer-link-list {
   list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.footer-nav-list button {
-  font-size: 0.85rem;
-  color: #94a3b8;
-  text-align: left;
-  padding: 2px 0;
-  transition: all 0.2s ease;
-}
-
-.footer-nav-list button:hover {
-  color: #ffffff;
-  transform: translateX(3px);
-}
-
-.footer-contact-items {
+  padding: 0;
+  margin: 0;
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
+.footer-link-list li {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.footer-link-list a,
+.footer-link-list button {
+  font-family: var(--font-sans-ui);
+  font-size: 0.86rem;
+  color: #94a3b8;
+  text-decoration: none;
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.footer-link-list a:hover,
+.footer-link-list button:hover {
+  color: #ffffff;
+  transform: translateX(4px);
+}
+
+.footer-contact-details {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
 .footer-contact-line {
   display: flex;
   align-items: flex-start;
-  gap: 10px;
+  gap: 12px;
+  font-family: var(--font-sans-ui);
   font-size: 0.86rem;
   color: #94a3b8;
-  line-height: 1.45;
+  line-height: 1.5;
+  margin: 0;
 }
 
 .footer-icon {
@@ -2668,39 +2669,29 @@ button {
 }
 
 .footer-bottom-bar {
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
-  padding: 24px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+  padding: 20px 0 24px;
+  background-color: rgba(0, 0, 0, 0.2);
 }
 
 .footer-bottom-container {
   width: 100%;
-  max-width: 1360px;
+  max-width: 1440px;
   margin: 0 auto;
-  padding: 0 44px;
+  padding: 0 clamp(24px, 3.5vw, 60px);
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
+  text-align: left;
 }
 
 .footer-copy-text {
-  font-size: 0.78rem;
+  font-family: var(--font-sans-ui);
+  font-size: 0.80rem;
   color: #64748b;
-}
-
-.back-to-top-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 0.72rem;
-  font-weight: 800;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--accent-gold);
-  transition: color 0.2s ease;
-}
-
-.back-to-top-btn:hover {
-  color: #ffffff;
+  letter-spacing: 0.01em;
+  margin: 0;
+  text-align: left;
 }
 
 /* ==========================================================================
@@ -2828,7 +2819,8 @@ button {
   .footer-bottom-container {
     flex-direction: column;
     gap: 12px;
-    text-align: center;
+    text-align: left;
+    align-items: flex-start;
   }
 }
 
