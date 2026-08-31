@@ -155,7 +155,7 @@ export function FoodOffersFrame({ onNavigate }) {
             );
 
             return (
-              <div key={category.id} className="menu-category-block">
+              <div key={category.id} id={category.id} className="menu-category-block">
                 {/* Top Split */}
                 <div className={`menu-category-top-split ${isTitleLeft ? 'layout-title-left' : 'layout-title-right'}`}>
                   <div className="top-split-left-col">
