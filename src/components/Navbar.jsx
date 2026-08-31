@@ -25,11 +25,11 @@ export function Navbar({ activeFrame, onNavigate }) {
 
       const diff = currentScrollY - lastScrollYRef.current;
 
-      if (diff > 4) {
-        // Scrolling DOWN -> immediately hide navbar and close dropdown
+      if (diff > 12 && currentScrollY > 60) {
+        // Scrolling DOWN -> hide navbar
         setActiveMegaMenu(null);
         setNavVisible(false);
-      } else if (diff < -3) {
+      } else if (diff < -3 && !window.isHeroExpanded) {
         // Scrolling UP -> immediately reveal navbar
         setNavVisible(true);
       }
@@ -41,7 +41,7 @@ export function Navbar({ activeFrame, onNavigate }) {
       if (e.deltaY > 8) {
         setActiveMegaMenu(null);
         setNavVisible(false);
-      } else if (e.deltaY < -8) {
+      } else if (e.deltaY < -8 && !window.isHeroExpanded) {
         setNavVisible(true);
       }
     };
@@ -60,7 +60,7 @@ export function Navbar({ activeFrame, onNavigate }) {
       if (diffY > 10) {
         setActiveMegaMenu(null);
         setNavVisible(false);
-      } else if (diffY < -10) {
+      } else if (diffY < -10 && !window.isHeroExpanded) {
         setNavVisible(true);
       }
       touchStartY = currentY;
@@ -72,8 +72,16 @@ export function Navbar({ activeFrame, onNavigate }) {
       } else if (['ArrowDown', 'PageDown'].includes(e.key)) {
         setActiveMegaMenu(null);
         setNavVisible(false);
-      } else if (['ArrowUp', 'PageUp', 'Home'].includes(e.key)) {
+      } else if (['ArrowUp', 'PageUp', 'Home'].includes(e.key) && !window.isHeroExpanded) {
         setNavVisible(true);
+      }
+    };
+
+    const handleCustomNavVisibility = (e) => {
+      window.isHeroExpanded = !e.detail;
+      setNavVisible(e.detail);
+      if (!e.detail) {
+        setActiveMegaMenu(null);
       }
     };
 
@@ -83,6 +91,7 @@ export function Navbar({ activeFrame, onNavigate }) {
     window.addEventListener('touchstart', handleTouchStart, { passive: true });
     window.addEventListener('touchmove', handleTouchMove, { passive: true });
     window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('nav-visible', handleCustomNavVisibility);
     handleScroll();
 
     return () => {
@@ -92,11 +101,13 @@ export function Navbar({ activeFrame, onNavigate }) {
       window.removeEventListener('touchstart', handleTouchStart);
       window.removeEventListener('touchmove', handleTouchMove);
       window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('nav-visible', handleCustomNavVisibility);
     };
   }, []);
 
   // When changing frames, ensure navbar is immediately shown at the top
   useEffect(() => {
+    window.isHeroExpanded = false;
     setNavVisible(true);
     lastScrollYRef.current = 0;
   }, [activeFrame]);
