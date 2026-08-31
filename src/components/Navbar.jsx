@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ChevronDown, Menu, X } from 'lucide-react';
+import { Plus, X, Menu, ArrowRight } from 'lucide-react';
 
 export function Navbar({ activeFrame, onNavigate }) {
   const [scrollRatio, setScrollRatio] = useState(0);
@@ -12,7 +12,7 @@ export function Navbar({ activeFrame, onNavigate }) {
   const navRef = useRef(null);
   const lastScrollYRef = useRef(0);
 
-  // Calculates smooth fade-in of the background and smart hide-on-scroll-down / reveal-on-scroll-up across ALL frames & hero sections
+  // Calculates smooth fade-in of the background and smart hide-on-scroll-down / reveal-on-scroll-up
   useEffect(() => {
     lastScrollYRef.current = window.pageYOffset || document.documentElement.scrollTop || window.scrollY || 0;
     let touchStartY = 0;
@@ -26,7 +26,7 @@ export function Navbar({ activeFrame, onNavigate }) {
       const diff = currentScrollY - lastScrollYRef.current;
 
       if (diff > 4) {
-        // Scrolling DOWN -> immediately hide navbar
+        // Scrolling DOWN -> immediately hide navbar and close dropdown
         setActiveMegaMenu(null);
         setNavVisible(false);
       } else if (diff < -3) {
@@ -38,12 +38,10 @@ export function Navbar({ activeFrame, onNavigate }) {
     };
 
     const handleWheel = (e) => {
-      if (e.deltaY > 6) {
-        // Wheel scrolling DOWN (even right at the start of hero sections in What We Offer!)
+      if (e.deltaY > 8) {
         setActiveMegaMenu(null);
         setNavVisible(false);
-      } else if (e.deltaY < -6) {
-        // Wheel scrolling UP (even slightly!) -> reveal navbar
+      } else if (e.deltaY < -8) {
         setNavVisible(true);
       }
     };
@@ -59,19 +57,19 @@ export function Navbar({ activeFrame, onNavigate }) {
       const currentY = e.touches[0].clientY;
       const diffY = touchStartY - currentY;
 
-      if (diffY > 8) {
-        // Swiping UP (scrolling DOWN) -> immediately hide navbar
+      if (diffY > 10) {
         setActiveMegaMenu(null);
         setNavVisible(false);
-      } else if (diffY < -8) {
-        // Swiping DOWN (scrolling UP) -> immediately reveal navbar
+      } else if (diffY < -10) {
         setNavVisible(true);
       }
       touchStartY = currentY;
     };
 
     const handleKeyDown = (e) => {
-      if (['ArrowDown', 'PageDown', ' '].includes(e.key)) {
+      if (e.key === 'Escape') {
+        setActiveMegaMenu(null);
+      } else if (['ArrowDown', 'PageDown'].includes(e.key)) {
         setActiveMegaMenu(null);
         setNavVisible(false);
       } else if (['ArrowUp', 'PageUp', 'Home'].includes(e.key)) {
@@ -84,7 +82,7 @@ export function Navbar({ activeFrame, onNavigate }) {
     window.addEventListener('wheel', handleWheel, { passive: true });
     window.addEventListener('touchstart', handleTouchStart, { passive: true });
     window.addEventListener('touchmove', handleTouchMove, { passive: true });
-    window.addEventListener('keydown', handleKeyDown, { passive: true });
+    window.addEventListener('keydown', handleKeyDown);
     handleScroll();
 
     return () => {
@@ -102,19 +100,6 @@ export function Navbar({ activeFrame, onNavigate }) {
     setNavVisible(true);
     lastScrollYRef.current = 0;
   }, [activeFrame]);
-
-  // Listen for custom visibility events from opening hero components
-  useEffect(() => {
-    const handleNavEvent = (e) => {
-      if (typeof e.detail === 'boolean') {
-        if (!e.detail) setActiveMegaMenu(null);
-        setNavVisible(e.detail);
-      }
-    };
-
-    window.addEventListener('nav-visible', handleNavEvent);
-    return () => window.removeEventListener('nav-visible', handleNavEvent);
-  }, []);
 
   // Close mega menu on click outside
   useEffect(() => {
@@ -156,25 +141,31 @@ export function Navbar({ activeFrame, onNavigate }) {
     }
   };
 
+  const toggleMegaMenu = (menuKey) => {
+    setActiveMegaMenu((prev) => (prev === menuKey ? null : menuKey));
+  };
+
   const isHome = activeFrame === 'home';
   const isScrolled = scrollRatio > 0.05;
-  const showSolidNav = isScrolled; // Header ONLY floats and sticks once scrolled out of the hero section
+  const isOffersOpen = activeMegaMenu === 'offers';
+  const isMustVisitOpen = activeMegaMenu === 'must-visit';
+  const isAnyMenuOpen = activeMegaMenu !== null;
+  const showSolidNav = isScrolled || isAnyMenuOpen;
 
   return (
     <header
       ref={navRef}
       className={`primary-nav-header ${navVisible ? 'is-visible' : 'nav-hidden'} ${showSolidNav ? 'is-scrolled' : 'is-at-top'} ${!showSolidNav && !isHome ? 'on-light-hero' : ''}`}
       style={{
-        backgroundColor: showSolidNav ? '#383e24' : 'transparent',
+        backgroundColor: showSolidNav ? '#151b18' : 'transparent',
         borderBottomColor: showSolidNav ? 'rgba(255, 255, 255, 0.12)' : 'transparent',
-        boxShadow: showSolidNav ? '0 4px 20px rgba(0, 0, 0, 0.35)' : 'none',
-        padding: showSolidNav ? '14px 0' : '22px 0 10px',
+        boxShadow: showSolidNav ? '0 8px 30px rgba(0, 0, 0, 0.5)' : 'none',
+        padding: showSolidNav ? '14px 0' : '20px 0 10px',
         transform: navVisible ? 'translateY(0)' : 'translateY(-115%)',
         opacity: navVisible ? 1 : 0,
         pointerEvents: navVisible ? 'auto' : 'none',
         transition: 'transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease, padding 0.25s ease, background-color 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease'
       }}
-      onMouseLeave={() => setActiveMegaMenu(null)}
     >
       <div className="primary-nav-container">
         {/* Left: Typeset Qetsiyah Logo */}
@@ -206,38 +197,39 @@ export function Navbar({ activeFrame, onNavigate }) {
           <a
             href="#home"
             className={`primary-nav-link ${isHome ? 'active' : ''}`}
-            onMouseEnter={() => setActiveMegaMenu(null)}
             onClick={(e) => handleNavClick(e, 'home', '#home')}
           >
             HOME
           </a>
 
-          {/* 2. About (Dedicated Frame) */}
+          {/* 2. About */}
           <a
             href="#about"
             className={`primary-nav-link ${activeFrame === 'about' ? 'active' : ''}`}
-            onMouseEnter={() => setActiveMegaMenu(null)}
             onClick={(e) => handleNavClick(e, 'about')}
           >
             ABOUT
           </a>
 
-          {/* 3. WHAT WE OFFER (Full Width Mega Menu Trigger) */}
-          <div
+          <div 
             className="nav-dropdown-item"
             onMouseEnter={() => setActiveMegaMenu('offers')}
+            onMouseLeave={() => setActiveMegaMenu(null)}
           >
             <button
-              className={`primary-nav-link dropdown-trigger ${
-                ['activities', 'food-offers', 'stays-venues', 'services', 'gallery'].includes(activeFrame) || activeMegaMenu === 'offers'
-                  ? 'active'
+              className={`primary-nav-link dropdown-trigger-btn ${
+                ['activities', 'food-offers', 'stays-venues', 'services', 'gallery'].includes(activeFrame) || isOffersOpen
+                  ? 'active-open'
                   : ''
               }`}
-              onClick={() => setActiveMegaMenu(activeMegaMenu === 'offers' ? null : 'offers')}
-              aria-expanded={activeMegaMenu === 'offers'}
+              onClick={() => toggleMegaMenu('offers')}
+              aria-expanded={isOffersOpen}
+              type="button"
             >
               <span>WHAT WE OFFER</span>
-              <ChevronDown size={13} className={`chevron-arrow ${activeMegaMenu === 'offers' ? 'open' : ''}`} />
+              <span className="nav-toggle-icon-wrap">
+                {isOffersOpen ? <X size={15} className="toggle-close-x" /> : <Plus size={15} className="toggle-plus-icon" />}
+              </span>
             </button>
           </div>
 
@@ -245,7 +237,6 @@ export function Navbar({ activeFrame, onNavigate }) {
           <a
             href="#announcements"
             className={`primary-nav-link ${activeFrame === 'announcements' ? 'active' : ''}`}
-            onMouseEnter={() => setActiveMegaMenu(null)}
             onClick={(e) => handleNavClick(e, 'announcements')}
           >
             ANNOUNCEMENTS
@@ -255,24 +246,26 @@ export function Navbar({ activeFrame, onNavigate }) {
           <a
             href="#booking"
             className="primary-nav-link"
-            onMouseEnter={() => setActiveMegaMenu(null)}
             onClick={(e) => handleNavClick(e, 'home', '#booking')}
           >
             BOOKING
           </a>
 
-          {/* 6. Must Visit (Full Width Mega Menu Trigger) */}
-          <div
+          <div 
             className="nav-dropdown-item"
             onMouseEnter={() => setActiveMegaMenu('must-visit')}
+            onMouseLeave={() => setActiveMegaMenu(null)}
           >
             <button
-              className={`primary-nav-link dropdown-trigger ${activeFrame === 'must-visit' || activeMegaMenu === 'must-visit' ? 'active' : ''}`}
-              onClick={() => setActiveMegaMenu(activeMegaMenu === 'must-visit' ? null : 'must-visit')}
-              aria-expanded={activeMegaMenu === 'must-visit'}
+              className={`primary-nav-link dropdown-trigger-btn ${activeFrame === 'must-visit' || isMustVisitOpen ? 'active-open' : ''}`}
+              onClick={() => toggleMegaMenu('must-visit')}
+              aria-expanded={isMustVisitOpen}
+              type="button"
             >
               <span>MUST VISIT</span>
-              <ChevronDown size={13} className={`chevron-arrow ${activeMegaMenu === 'must-visit' ? 'open' : ''}`} />
+              <span className="nav-toggle-icon-wrap">
+                {isMustVisitOpen ? <X size={15} className="toggle-close-x" /> : <Plus size={15} className="toggle-plus-icon" />}
+              </span>
             </button>
           </div>
         </nav>
@@ -288,152 +281,241 @@ export function Navbar({ activeFrame, onNavigate }) {
       </div>
 
       {/* =========================================================================
-          WHAT WE OFFER: 5-COLUMN FULL-WIDTH MEGA MENU POPOVER
+          FULL-FRAME EDITORIAL MEGA MENU: WHAT WE OFFER (MATCHING REFERENCE IMAGE)
          ========================================================================= */}
-      {activeMegaMenu === 'offers' && (
-        <div className="full-width-mega-menu-popover animate-mega-fade">
-          <div className="mega-menu-inner-container">
-            <div className="mega-menu-categories-grid five-cols">
-              {/* Column 1: ACTIVITIES */}
-              <div className="mega-cat-col">
-                <button
-                  className="mega-cat-header-link"
+      {isOffersOpen && (
+        <div className="full-frame-mega-menu-overlay animate-fullframe-fade">
+          <div className="full-frame-mega-menu-inner">
+            
+            {/* Left Multi-Column Links Section */}
+            <div className="mega-menu-left-content">
+              
+              {/* Main Section Header with Full Horizontal Line */}
+              <div className="mega-menu-main-header">
+                <h2 className="mega-menu-heading-title">Things to do</h2>
+                <div className="mega-menu-heading-divider"></div>
+              </div>
+
+              {/* Top 3-Columns Grid */}
+              <div className="mega-menu-three-cols-grid">
+                
+                {/* Column 1: Activities & Rides */}
+                <div className="mega-links-column">
+                  <ul className="mega-clean-links-list">
+                    <li><a href="#activities" onClick={(e) => handleNavClick(e, 'activities')}>Zip Lining</a></li>
+                    <li><a href="#activities" onClick={(e) => handleNavClick(e, 'activities')}>Sky Biking</a></li>
+                    <li><a href="#activities" onClick={(e) => handleNavClick(e, 'activities')}>Paddle Boats</a></li>
+                    <li><a href="#activities" onClick={(e) => handleNavClick(e, 'activities')}>Horse Riding</a></li>
+                    <li><a href="#activities" onClick={(e) => handleNavClick(e, 'activities')}>Playground for Kids</a></li>
+                    <li><a href="#activities" onClick={(e) => handleNavClick(e, 'activities')}>Kiddy Pool</a></li>
+                    <li><a href="#activities" onClick={(e) => handleNavClick(e, 'activities')}>Scenic Nature Trails</a></li>
+                  </ul>
+                </div>
+
+                {/* Column 2: Food & Dining */}
+                <div className="mega-links-column">
+                  <ul className="mega-clean-links-list">
+                    <li><a href="#food-offers" onClick={(e) => handleNavClick(e, 'food-offers')}>Qetsiyah Café & Restaurant</a></li>
+                    <li><a href="#food-offers" onClick={(e) => handleNavClick(e, 'food-offers')}>Short Orders & Snacks</a></li>
+                    <li><a href="#food-offers" onClick={(e) => handleNavClick(e, 'food-offers')}>Sizzling & Grill Specials</a></li>
+                    <li><a href="#food-offers" onClick={(e) => handleNavClick(e, 'food-offers')}>Pasta & Noodles</a></li>
+                    <li><a href="#food-offers" onClick={(e) => handleNavClick(e, 'food-offers')}>Hearty Soups</a></li>
+                    <li><a href="#food-offers" onClick={(e) => handleNavClick(e, 'food-offers')}>Chicken & Beef Meals</a></li>
+                    <li><a href="#food-offers" onClick={(e) => handleNavClick(e, 'food-offers')}>Halo-Halo & Refreshing Drinks</a></li>
+                  </ul>
+                </div>
+
+                {/* Column 3: Stays & Venues */}
+                <div className="mega-links-column">
+                  <ul className="mega-clean-links-list">
+                    <li><a href="#stays-venues" onClick={(e) => handleNavClick(e, 'stays-venues')}>Verde Villa Luxury Retreat</a></li>
+                    <li><a href="#stays-venues" onClick={(e) => handleNavClick(e, 'stays-venues')}>Cottage Rentals</a></li>
+                    <li><a href="#stays-venues" onClick={(e) => handleNavClick(e, 'stays-venues')}>Lakeside Gazebos</a></li>
+                    <li><a href="#stays-venues" onClick={(e) => handleNavClick(e, 'stays-venues')}>Dine-in Pavilions</a></li>
+                    <li><a href="#stays-venues" onClick={(e) => handleNavClick(e, 'stays-venues')}>Day Tour Resting Cottages</a></li>
+                    <li><a href="#stays-venues" onClick={(e) => handleNavClick(e, 'stays-venues')}>Botanical Garden Grounds</a></li>
+                  </ul>
+                </div>
+
+              </div>
+
+              {/* Bottom 3-Columns Section with Underlined Subheadings */}
+              <div className="mega-menu-bottom-subsections-grid">
+                
+                {/* Subsection 1: Family Activities / Our Services */}
+                <div className="mega-sub-col">
+                  <div className="mega-sub-header">
+                    <h3 className="mega-sub-title">Our services</h3>
+                    <div className="mega-sub-divider"></div>
+                  </div>
+                  <ul className="mega-clean-links-list">
+                    <li><a href="#services" onClick={(e) => handleNavClick(e, 'services')}>Food Catering Packages</a></li>
+                    <li><a href="#services" onClick={(e) => handleNavClick(e, 'services')}>Wedding Receptions</a></li>
+                    <li><a href="#services" onClick={(e) => handleNavClick(e, 'services')}>Birthday & Family Milestones</a></li>
+                    <li><a href="#services" onClick={(e) => handleNavClick(e, 'services')}>Corporate & Office Events</a></li>
+                  </ul>
+                </div>
+
+                {/* Subsection 2: Events & Gallery */}
+                <div className="mega-sub-col">
+                  <div className="mega-sub-header">
+                    <h3 className="mega-sub-title">Park gallery</h3>
+                    <div className="mega-sub-divider"></div>
+                  </div>
+                  <ul className="mega-clean-links-list">
+                    <li><a href="#gallery" onClick={(e) => handleNavClick(e, 'gallery')}>Park Highlights & Views</a></li>
+                    <li><a href="#gallery" onClick={(e) => handleNavClick(e, 'gallery')}>Activity Moments</a></li>
+                    <li><a href="#gallery" onClick={(e) => handleNavClick(e, 'gallery')}>Event Hall & Pavilions</a></li>
+                    <li><a href="#gallery" onClick={(e) => handleNavClick(e, 'gallery')}>View All Park Photos</a></li>
+                  </ul>
+                </div>
+
+                {/* Subsection 3: Tours & Programs / Visitor Info */}
+                <div className="mega-sub-col">
+                  <div className="mega-sub-header">
+                    <h3 className="mega-sub-title">Visitor info</h3>
+                    <div className="mega-sub-divider"></div>
+                  </div>
+                  <ul className="mega-clean-links-list">
+                    <li><a href="#about" onClick={(e) => handleNavClick(e, 'about')}>Daily Operating Hours (8AM–10PM)</a></li>
+                    <li><a href="#about" onClick={(e) => handleNavClick(e, 'about')}>DOT Accreditation Facility</a></li>
+                    <li><a href="#booking" onClick={(e) => handleNavClick(e, 'home', '#booking')}>Online Booking & Reservation</a></li>
+                    <li><a href="#announcements" onClick={(e) => handleNavClick(e, 'announcements')}>Park Bulletins & Advisories</a></li>
+                  </ul>
+                </div>
+
+              </div>
+
+            </div>
+
+            {/* Right Featured Card (Matching Reference Layout) */}
+            <div className="mega-menu-right-featured-card">
+              <div className="featured-card-image-wrap">
+                <img
+                  src="/about-adventure-sanctuary.jpg"
+                  alt="Explore Qetsiyah Eco Park"
+                  className="featured-img-rounded"
+                />
+              </div>
+              <div className="featured-card-caption-block">
+                <h4 className="featured-card-title">
+                  Discover activities and scenic wonders across Qetsiyah Eco Park
+                </h4>
+                <a
+                  href="#activities"
+                  className="featured-card-pill-btn"
                   onClick={(e) => handleNavClick(e, 'activities')}
                 >
-                  <span className="mega-cat-label">ACTIVITIES ›</span>
-                </button>
-                <ul className="mega-cat-items-list">
-                  <li><a href="#activities" onClick={(e) => handleNavClick(e, 'activities')}>Zip Lining</a></li>
-                  <li><a href="#activities" onClick={(e) => handleNavClick(e, 'activities')}>Sky Biking</a></li>
-                  <li><a href="#activities" onClick={(e) => handleNavClick(e, 'activities')}>Paddle Boats</a></li>
-                  <li><a href="#activities" onClick={(e) => handleNavClick(e, 'activities')}>Horse Riding</a></li>
-                  <li><a href="#activities" onClick={(e) => handleNavClick(e, 'activities')}>Playground for Kids</a></li>
-                  <li><a href="#activities" onClick={(e) => handleNavClick(e, 'activities')}>Kiddy Pool</a></li>
-                </ul>
-              </div>
-
-              {/* Column 2: FOOD OFFERS */}
-              <div className="mega-cat-col">
-                <button
-                  className="mega-cat-header-link"
-                  onClick={(e) => handleNavClick(e, 'food-offers')}
-                >
-                  <span className="mega-cat-label">FOOD OFFERS ›</span>
-                </button>
-                <ul className="mega-cat-items-list">
-                  <li><a href="#food-offers" onClick={(e) => handleNavClick(e, 'food-offers')}>Short Orders</a></li>
-                  <li><a href="#food-offers" onClick={(e) => handleNavClick(e, 'food-offers')}>Drinks</a></li>
-                  <li><a href="#food-offers" onClick={(e) => handleNavClick(e, 'food-offers')}>Snacks</a></li>
-                  <li><a href="#food-offers" onClick={(e) => handleNavClick(e, 'food-offers')}>Pasta and Noodles</a></li>
-                  <li><a href="#food-offers" onClick={(e) => handleNavClick(e, 'food-offers')}>Sizzling and Grill</a></li>
-                  <li><a href="#food-offers" onClick={(e) => handleNavClick(e, 'food-offers')}>Soup</a></li>
-                  <li><a href="#food-offers" onClick={(e) => handleNavClick(e, 'food-offers')}>Chicken Meals</a></li>
-                  <li><a href="#food-offers" onClick={(e) => handleNavClick(e, 'food-offers')}>Beef Meals</a></li>
-                  <li><a href="#food-offers" onClick={(e) => handleNavClick(e, 'food-offers')}>Combo Meals</a></li>
-                </ul>
-              </div>
-
-              {/* Column 3: STAYS & VENUES */}
-              <div className="mega-cat-col">
-                <button
-                  className="mega-cat-header-link"
-                  onClick={(e) => handleNavClick(e, 'stays-venues')}
-                >
-                  <span className="mega-cat-label">STAYS & VENUES ›</span>
-                </button>
-                <ul className="mega-cat-items-list">
-                  <li><a href="#stays-venues" onClick={(e) => handleNavClick(e, 'stays-venues')}>Verde Villa Retreat</a></li>
-                  <li><a href="#stays-venues" onClick={(e) => handleNavClick(e, 'stays-venues')}>Cottage Stay</a></li>
-                  <li><a href="#stays-venues" onClick={(e) => handleNavClick(e, 'stays-venues')}>Qetsiyah Café</a></li>
-                  <li><a href="#stays-venues" onClick={(e) => handleNavClick(e, 'stays-venues')}>Dine-in Restaurant</a></li>
-                  <li><a href="#stays-venues" onClick={(e) => handleNavClick(e, 'stays-venues')}>Lakeside Gazebos</a></li>
-                </ul>
-              </div>
-
-              {/* Column 4: OUR SERVICES */}
-              <div className="mega-cat-col">
-                <button
-                  className="mega-cat-header-link"
-                  onClick={(e) => handleNavClick(e, 'services')}
-                >
-                  <span className="mega-cat-label">OUR SERVICES ›</span>
-                </button>
-                <ul className="mega-cat-items-list">
-                  <li><a href="#services" onClick={(e) => handleNavClick(e, 'services')}>Food Catering</a></li>
-                  <li><a href="#services" onClick={(e) => handleNavClick(e, 'services')}>Weddings</a></li>
-                  <li><a href="#services" onClick={(e) => handleNavClick(e, 'services')}>Family Events</a></li>
-                  <li><a href="#services" onClick={(e) => handleNavClick(e, 'services')}>Birthday Event</a></li>
-                  <li><a href="#services" onClick={(e) => handleNavClick(e, 'services')}>Office Event</a></li>
-                  <li><a href="#services" onClick={(e) => handleNavClick(e, 'services')}>Event Hall</a></li>
-                </ul>
-              </div>
-
-              {/* Column 5: PARK GALLERY */}
-              <div className="mega-cat-col">
-                <button
-                  className="mega-cat-header-link"
-                  onClick={(e) => handleNavClick(e, 'gallery')}
-                >
-                  <span className="mega-cat-label">PARK GALLERY ›</span>
-                </button>
-                <ul className="mega-cat-items-list">
-                  <li><a href="#gallery" onClick={(e) => handleNavClick(e, 'gallery')}>Park Highlights & Views</a></li>
-                  <li><a href="#gallery" onClick={(e) => handleNavClick(e, 'gallery')}>Activity Moments</a></li>
-                  <li><a href="#gallery" onClick={(e) => handleNavClick(e, 'gallery')}>Event Hall & Pavilions</a></li>
-                  <li><a href="#gallery" onClick={(e) => handleNavClick(e, 'gallery')}>Lakeside Grounds</a></li>
-                  <li><a href="#gallery" onClick={(e) => handleNavClick(e, 'gallery')}>Café & Dining Ambiance</a></li>
-                  <li><a href="#gallery" onClick={(e) => handleNavClick(e, 'gallery')}>View All Park Photos</a></li>
-                </ul>
+                  <span>View all</span>
+                  <ArrowRight size={16} className="pill-arrow-icon" />
+                </a>
               </div>
             </div>
+
           </div>
         </div>
       )}
 
-      {/* MUST VISIT FULL-WIDTH POPOVER */}
-      {activeMegaMenu === 'must-visit' && (
-        <div className="full-width-mega-menu-popover animate-mega-fade">
-          <div className="mega-menu-inner-container">
-            <div className="mega-menu-categories-grid five-cols">
-              <div className="mega-cat-col">
-                <button
-                  className="mega-cat-header-link"
-                  onClick={(e) => handleNavClick(e, 'must-visit')}
-                >
-                  <span className="mega-cat-label">PARTNER ACCOMMODATIONS ›</span>
-                </button>
-                <ul className="mega-cat-items-list">
-                  <li><a href="#must-visit" onClick={(e) => handleNavClick(e, 'must-visit')}>Wyattel Hotel (Tacurong City)</a></li>
-                  <li><a href="#stays-venues" onClick={(e) => handleNavClick(e, 'stays-venues')}>Verde Villa (At Eco-Park)</a></li>
-                </ul>
+      {/* =========================================================================
+          FULL-FRAME EDITORIAL MEGA MENU: MUST VISIT
+         ========================================================================= */}
+      {isMustVisitOpen && (
+        <div className="full-frame-mega-menu-overlay animate-fullframe-fade">
+          <div className="full-frame-mega-menu-inner">
+            
+            <div className="mega-menu-left-content">
+              <div className="mega-menu-main-header">
+                <h2 className="mega-menu-heading-title">Must visit & Partners</h2>
+                <div className="mega-menu-heading-divider"></div>
               </div>
 
-              <div className="mega-cat-col">
-                <button
-                  className="mega-cat-header-link"
-                  onClick={(e) => handleNavClick(e, 'must-visit')}
-                >
-                  <span className="mega-cat-label">SULTAN KUDARAT DESTINATIONS ›</span>
-                </button>
-                <ul className="mega-cat-items-list">
-                  <li><a href="#must-visit" onClick={(e) => handleNavClick(e, 'must-visit')}>Tacurong City Bird Sanctuary</a></li>
-                  <li><a href="#must-visit" onClick={(e) => handleNavClick(e, 'must-visit')}>Sultan Kudarat Provincial Capitol</a></li>
-                </ul>
+              <div className="mega-menu-three-cols-grid">
+                <div className="mega-links-column">
+                  <ul className="mega-clean-links-list">
+                    <li><a href="#must-visit" onClick={(e) => handleNavClick(e, 'must-visit')}>Wyattel Hotel (Tacurong City)</a></li>
+                    <li><a href="#must-visit" onClick={(e) => handleNavClick(e, 'must-visit')}>Executive Suites & Rooms</a></li>
+                    <li><a href="#must-visit" onClick={(e) => handleNavClick(e, 'must-visit')}>Air-Conditioned Modern Rooms</a></li>
+                    <li><a href="#must-visit" onClick={(e) => handleNavClick(e, 'must-visit')}>Downtown Tacurong Location</a></li>
+                  </ul>
+                </div>
+
+                <div className="mega-links-column">
+                  <ul className="mega-clean-links-list">
+                    <li><a href="#must-visit" onClick={(e) => handleNavClick(e, 'must-visit')}>Tacurong City Bird Sanctuary</a></li>
+                    <li><a href="#must-visit" onClick={(e) => handleNavClick(e, 'must-visit')}>Sultan Kudarat Provincial Capitol</a></li>
+                    <li><a href="#must-visit" onClick={(e) => handleNavClick(e, 'must-visit')}>Regional Cultural Heritage</a></li>
+                    <li><a href="#must-visit" onClick={(e) => handleNavClick(e, 'must-visit')}>Local Ecotourism Destinations</a></li>
+                  </ul>
+                </div>
+
+                <div className="mega-links-column">
+                  <ul className="mega-clean-links-list">
+                    <li><a href="#must-visit" onClick={(e) => handleNavClick(e, 'must-visit')}>Wyattel Fine Dining & Restaurant</a></li>
+                    <li><a href="#must-visit" onClick={(e) => handleNavClick(e, 'must-visit')}>Affiliated Regional Tourism Partners</a></li>
+                    <li><a href="#must-visit" onClick={(e) => handleNavClick(e, 'must-visit')}>Partner Inquiry via Qetsiyah</a></li>
+                  </ul>
+                </div>
               </div>
 
-              <div className="mega-cat-col">
-                <button
-                  className="mega-cat-header-link"
-                  onClick={(e) => handleNavClick(e, 'must-visit')}
-                >
-                  <span className="mega-cat-label">AFFILIATED BUSINESSES ›</span>
-                </button>
-                <ul className="mega-cat-items-list">
-                  <li><a href="#must-visit" onClick={(e) => handleNavClick(e, 'must-visit')}>Wyattel Fine Dining & Suites</a></li>
-                  <li><a href="#must-visit" onClick={(e) => handleNavClick(e, 'must-visit')}>Tourism Partner Slot (Inquire)</a></li>
-                </ul>
+              <div className="mega-menu-bottom-subsections-grid">
+                <div className="mega-sub-col">
+                  <div className="mega-sub-header">
+                    <h3 className="mega-sub-title">Hotel partnership</h3>
+                    <div className="mega-sub-divider"></div>
+                  </div>
+                  <ul className="mega-clean-links-list">
+                    <li><a href="#must-visit" onClick={(e) => handleNavClick(e, 'must-visit')}>Tour & Stay Packages</a></li>
+                    <li><a href="#must-visit" onClick={(e) => handleNavClick(e, 'must-visit')}>Direct Reception Coordination</a></li>
+                  </ul>
+                </div>
+
+                <div className="mega-sub-col">
+                  <div className="mega-sub-header">
+                    <h3 className="mega-sub-title">Regional tourism</h3>
+                    <div className="mega-sub-divider"></div>
+                  </div>
+                  <ul className="mega-clean-links-list">
+                    <li><a href="#must-visit" onClick={(e) => handleNavClick(e, 'must-visit')}>Sultan Kudarat Travel Guide</a></li>
+                    <li><a href="#must-visit" onClick={(e) => handleNavClick(e, 'must-visit')}>Tacurong City Tourism Hub</a></li>
+                  </ul>
+                </div>
+
+                <div className="mega-sub-col">
+                  <div className="mega-sub-header">
+                    <h3 className="mega-sub-title">Inquiries</h3>
+                    <div className="mega-sub-divider"></div>
+                  </div>
+                  <ul className="mega-clean-links-list">
+                    <li><a href="#booking" onClick={(e) => handleNavClick(e, 'home', '#booking')}>Partner Promotion Inquiries</a></li>
+                  </ul>
+                </div>
               </div>
             </div>
+
+            {/* Right Featured Card */}
+            <div className="mega-menu-right-featured-card">
+              <div className="featured-card-image-wrap">
+                <img
+                  src="https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80"
+                  alt="Wyattel Hotel Tacurong"
+                  className="featured-img-rounded"
+                />
+              </div>
+              <div className="featured-card-caption-block">
+                <h4 className="featured-card-title">
+                  Premier hospitality & cozy executive suites in Tacurong City
+                </h4>
+                <a
+                  href="#must-visit"
+                  className="featured-card-pill-btn"
+                  onClick={(e) => handleNavClick(e, 'must-visit')}
+                >
+                  <span>View all</span>
+                  <ArrowRight size={16} className="pill-arrow-icon" />
+                </a>
+              </div>
+            </div>
+
           </div>
         </div>
       )}
@@ -451,7 +533,9 @@ export function Navbar({ activeFrame, onNavigate }) {
               onClick={() => setMobileOffersOpen(!mobileOffersOpen)}
             >
               <span>WHAT WE OFFER</span>
-              <ChevronDown size={16} className={`chevron-arrow ${mobileOffersOpen ? 'open' : ''}`} />
+              <span className="nav-toggle-icon-wrap">
+                {mobileOffersOpen ? <X size={16} /> : <Plus size={16} />}
+              </span>
             </button>
 
             {mobileOffersOpen && (
