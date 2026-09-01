@@ -1,184 +1,97 @@
-import React, { useState, useEffect } from 'react';
-import { X, ChevronLeft, ChevronRight, Maximize2 } from 'lucide-react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 
 export function ParkGallerySection() {
   const [activeCategory, setActiveCategory] = useState('all');
   const [lightboxIndex, setLightboxIndex] = useState(null);
 
-  // Exact categories matching the website's Mega Menu & navigation
+  // Compact controls keep the gallery easy to browse while the photos remain
+  // the only visual focus of this section.
   const categories = [
-    { id: 'all', label: 'View All Park Photos' },
-    { id: 'highlights', label: 'Park Highlights & Views' },
-    { id: 'activities', label: 'Activity Moments' },
-    { id: 'events', label: 'Event Hall & Pavilions' },
-    { id: 'grounds', label: 'Lakeside Grounds' },
-    { id: 'dining', label: 'Café & Dining Ambiance' }
+    { id: 'all', label: 'All' },
+    { id: 'views', label: 'Views' },
+    { id: 'adventure', label: 'Adventure' },
+    { id: 'waterside', label: 'Waterside' },
+    { id: 'family', label: 'Family' },
+    { id: 'dining', label: 'Dining' }
   ];
 
-  // Master gallery items dataset with exact category associations
-  const allGalleryItems = [
-    // 1. Column 1 - Top (Landscape / Grand Vault)
-    {
-      id: 'col1-top',
-      slot: 'col1-top',
-      title: 'Grand Canopy & Sanctuary Vista',
-      subtitle: 'Natural Eco-Sanctuary',
-      category: 'highlights',
-      categories: ['highlights', 'grounds'],
-      image: '/about-adventure-sanctuary.jpg',
-      aspect: 'landscape',
-      tag: '01 / ARCHIVE'
-    },
-    // 2. Column 1 - Middle (Tall / Curves & Arches)
-    {
-      id: 'col1-mid',
-      slot: 'col1-mid',
-      title: 'Zipline High Canopy Course',
-      subtitle: 'Adventure Experiences',
-      category: 'activities',
-      categories: ['activities'],
-      image: '/Activities/Zip Lining.jpg',
-      aspect: 'portrait',
-      tag: '02 / ADVENTURE'
-    },
-    // 3. Column 1 - Bottom (Landscape / Staircase Hall)
-    {
-      id: 'col1-bot',
-      slot: 'col1-bot',
-      title: 'Qetsiyah Café Veranda & Dining',
-      subtitle: 'Café & Restaurant',
-      category: 'dining',
-      categories: ['dining'],
-      image: '/about-cafe-dining.jpg',
-      aspect: 'landscape',
-      tag: '03 / DINING'
-    },
-    // 4. Column 2 - Top (Tall Rotunda / Main Feature)
-    {
-      id: 'col2-top',
-      slot: 'col2-top',
-      title: 'Verde Villa Luxury Retreat',
-      subtitle: 'Exclusive Suites & Grounds',
-      category: 'events',
-      categories: ['events', 'highlights'],
-      image: '/about-verde-villa.jpg',
-      aspect: 'tall-portrait',
-      tag: '04 / RETREAT'
-    },
-    // 5. Column 2 - Bottom (Classical Facade / Gate)
-    {
-      id: 'col2-bot',
-      slot: 'col2-bot',
-      title: 'Grand Event Pavilion & Hall Entrance',
-      subtitle: 'Celebrations & Milestones',
-      category: 'events',
-      categories: ['events'],
-      image: '/Activities/Playground.jpg',
-      aspect: 'landscape',
-      tag: '05 / PAVILION'
-    },
-    // 6. Column 3 & 4 - Top Spanning (Wide Panorama / Skyline & Bridge)
-    {
-      id: 'col34-top',
-      slot: 'col34-top',
-      title: 'Tropical Dusk Panoramic Lake View',
-      subtitle: 'Scenic Sunset Horizon',
-      category: 'highlights',
-      categories: ['highlights', 'grounds'],
-      image: '/qetsiyah-tropical-dusk.jpg',
-      aspect: 'wide-landscape',
-      tag: '06 / PANORAMA'
-    },
-    // 7. Column 3 - Middle (Tall / Sculpture in Arch)
-    {
-      id: 'col3-mid',
-      slot: 'col3-mid',
-      title: 'Horse Riding Trails & Botanical Grove',
-      subtitle: 'Guided Equestrian Tours',
-      category: 'activities',
-      categories: ['activities', 'grounds'],
-      image: '/Activities/Horse Riding.jpg',
-      aspect: 'portrait',
-      tag: '07 / TRAILS'
-    },
-    // 8. Column 4 - Middle (Tall / Boulevard Street View)
-    {
-      id: 'col4-mid',
-      slot: 'col4-mid',
-      title: 'Sky Biking High-Wire Adventure',
-      subtitle: 'Panoramic Aerial Ride',
-      category: 'activities',
-      categories: ['activities'],
-      image: '/Activities/Sky Biking.jpg',
-      aspect: 'portrait',
-      tag: '08 / SKY RIDE'
-    },
-    // 9. Column 3 & 4 - Bottom Spanning (Wide Exhibition Hall & Visitors)
-    {
-      id: 'col34-bot',
-      slot: 'col34-bot',
-      title: 'Lakeside Paddle Boats & Recreation',
-      subtitle: 'Family Fun & Water Activities',
-      category: 'grounds',
-      categories: ['grounds', 'activities'],
-      image: '/Activities/Paddle Boats.jpg',
-      aspect: 'wide-landscape',
-      tag: '09 / LAKESIDE'
-    },
-    // Extra photos for rich category exploration
-    {
-      id: 'extra-pool-1',
-      title: 'Kiddy Pool Resort & Family Splash Area',
-      subtitle: 'Children Splash Park',
-      category: 'activities',
-      categories: ['activities', 'grounds'],
-      image: '/Activities/Kiddy Pool.jpg',
-      aspect: 'landscape',
-      tag: '10 / POOL'
-    },
-    {
-      id: 'extra-grounds-1',
-      title: 'Botanical Walkways & Tropical Gardens',
-      subtitle: 'Lush Manicured Grounds',
-      category: 'grounds',
-      categories: ['grounds', 'highlights'],
-      image: '/Background Pictures/Background Hero Section II.jpg',
-      aspect: 'landscape',
-      tag: '11 / GROUNDS'
-    },
-    {
-      id: 'extra-dining-1',
-      title: 'Qetsiyah Culinary Special Delights',
-      subtitle: 'Local Flavors & Comfort Dishes',
-      category: 'dining',
-      categories: ['dining'],
-      image: '/food-plate-hero.jpg',
-      aspect: 'landscape',
-      tag: '12 / DINING'
-    }
+  // Every image is an existing project asset. No generated or third-party
+  // gallery imagery is used here.
+  const mosaicSlots = [
+    'slot-col1-top',
+    'slot-col1-mid',
+    'slot-col1-bot',
+    'slot-col2-tall-photo',
+    'slot-col2-bot',
+    'slot-col34-top',
+    'slot-col3-mid',
+    'slot-col4-mid',
+    'slot-col34-bot'
   ];
 
-  // Active items based on selected category tab
-  const activeItems = activeCategory === 'all' 
-    ? allGalleryItems.slice(0, 9) 
-    : allGalleryItems.filter(item => item.categories ? item.categories.includes(activeCategory) : item.category === activeCategory);
+  const photoSources = {
+    sanctuary: '/about-adventure-sanctuary.jpg',
+    villa: '/about-verde-villa.jpg',
+    cafe: '/about-cafe-dining.jpg',
+    dusk: '/qetsiyah-tropical-dusk.jpg',
+    vista: '/Background Pictures/Background Hero Section II.jpg',
+    zipline: '/Activities/Zip Lining.jpg',
+    skyBike: '/Activities/Sky Biking.jpg',
+    horseRiding: '/Activities/Horse Riding.jpg',
+    paddleBoats: '/Activities/Paddle Boats.jpg',
+    kiddyPool: '/Activities/Kiddy Pool.jpg',
+    playground: '/Activities/Playground.jpg',
+    foodHero: '/food-plate-hero.jpg',
+    foodBeef: '/Food Menu/Beef Meals.jpg',
+    foodChicken: '/Food Menu/Chicken Meals.jpg',
+    foodCombo: '/Food Menu/Combo Meals.jpg',
+    foodPasta: '/Food Menu/Pasta and Noodles Meals.jpg',
+    foodSizzling: '/Food Menu/Sizzling and Grill Meals.jpg',
+    foodSoup: '/Food Menu/Soup Meals.jpg',
+    foodDrinks: '/Food Menu/Drinks.jpg'
+  };
 
-  // Keyboard navigation for Lightbox
+  // Every filter receives a curated nine-photo story in the same editorial
+  // frame. This keeps the visual rhythm identical instead of falling back to
+  // a sparse, ordinary card grid for the smaller categories.
+  const gallerySets = {
+    all: ['sanctuary', 'zipline', 'cafe', 'villa', 'paddleBoats', 'dusk', 'horseRiding', 'skyBike', 'kiddyPool'],
+    views: ['sanctuary', 'vista', 'dusk', 'villa', 'cafe', 'paddleBoats', 'horseRiding', 'skyBike', 'zipline'],
+    adventure: ['zipline', 'skyBike', 'horseRiding', 'paddleBoats', 'kiddyPool', 'playground', 'vista', 'sanctuary', 'dusk'],
+    waterside: ['sanctuary', 'paddleBoats', 'kiddyPool', 'dusk', 'vista', 'horseRiding', 'cafe', 'skyBike', 'villa'],
+    family: ['kiddyPool', 'playground', 'paddleBoats', 'cafe', 'horseRiding', 'zipline', 'skyBike', 'sanctuary', 'villa'],
+    dining: ['cafe', 'foodHero', 'foodBeef', 'foodChicken', 'foodCombo', 'foodPasta', 'foodSizzling', 'foodSoup', 'foodDrinks']
+  };
+
+  const activeItems = useMemo(
+    () => gallerySets[activeCategory].map((photoId, index) => ({
+      id: `${activeCategory}-${photoId}-${index}`,
+      image: photoSources[photoId],
+      slot: mosaicSlots[index]
+    })),
+    [activeCategory]
+  );
+
   useEffect(() => {
-    const handleKeyDown = (e) => {
+    const handleKeyDown = (event) => {
       if (lightboxIndex === null) return;
-      if (e.key === 'Escape') setLightboxIndex(null);
-      if (e.key === 'ArrowLeft') {
-        setLightboxIndex((prev) => (prev > 0 ? prev - 1 : activeItems.length - 1));
+      if (event.key === 'Escape') setLightboxIndex(null);
+      if (event.key === 'ArrowLeft') {
+        setLightboxIndex((current) => current > 0 ? current - 1 : activeItems.length - 1);
       }
-      if (e.key === 'ArrowRight') {
-        setLightboxIndex((prev) => (prev < activeItems.length - 1 ? prev + 1 : 0));
+      if (event.key === 'ArrowRight') {
+        setLightboxIndex((current) => current < activeItems.length - 1 ? current + 1 : 0);
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [lightboxIndex, activeItems.length]);
+  }, [activeItems.length, lightboxIndex]);
+
+  useEffect(() => () => {
+    document.body.style.overflow = '';
+  }, []);
 
   const openLightbox = (index) => {
     setLightboxIndex(index);
@@ -190,353 +103,97 @@ export function ParkGallerySection() {
     document.body.style.overflow = '';
   };
 
-  const nextImage = (e) => {
-    e.stopPropagation();
-    setLightboxIndex((prev) => (prev < activeItems.length - 1 ? prev + 1 : 0));
+  const changeImage = (direction, event) => {
+    event.stopPropagation();
+    setLightboxIndex((current) => (
+      direction === 'next'
+        ? (current < activeItems.length - 1 ? current + 1 : 0)
+        : (current > 0 ? current - 1 : activeItems.length - 1)
+    ));
   };
 
-  const prevImage = (e) => {
-    e.stopPropagation();
-    setLightboxIndex((prev) => (prev > 0 ? prev - 1 : activeItems.length - 1));
+  const handleTileKeyDown = (event, index) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      openLightbox(index);
+    }
   };
+
+  const renderTile = (item, index, extraClassName = '') => (
+    <div
+      key={item.id}
+      className={`mosaic-card-wrapper ${extraClassName}`}
+      onClick={() => openLightbox(index)}
+      onKeyDown={(event) => handleTileKeyDown(event, index)}
+      role="button"
+      tabIndex={0}
+      aria-label={`Open park photo ${index + 1}`}
+    >
+      <img
+        src={item.image}
+        alt={`Park gallery photo ${index + 1}`}
+        className="mosaic-img"
+        loading="lazy"
+      />
+    </div>
+  );
 
   return (
     <section className="park-gallery-editorial-section" id="park-gallery-mosaic">
       <div className="gallery-editorial-container">
-        
-        {/* =========================================================================
-            CATEGORY FILTER BUTTONS (Matching Website Aesthetic & Mega Menu)
-           ========================================================================= */}
-        <div className="gallery-category-filter-bar">
-          {categories.map((cat) => (
+        <div className="gallery-category-filter-bar" aria-label="Park photo categories">
+          {categories.map((category) => (
             <button
-              key={cat.id}
-              className={`gallery-category-pill-btn ${activeCategory === cat.id ? 'is-active' : ''}`}
+              key={category.id}
+              className={`gallery-category-pill-btn ${activeCategory === category.id ? 'is-active' : ''}`}
               onClick={() => {
-                setActiveCategory(cat.id);
+                setActiveCategory(category.id);
                 setLightboxIndex(null);
               }}
               type="button"
+              aria-pressed={activeCategory === category.id}
             >
-              <span className="gallery-btn-label">{cat.label}</span>
+              <span className="gallery-btn-label">{category.label}</span>
             </button>
           ))}
         </div>
 
-        {/* =========================================================================
-            MAIN GALLERY VIEW: 4-COLUMN MOSAIC (WHEN 'VIEW ALL PARK PHOTOS' IS SELECTED)
-           ========================================================================= */}
-        {activeCategory === 'all' ? (
-          <div className="gallery-reference-mosaic-grid">
-            
-            {/* ----------------- COLUMN 1: 3 Stacked Photos ----------------- */}
-            {/* Slot 1: Col 1 Top */}
-            <div 
-              className="mosaic-card-wrapper slot-col1-top"
-              onClick={() => openLightbox(0)}
-              role="button"
-              tabIndex={0}
-              aria-label="View photo: Grand Canopy & Sanctuary Vista"
-            >
-              <img 
-                src={allGalleryItems[0].image} 
-                alt={allGalleryItems[0].title}
-                className="mosaic-img"
-                loading="lazy"
-              />
-              <div className="mosaic-hover-overlay">
-                <span className="mosaic-tag-pill">{allGalleryItems[0].tag}</span>
-                <h4 className="mosaic-overlay-title">{allGalleryItems[0].title}</h4>
-                <p className="mosaic-overlay-sub">{allGalleryItems[0].subtitle}</p>
-                <div className="mosaic-zoom-icon-wrap">
-                  <Maximize2 size={16} />
-                </div>
-              </div>
-            </div>
-
-            {/* Slot 2: Col 1 Middle */}
-            <div 
-              className="mosaic-card-wrapper slot-col1-mid"
-              onClick={() => openLightbox(1)}
-              role="button"
-              tabIndex={0}
-              aria-label="View photo: Zipline High Canopy Course"
-            >
-              <img 
-                src={allGalleryItems[1].image} 
-                alt={allGalleryItems[1].title}
-                className="mosaic-img"
-                loading="lazy"
-              />
-              <div className="mosaic-hover-overlay">
-                <span className="mosaic-tag-pill">{allGalleryItems[1].tag}</span>
-                <h4 className="mosaic-overlay-title">{allGalleryItems[1].title}</h4>
-                <p className="mosaic-overlay-sub">{allGalleryItems[1].subtitle}</p>
-                <div className="mosaic-zoom-icon-wrap">
-                  <Maximize2 size={16} />
-                </div>
-              </div>
-            </div>
-
-            {/* Slot 3: Col 1 Bottom */}
-            <div 
-              className="mosaic-card-wrapper slot-col1-bot"
-              onClick={() => openLightbox(2)}
-              role="button"
-              tabIndex={0}
-              aria-label="View photo: Qetsiyah Café Veranda & Dining"
-            >
-              <img 
-                src={allGalleryItems[2].image} 
-                alt={allGalleryItems[2].title}
-                className="mosaic-img"
-                loading="lazy"
-              />
-              <div className="mosaic-hover-overlay">
-                <span className="mosaic-tag-pill">{allGalleryItems[2].tag}</span>
-                <h4 className="mosaic-overlay-title">{allGalleryItems[2].title}</h4>
-                <p className="mosaic-overlay-sub">{allGalleryItems[2].subtitle}</p>
-                <div className="mosaic-zoom-icon-wrap">
-                  <Maximize2 size={16} />
-                </div>
-              </div>
-            </div>
-
-
-            {/* ----------------- COLUMN 2: Tall Photo + Bottom Photo ----------------- */}
-            {/* Slot 4: Col 2 Tall Top Photo */}
-            <div 
-              className="mosaic-card-wrapper slot-col2-tall-photo"
-              onClick={() => openLightbox(3)}
-              role="button"
-              tabIndex={0}
-              aria-label="View photo: Verde Villa Luxury Retreat"
-            >
-              <img 
-                src={allGalleryItems[3].image} 
-                alt={allGalleryItems[3].title}
-                className="mosaic-img"
-                loading="lazy"
-              />
-              <div className="mosaic-hover-overlay">
-                <span className="mosaic-tag-pill">{allGalleryItems[3].tag}</span>
-                <h4 className="mosaic-overlay-title">{allGalleryItems[3].title}</h4>
-                <p className="mosaic-overlay-sub">{allGalleryItems[3].subtitle}</p>
-                <div className="mosaic-zoom-icon-wrap">
-                  <Maximize2 size={16} />
-                </div>
-              </div>
-            </div>
-
-            {/* Slot 5: Col 2 Bottom */}
-            <div 
-              className="mosaic-card-wrapper slot-col2-bot"
-              onClick={() => openLightbox(4)}
-              role="button"
-              tabIndex={0}
-              aria-label="View photo: Grand Event Pavilion & Hall Entrance"
-            >
-              <img 
-                src={allGalleryItems[4].image} 
-                alt={allGalleryItems[4].title}
-                className="mosaic-img"
-                loading="lazy"
-              />
-              <div className="mosaic-hover-overlay">
-                <span className="mosaic-tag-pill">{allGalleryItems[4].tag}</span>
-                <h4 className="mosaic-overlay-title">{allGalleryItems[4].title}</h4>
-                <p className="mosaic-overlay-sub">{allGalleryItems[4].subtitle}</p>
-                <div className="mosaic-zoom-icon-wrap">
-                  <Maximize2 size={16} />
-                </div>
-              </div>
-            </div>
-
-
-            {/* ----------------- COLUMNS 3 & 4 (Right Half) ----------------- */}
-            {/* Slot 6: Col 3 & 4 Top Spanning (Wide 2-Column Panorama) */}
-            <div 
-              className="mosaic-card-wrapper slot-col34-top"
-              onClick={() => openLightbox(5)}
-              role="button"
-              tabIndex={0}
-              aria-label="View photo: Tropical Dusk Panoramic Lake View"
-            >
-              <img 
-                src={allGalleryItems[5].image} 
-                alt={allGalleryItems[5].title}
-                className="mosaic-img"
-                loading="lazy"
-              />
-              <div className="mosaic-hover-overlay">
-                <span className="mosaic-tag-pill">{allGalleryItems[5].tag}</span>
-                <h4 className="mosaic-overlay-title">{allGalleryItems[5].title}</h4>
-                <p className="mosaic-overlay-sub">{allGalleryItems[5].subtitle}</p>
-                <div className="mosaic-zoom-icon-wrap">
-                  <Maximize2 size={16} />
-                </div>
-              </div>
-            </div>
-
-            {/* Slot 7: Col 3 Middle (Tall Portrait) */}
-            <div 
-              className="mosaic-card-wrapper slot-col3-mid"
-              onClick={() => openLightbox(6)}
-              role="button"
-              tabIndex={0}
-              aria-label="View photo: Horse Riding Trails & Botanical Grove"
-            >
-              <img 
-                src={allGalleryItems[6].image} 
-                alt={allGalleryItems[6].title}
-                className="mosaic-img"
-                loading="lazy"
-              />
-              <div className="mosaic-hover-overlay">
-                <span className="mosaic-tag-pill">{allGalleryItems[6].tag}</span>
-                <h4 className="mosaic-overlay-title">{allGalleryItems[6].title}</h4>
-                <p className="mosaic-overlay-sub">{allGalleryItems[6].subtitle}</p>
-                <div className="mosaic-zoom-icon-wrap">
-                  <Maximize2 size={16} />
-                </div>
-              </div>
-            </div>
-
-            {/* Slot 8: Col 4 Middle (Tall Portrait) */}
-            <div 
-              className="mosaic-card-wrapper slot-col4-mid"
-              onClick={() => openLightbox(7)}
-              role="button"
-              tabIndex={0}
-              aria-label="View photo: Sky Biking High-Wire Adventure"
-            >
-              <img 
-                src={allGalleryItems[7].image} 
-                alt={allGalleryItems[7].title}
-                className="mosaic-img"
-                loading="lazy"
-              />
-              <div className="mosaic-hover-overlay">
-                <span className="mosaic-tag-pill">{allGalleryItems[7].tag}</span>
-                <h4 className="mosaic-overlay-title">{allGalleryItems[7].title}</h4>
-                <p className="mosaic-overlay-sub">{allGalleryItems[7].subtitle}</p>
-                <div className="mosaic-zoom-icon-wrap">
-                  <Maximize2 size={16} />
-                </div>
-              </div>
-            </div>
-
-            {/* Slot 9: Col 3 & 4 Bottom Spanning (Wide 2-Column Exhibition) */}
-            <div 
-              className="mosaic-card-wrapper slot-col34-bot"
-              onClick={() => openLightbox(8)}
-              role="button"
-              tabIndex={0}
-              aria-label="View photo: Lakeside Paddle Boats & Recreation"
-            >
-              <img 
-                src={allGalleryItems[8].image} 
-                alt={allGalleryItems[8].title}
-                className="mosaic-img"
-                loading="lazy"
-              />
-              <div className="mosaic-hover-overlay">
-                <span className="mosaic-tag-pill">{allGalleryItems[8].tag}</span>
-                <h4 className="mosaic-overlay-title">{allGalleryItems[8].title}</h4>
-                <p className="mosaic-overlay-sub">{allGalleryItems[8].subtitle}</p>
-                <div className="mosaic-zoom-icon-wrap">
-                  <Maximize2 size={16} />
-                </div>
-              </div>
-            </div>
-
-          </div>
-        ) : (
-          /* =========================================================================
-             FILTERED CATEGORY GRID VIEW
-             ========================================================================= */
-          <div className="gallery-filtered-category-grid">
-            {activeItems.map((item, idx) => (
-              <div 
-                key={item.id}
-                className="mosaic-card-wrapper filtered-category-card"
-                onClick={() => openLightbox(idx)}
-                role="button"
-                tabIndex={0}
-                aria-label={`View photo: ${item.title}`}
-              >
-                <img 
-                  src={item.image} 
-                  alt={item.title}
-                  className="mosaic-img"
-                  loading="lazy"
-                />
-                <div className="mosaic-hover-overlay">
-                  <span className="mosaic-tag-pill">{item.tag}</span>
-                  <h4 className="mosaic-overlay-title">{item.title}</h4>
-                  <p className="mosaic-overlay-sub">{item.subtitle}</p>
-                  <div className="mosaic-zoom-icon-wrap">
-                    <Maximize2 size={16} />
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-
+        <div key={activeCategory} className="gallery-reference-mosaic-grid gallery-photo-only-grid">
+          {activeItems.map((item, index) => renderTile(item, index, item.slot))}
+        </div>
       </div>
 
-      {/* =========================================================================
-          FULLSCREEN HIGH-RES LIGHTBOX MODAL
-         ========================================================================= */}
       {lightboxIndex !== null && activeItems[lightboxIndex] && (
         <div className="gallery-lightbox-backdrop" onClick={closeLightbox}>
-          <div className="gallery-lightbox-modal" onClick={(e) => e.stopPropagation()}>
-            {/* Close Button */}
-            <button 
-              className="lightbox-close-btn" 
+          <div className="gallery-lightbox-modal" onClick={(event) => event.stopPropagation()}>
+            <button
+              className="lightbox-close-btn"
               onClick={closeLightbox}
-              aria-label="Close Lightbox"
+              aria-label="Close photo"
             >
               <X size={24} />
             </button>
 
-            {/* Left Nav Arrow */}
-            <button 
-              className="lightbox-arrow-btn arrow-prev" 
-              onClick={prevImage}
-              aria-label="Previous Photo"
+            <button
+              className="lightbox-arrow-btn arrow-prev"
+              onClick={(event) => changeImage('previous', event)}
+              aria-label="Previous photo"
             >
               <ChevronLeft size={32} />
             </button>
 
-            {/* Active Image & Info */}
             <div className="lightbox-image-stage">
-              <img 
-                src={activeItems[lightboxIndex].image} 
-                alt={activeItems[lightboxIndex].title}
+              <img
+                src={activeItems[lightboxIndex].image}
+                alt={`Park gallery photo ${lightboxIndex + 1}`}
                 className="lightbox-display-img"
               />
-              <div className="lightbox-caption-bar">
-                <div className="lightbox-caption-text">
-                  <span className="lightbox-counter">
-                    {lightboxIndex + 1} of {activeItems.length}
-                  </span>
-                  <h3 className="lightbox-image-title">
-                    {activeItems[lightboxIndex].title}
-                  </h3>
-                  <p className="lightbox-image-desc">
-                    {activeItems[lightboxIndex].subtitle}
-                  </p>
-                </div>
-              </div>
             </div>
 
-            {/* Right Nav Arrow */}
-            <button 
-              className="lightbox-arrow-btn arrow-next" 
-              onClick={nextImage}
-              aria-label="Next Photo"
+            <button
+              className="lightbox-arrow-btn arrow-next"
+              onClick={(event) => changeImage('next', event)}
+              aria-label="Next photo"
             >
               <ChevronRight size={32} />
             </button>

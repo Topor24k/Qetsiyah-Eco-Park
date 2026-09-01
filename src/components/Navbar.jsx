@@ -16,6 +16,10 @@ export function Navbar({ activeFrame, onNavigate }) {
   useEffect(() => {
     lastScrollYRef.current = window.pageYOffset || document.documentElement.scrollTop || window.scrollY || 0;
     let touchStartY = 0;
+    const isHeaderLockedByHero = () => {
+      const currentScrollY = window.pageYOffset || document.documentElement.scrollTop || window.scrollY || 0;
+      return Boolean(window.isHeroExpanded) && currentScrollY <= 10;
+    };
 
     const handleScroll = () => {
       const currentScrollY = window.pageYOffset || document.documentElement.scrollTop || window.scrollY || 0;
@@ -29,7 +33,7 @@ export function Navbar({ activeFrame, onNavigate }) {
         // Scrolling DOWN -> hide navbar
         setActiveMegaMenu(null);
         setNavVisible(false);
-      } else if (diff < -3 && !window.isHeroExpanded) {
+      } else if (diff < -3 && !isHeaderLockedByHero()) {
         // Scrolling UP -> immediately reveal navbar
         setNavVisible(true);
       }
@@ -41,7 +45,7 @@ export function Navbar({ activeFrame, onNavigate }) {
       if (e.deltaY > 8) {
         setActiveMegaMenu(null);
         setNavVisible(false);
-      } else if (e.deltaY < -8 && !window.isHeroExpanded) {
+      } else if (e.deltaY < -8 && !isHeaderLockedByHero()) {
         setNavVisible(true);
       }
     };
@@ -60,7 +64,7 @@ export function Navbar({ activeFrame, onNavigate }) {
       if (diffY > 10) {
         setActiveMegaMenu(null);
         setNavVisible(false);
-      } else if (diffY < -10 && !window.isHeroExpanded) {
+      } else if (diffY < -10 && !isHeaderLockedByHero()) {
         setNavVisible(true);
       }
       touchStartY = currentY;
@@ -72,7 +76,7 @@ export function Navbar({ activeFrame, onNavigate }) {
       } else if (['ArrowDown', 'PageDown'].includes(e.key)) {
         setActiveMegaMenu(null);
         setNavVisible(false);
-      } else if (['ArrowUp', 'PageUp', 'Home'].includes(e.key) && !window.isHeroExpanded) {
+      } else if (['ArrowUp', 'PageUp', 'Home'].includes(e.key) && !isHeaderLockedByHero()) {
         setNavVisible(true);
       }
     };
@@ -109,8 +113,24 @@ export function Navbar({ activeFrame, onNavigate }) {
   useEffect(() => {
     window.isHeroExpanded = false;
     setNavVisible(true);
+    setMobileMenuOpen(false);
+    setMobileOffersOpen(false);
+    setMobileMustVisitOpen(false);
     lastScrollYRef.current = 0;
   }, [activeFrame]);
+
+  // Prevent the page behind the mobile navigation from drifting while the
+  // drawer is open. Restore the previous value on close/unmount.
+  useEffect(() => {
+    if (!mobileMenuOpen) return undefined;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [mobileMenuOpen]);
 
   // Close mega menu on click outside
   useEffect(() => {
@@ -133,7 +153,7 @@ export function Navbar({ activeFrame, onNavigate }) {
     closeAll();
 
     if (onNavigate) {
-      onNavigate(frameName);
+      onNavigate(frameName, scrollTarget);
     }
 
     if (scrollTarget) {
@@ -164,8 +184,9 @@ export function Navbar({ activeFrame, onNavigate }) {
   const showSolidNav = isScrolled || isAnyMenuOpen;
 
   const isLightHeader = isScrolled && !isAnyMenuOpen;
+  const hasDarkOpeningHero = activeFrame === 'about' || activeFrame === 'must-visit';
   const headerBgColor = isAnyMenuOpen ? '#151b18' : (isScrolled ? '#eae3d4' : 'transparent');
-  const addLightTextClass = isLightHeader || (!showSolidNav && !isHome);
+  const addLightTextClass = isLightHeader || (!showSolidNav && !isHome && !hasDarkOpeningHero);
 
   return (
     <header
@@ -282,6 +303,8 @@ export function Navbar({ activeFrame, onNavigate }) {
           className="phone-only-burger-btn"
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           aria-label="Toggle Mobile Menu"
+          aria-expanded={mobileMenuOpen}
+          aria-controls="mobile-primary-navigation"
         >
           {mobileMenuOpen ? <X size={26} /> : <Menu size={26} />}
         </button>
@@ -510,7 +533,7 @@ export function Navbar({ activeFrame, onNavigate }) {
 
       {/* Mobile Responsive Navigation Drawer */}
       {mobileMenuOpen && (
-        <div className="mobile-nav-panel">
+        <div className="mobile-nav-panel" id="mobile-primary-navigation">
           <a href="#home" className="mobile-nav-item" onClick={(e) => handleNavClick(e, 'home', '#home')}>HOME</a>
           <a href="#about" className="mobile-nav-item" onClick={(e) => handleNavClick(e, 'about')}>ABOUT</a>
 

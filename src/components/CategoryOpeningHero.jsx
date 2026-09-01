@@ -10,7 +10,8 @@ export function CategoryOpeningHero({
   video = null,
   id = 'opening-hero',
   hasContentBelow = false,
-  onExploreBelow = null
+  onExploreBelow = null,
+  exploreLabel = 'SCROLL TO VIEW FULL MENU'
 }) {
   const [progress, setProgress] = useState(0);
   const [windowScrollY, setWindowScrollY] = useState(0);
@@ -164,14 +165,21 @@ export function CategoryOpeningHero({
     };
   }, []);
 
-  // Synchronize header visibility with opening hero expansion (header disappears immediately as video starts showing)
+  // Keep the header out of the way only while this opening hero is expanded at
+  // the top of the page. Once the visitor moves into the page content, release
+  // its lock without forcing the header open (the navbar then controls itself).
   useEffect(() => {
-    if (progress > 0.005 || targetProgressRef.current > 0.01) {
+    const isAtHeroTop = windowScrollY <= 10;
+    const isOpeningHeroExpanded = progress > 0.005 || targetProgressRef.current > 0.01;
+
+    if (isAtHeroTop && isOpeningHeroExpanded) {
       window.dispatchEvent(new CustomEvent('nav-visible', { detail: false }));
-    } else if (progress <= 0.005 && targetProgressRef.current === 0 && (window.scrollY || 0) <= 10) {
+    } else if (isAtHeroTop) {
       window.dispatchEvent(new CustomEvent('nav-visible', { detail: true }));
+    } else {
+      window.isHeroExpanded = false;
     }
-  }, [progress]);
+  }, [progress, windowScrollY]);
 
   // Click to expand / reveal full frame video or image (ONLY triggers on click, NOT on scroll)
   const handleFrameClick = (e) => {
@@ -280,7 +288,7 @@ export function CategoryOpeningHero({
           }}
         />
 
-        {/* Action Button to scroll down to Menu / Content if present */}
+        {/* Action button to scroll down to the frame's next content section. */}
         {hasContentBelow && p >= 0.85 && (
           <button 
             className="opening-explore-menu-btn"
@@ -295,7 +303,7 @@ export function CategoryOpeningHero({
               }
             }}
           >
-            <span>SCROLL TO VIEW FULL MENU</span>
+            <span>{exploreLabel}</span>
             <ArrowDown size={15} />
           </button>
         )}
@@ -326,9 +334,17 @@ export function CategoryOpeningHero({
 
       {/* Click / Scroll Hint Indicator at 0% */}
       {p < 0.05 && (
-        <div className="opening-scroll-hint">
+        <button
+          className="opening-scroll-hint"
+          type="button"
+          onClick={(event) => {
+            event.stopPropagation();
+            handleFrameClick(event);
+          }}
+          aria-label={`Reveal ${titleBottom.toLowerCase()}`}
+        >
           <span>CLICK TO REVEAL</span>
-        </div>
+        </button>
       )}
     </div>
   );

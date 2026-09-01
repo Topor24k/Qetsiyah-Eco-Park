@@ -19,16 +19,25 @@ import { MustVisitFrame } from './components/frames/MustVisitFrame';
 
 export function App() {
   const [activeFrame, setActiveFrame] = useState('home');
+  const [previousFrame, setPreviousFrame] = useState(null);
+  const [exitingFromAbout, setExitingFromAbout] = useState(false);
+  const [enteringHomeFromAbout, setEnteringHomeFromAbout] = useState(false);
 
-  // Handle URL hash routing (e.g. #about, #activities, #food-offers, etc.)
+  // Handle URL hash routing
   useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash.replace('#', '').replace('/', '');
+      let targetFrame = 'home';
       if (['about', 'activities', 'food-offers', 'stays-venues', 'services', 'gallery', 'announcements', 'must-visit'].includes(hash)) {
-        setActiveFrame(hash);
-      } else if (hash === 'home' || hash === '' || hash === 'about-park' || hash === 'contact' || hash === 'booking') {
-        setActiveFrame('home');
+        targetFrame = hash;
       }
+      
+      setActiveFrame((current) => {
+        if (current !== targetFrame) {
+          setPreviousFrame(current);
+        }
+        return targetFrame;
+      });
     };
 
     window.addEventListener('hashchange', handleHashChange);
@@ -36,91 +45,126 @@ export function App() {
     return () => window.removeEventListener('hashchange', handleHashChange);
   }, []);
 
-  const navigateTo = (frameName) => {
-    setActiveFrame(frameName);
-    if (frameName === 'home') {
-      window.history.pushState(null, '', '#home');
-    } else {
-      window.history.pushState(null, '', `#${frameName}`);
+  const navigateTo = (frameName, scrollTarget = null) => {
+    // About -> Home animation logic
+    if (activeFrame === 'about' && frameName === 'home') {
+      setExitingFromAbout(true);
+      setTimeout(() => {
+        setExitingFromAbout(false);
+        setEnteringHomeFromAbout(true);
+        setPreviousFrame('about');
+        setActiveFrame('home');
+        
+        const hash = scrollTarget ? scrollTarget : '#home';
+        window.history.pushState(null, '', hash);
+        
+        // Wait 50ms for Home components to mount
+        setTimeout(() => {
+          if (scrollTarget) {
+            const el = document.querySelector(scrollTarget);
+            if (el) {
+              const pos = el.getBoundingClientRect().top + window.pageYOffset - 72;
+              window.scrollTo({ top: Math.max(0, pos), behavior: 'smooth' });
+            }
+          } else {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }
+        }, 50);
+        
+        setTimeout(() => {
+          setEnteringHomeFromAbout(false);
+        }, 1500);
+      }, 900);
+      return;
     }
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    // Normal navigation
+    setPreviousFrame(activeFrame);
+    setActiveFrame(frameName);
+    
+    const hash = scrollTarget ? scrollTarget : (frameName === 'home' ? '#home' : '#' + frameName);
+    window.history.pushState(null, '', hash);
+    
+    // Wait 50ms for components to mount
+    setTimeout(() => {
+      if (scrollTarget) {
+        const el = document.querySelector(scrollTarget);
+        if (el) {
+          const pos = el.getBoundingClientRect().top + window.pageYOffset - 72;
+          window.scrollTo({ top: Math.max(0, pos), behavior: 'smooth' });
+        }
+      } else {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }, 50);
   };
 
   return (
     <div className="site-root">
-      {/* Dynamic Proximity Animated Scrollbar */}
       <CustomScrollbar />
-
-      {/* Global Fixed Navbar with Frame Switching */}
       <Navbar activeFrame={activeFrame} onNavigate={navigateTo} />
 
-      {/* Frame 1: HOME (Hero + Welcome + FoodPreview + Booking) */}
       {activeFrame === 'home' && (
         <main className="home-frame-view">
-          <HeroSection onNavigate={navigateTo} />
+          <HeroSection onNavigate={navigateTo} isEntering={enteringHomeFromAbout} />
           <WelcomeSection />
           <FoodPreviewSection onNavigate={navigateTo} />
           <ContactSection />
         </main>
       )}
 
-      {/* Frame 2: ABOUT FRAME (Dedicated Frame) */}
       {activeFrame === 'about' && (
         <main className="category-frame-view">
-          <AboutFrame onNavigate={navigateTo} />
+          <AboutFrame 
+            onNavigate={navigateTo} 
+            isExiting={exitingFromAbout} 
+            previousFrame={previousFrame} 
+          />
         </main>
       )}
 
-      {/* Frame 3: ACTIVITIES FRAME */}
       {activeFrame === 'activities' && (
         <main className="category-frame-view">
           <ActivitiesFrame onNavigate={navigateTo} />
         </main>
       )}
 
-      {/* Frame 4: FOOD OFFERS & MENU FRAME */}
       {activeFrame === 'food-offers' && (
         <main className="category-frame-view">
           <FoodOffersFrame onNavigate={navigateTo} />
         </main>
       )}
 
-      {/* Frame 5: STAYS & VENUES (VERDE VILLA) FRAME */}
       {activeFrame === 'stays-venues' && (
         <main className="category-frame-view">
           <StaysVenuesFrame onNavigate={navigateTo} />
         </main>
       )}
 
-      {/* Frame 6: OUR SERVICES & EVENT HALL FRAME */}
       {activeFrame === 'services' && (
         <main className="category-frame-view">
           <ServicesFrame onNavigate={navigateTo} />
         </main>
       )}
 
-      {/* Frame 7: PARK PHOTO GALLERY FRAME */}
       {activeFrame === 'gallery' && (
         <main className="category-frame-view">
           <GalleryFrame onNavigate={navigateTo} />
         </main>
       )}
 
-      {/* Frame 8: ANNOUNCEMENTS & ADVISORIES FRAME */}
       {activeFrame === 'announcements' && (
         <main className="category-frame-view">
           <AnnouncementsFrame onNavigate={navigateTo} />
         </main>
       )}
 
-      {/* Frame 9: MUST VISIT (WYATTEL HOTEL) FRAME */}
       {activeFrame === 'must-visit' && (
         <main className="category-frame-view">
           <MustVisitFrame onNavigate={navigateTo} />
         </main>
       )}
 
-      {/* Site-Wide Footer */}
       <Footer onNavigate={navigateTo} />
     </div>
   );
