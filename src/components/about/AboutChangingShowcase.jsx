@@ -1,70 +1,98 @@
-import React, { useState } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 
 const aboutShowcaseSlides = [
   {
     label: 'The Place',
-    titleTop: 'A place made for',
-    titleBottom: 'unhurried days',
-    subtitle: 'A generous open-air setting where nature, comfort and everyday moments are given room to breathe. This introductory copy can be replaced once the full park story is ready.',
-    image: '/about-adventure-sanctuary.jpg',
-    alt: 'A wide tropical landscape at Qetsiyah Eco Park'
+    titleTop: 'From a humble land',
+    titleBottom: 'to a thriving eco park',
+    subtitle: 'What began as a quiet natural landscape has grown into the eco-sanctuary it is today. Rooted in deep respect for the earth and built with purposeful care, Qetsiyah evolved step by step into a spacious haven where nature, families, and outdoor adventures come alive.',
+    images: [
+      '/About Changing Showcase/The Place.jpg',
+      '/About Changing Showcase/The Place II.jpg'
+    ],
+    alt: 'The scenic tropical landscape and origin of Qetsiyah Eco Park'
   },
   {
     label: 'The Community',
-    titleTop: 'People are always',
-    titleBottom: 'at the heart',
-    subtitle: 'A welcoming destination shaped around families, friendships and shared celebrations. This placeholder introduces the community values behind Qetsiyah.',
-    image: '/Activities/Playground.jpg',
-    alt: 'Families enjoying Qetsiyah Eco Park'
+    titleTop: 'Owners, team & visitors',
+    titleBottom: 'creating our heart',
+    subtitle: 'Behind Qetsiyah are visionary owners, dedicated staff, and the loyal visitors who return season after season. Together, their warm connection and shared celebrations cultivate an inclusive, welcoming community where every visitor feels like family.',
+    images: [
+      '/About Changing Showcase/The Community.jpg',
+      '/About Changing Showcase/The Communities II.jpg',
+      '/About Changing Showcase/The Communities III.jpg'
+    ],
+    alt: 'Families, visitors, and staff creating a welcoming community at Qetsiyah Eco Park'
   },
   {
     label: 'The Experiences',
-    titleTop: 'Every visit moves',
-    titleBottom: 'at your own pace',
-    subtitle: 'From playful adventures to peaceful afternoons, the park brings different experiences together without making the day feel rushed.',
-    image: '/Activities/Sky Biking.jpg',
-    alt: 'An outdoor adventure experience at Qetsiyah Eco Park'
+    titleTop: 'Professional care and',
+    titleBottom: 'unmatched safety',
+    subtitle: 'Every visit is defined by genuine professionalism. From trusted chefs crafting satisfying, quality menus to certified activity operators safeguarding your adventures, our staff and owners unite around one priority: guest happiness and peace of mind.',
+    images: [
+      '/About Changing Showcase/The Experiences.jpg',
+      '/About Changing Showcase/The Experiences II.jpg'
+    ],
+    alt: 'Professional and safe outdoor adventures at Qetsiyah Eco Park'
   },
   {
     label: 'The Hospitality',
-    titleTop: 'Thoughtful moments',
-    titleBottom: 'made to be shared',
-    subtitle: 'Food, rest and warm service complete the experience. This section can later carry the real story of the team, the cafe and Verde Villa.',
-    image: '/about-cafe-dining.jpg',
-    alt: 'Cafe and dining experience at Qetsiyah Eco Park'
+    titleTop: 'Receiving every guest',
+    titleBottom: 'with goodwill & warmth',
+    subtitle: 'Hospitality is the relationship of a host toward a guest, receiving every visitor with heartfelt goodwill and open welcome. From reception to entertainment, we ensure guests, families, and travelers feel completely valued, comforted, and celebrated.',
+    images: [
+      '/About Changing Showcase/The Hospitality.jpg',
+      '/About Changing Showcase/The Hospitality II.jpg'
+    ],
+    alt: 'Warm dining hospitality and gracious reception at Qetsiyah Eco Park'
   },
   {
     label: 'The Future',
-    titleTop: 'A young destination',
-    titleBottom: 'still growing',
-    subtitle: 'Qetsiyah continues to evolve with every season and every returning guest. Future milestones, plans and commitments can live here when they are ready.',
-    image: '/qetsiyah-tropical-dusk.jpg',
-    alt: 'Qetsiyah Eco Park illuminated at dusk'
+    titleTop: 'Growing with purpose,',
+    titleBottom: 'ready for tomorrow',
+    subtitle: 'Qetsiyah is continuously improving and adapting to every challenge and new horizon. Future milestones, sustainability commitments, and expanded park attractions will live right here as we continue to flourish.',
+    images: [
+      '/About Changing Showcase/The Future.jpg'
+    ],
+    alt: 'The illuminated future and continuous growth of Qetsiyah Eco Park'
   }
 ];
 
 export function AboutChangingShowcase() {
   const [activeSlide, setActiveSlide] = useState(0);
+  const total = aboutShowcaseSlides.length;
+
+  // Track sub-image rotation index for each of the 5 slides
+  const [subImageIndices, setSubImageIndices] = useState(() => aboutShowcaseSlides.map(() => 0));
+
+  // Rotate images every 5 seconds (5000ms)
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setSubImageIndices((prev) =>
+        prev.map((idx, sIdx) => {
+          const slideImages = aboutShowcaseSlides[sIdx].images;
+          return (idx + 1) % slideImages.length;
+        })
+      );
+    }, 5000);
+
+    return () => clearInterval(timer);
+  }, [activeSlide]);
 
   const selectPrevious = () => {
-    setActiveSlide((current) => (current - 1 + aboutShowcaseSlides.length) % aboutShowcaseSlides.length);
+    setActiveSlide((current) => (current - 1 + total) % total);
   };
 
   const selectNext = () => {
-    setActiveSlide((current) => (current + 1) % aboutShowcaseSlides.length);
+    setActiveSlide((current) => (current + 1) % total);
   };
 
-  const previousIndex = (activeSlide - 1 + aboutShowcaseSlides.length) % aboutShowcaseSlides.length;
-  const nextIndex = (activeSlide + 1) % aboutShowcaseSlides.length;
   const activeContent = aboutShowcaseSlides[activeSlide];
 
   return (
     <section className="about-changing-showcase" aria-roledescription="carousel" aria-label="About Qetsiyah themes">
       <div className="about-changing-copy" key={`copy-${activeSlide}`}>
-        <p className="about-changing-eyebrow">
-          {String(activeSlide + 1).padStart(2, '0')} · {activeContent.label}
-        </p>
         <h2>
           <span>{activeContent.titleTop}</span>
           <span>{activeContent.titleBottom}</span>
@@ -76,56 +104,93 @@ export function AboutChangingShowcase() {
         </div>
       </div>
 
-      <div className="about-changing-gallery">
-        <button
-          className="about-gallery-preview about-gallery-preview-left"
-          type="button"
-          onClick={selectPrevious}
-          aria-label={`View ${aboutShowcaseSlides[previousIndex].label}`}
-        >
-          <img src={aboutShowcaseSlides[previousIndex].image} alt="" aria-hidden="true" />
-        </button>
+      <div className="about-changing-full-slider">
+        <div className="about-changing-track-absolute">
+          {aboutShowcaseSlides.map((slide, i) => {
+            let offset = (i - activeSlide) % total;
+            if (offset > Math.floor(total / 2)) offset -= total;
+            if (offset < -Math.floor(total / 2)) offset += total;
 
-        <figure className="about-gallery-feature" key={`image-${activeSlide}`}>
-          <img src={activeContent.image} alt={activeContent.alt} />
-          <figcaption>
-            <span>{activeContent.label}</span>
-            <span>
-              {String(activeSlide + 1).padStart(2, '0')} / {String(aboutShowcaseSlides.length).padStart(2, '0')}
-            </span>
-          </figcaption>
-        </figure>
+            const isActive = offset === 0;
 
-        <button
-          className="about-gallery-preview about-gallery-preview-right"
-          type="button"
-          onClick={selectNext}
-          aria-label={`View ${aboutShowcaseSlides[nextIndex].label}`}
-        >
-          <img src={aboutShowcaseSlides[nextIndex].image} alt="" aria-hidden="true" />
-        </button>
+            return (
+              <div
+                className={`about-slide-item-absolute ${isActive ? 'is-active' : ''}`}
+                key={i}
+                data-offset={offset}
+                style={{ '--offset': offset }}
+                onClick={() => {
+                  if (offset === -1) selectPrevious();
+                  else if (offset === 1) selectNext();
+                  else if (!isActive) setActiveSlide(i);
+                }}
+              >
+                {slide.images.map((imgSrc, imgIdx) => {
+                  const isCurrentImg = imgIdx === (subImageIndices[i] || 0);
+                  return (
+                    <img
+                      key={imgSrc}
+                      src={imgSrc}
+                      alt={`${slide.alt} ${imgIdx + 1}`}
+                      className={`about-slide-subimg ${isCurrentImg ? 'active' : ''}`}
+                    />
+                  );
+                })}
+                <div className="slide-overlay-gradient"></div>
+                {isActive && (
+                  <div className="slide-caption-bar">
+                    <div className="slide-caption-title-wrap">
+                      <span>{slide.label}</span>
+                      {slide.images.length > 1 && (
+                        <div className="sub-slide-pills" aria-label="Rotating gallery indicators">
+                          {slide.images.map((_, pIdx) => (
+                            <button
+                              key={pIdx}
+                              type="button"
+                              className={`sub-slide-pill ${pIdx === (subImageIndices[i] || 0) ? 'active' : ''}`}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setSubImageIndices((prev) => {
+                                  const next = [...prev];
+                                  next[i] = pIdx;
+                                  return next;
+                                });
+                              }}
+                              aria-label={`Show picture ${pIdx + 1} of ${slide.label}`}
+                            />
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                    <span>
+                      {String(i + 1).padStart(2, '0')} / {String(total).padStart(2, '0')}
+                    </span>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
 
-        <div className="about-gallery-arrows">
-          <button type="button" onClick={selectPrevious} aria-label="Previous About story">
-            <ArrowLeft size={18} />
+        <div className="global-slider-arrows">
+          <button className="nav-arrow prev-arrow" onClick={selectPrevious} aria-label="Previous image">
+            <ArrowLeft size={20} />
           </button>
-          <button type="button" onClick={selectNext} aria-label="Next About story">
-            <ArrowRight size={18} />
+          <button className="nav-arrow next-arrow" onClick={selectNext} aria-label="Next image">
+            <ArrowRight size={20} />
           </button>
         </div>
       </div>
 
-      <div className="about-gallery-dots" aria-label="Choose an About story">
-        {aboutShowcaseSlides.map((slide, index) => (
+      <div className="about-gallery-dots">
+        {aboutShowcaseSlides.map((_, i) => (
           <button
-            key={slide.label}
-            type="button"
-            className={index === activeSlide ? 'is-active' : ''}
-            onClick={() => setActiveSlide(index)}
-            aria-label={`Show ${slide.label}`}
-            aria-pressed={index === activeSlide}
+            key={i}
+            className={i === activeSlide ? 'is-active' : ''}
+            onClick={() => setActiveSlide(i)}
+            aria-label={`Go to slide ${i + 1}`}
           >
-            <span>{String(index + 1).padStart(2, '0')}</span>
+            {String(i + 1).padStart(2, '0')}
           </button>
         ))}
       </div>
