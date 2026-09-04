@@ -4,22 +4,19 @@ import { ArrowRight, Utensils } from 'lucide-react';
 export function FoodPreviewSection({ onNavigate }) {
   const dishes = [
     {
-      id: 'beef',
-      name: 'Beef Meals',
-      // High quality savory beef meal
-      image: 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=800&q=85'
+      id: 'combo',
+      name: 'Combo Meals',
+      image: '/Preview Food Picture/Combo Meals.jpg'
     },
     {
       id: 'soup',
       name: 'Soup Meals',
-      // Hearty comforting native soup dish
-      image: 'https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&w=800&q=85'
+      image: '/Preview Food Picture/Soup Meals.jpg'
     },
     {
-      id: 'chicken',
-      name: 'Chicken Meals',
-      // Crispy golden glazed chicken meal
-      image: 'https://images.unsplash.com/photo-1567620832903-9fc6debc209f?auto=format&fit=crop&w=800&q=85'
+      id: 'snacks',
+      name: 'Snacks Meals',
+      image: '/Preview Food Picture/Snacks Meals.jpg'
     }
   ];
 
