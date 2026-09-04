@@ -125,7 +125,10 @@ export function CategoryOpeningHero({
     if (isHeroActive) {
       videoRef.current.muted = false;
       videoRef.current.play().catch(() => {
-        activateAudioEngine();
+        if (videoRef.current) {
+          videoRef.current.muted = true;
+          videoRef.current.play().catch(() => {});
+        }
       });
     } else {
       videoRef.current.pause();
@@ -269,6 +272,7 @@ export function CategoryOpeningHero({
             src={mediaSrc} 
             loop 
             playsInline 
+            muted
             preload="auto"
             className="expanding-image-content expanding-video-content"
           />
