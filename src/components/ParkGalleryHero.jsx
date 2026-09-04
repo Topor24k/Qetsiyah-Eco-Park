@@ -33,15 +33,27 @@ export function ParkGalleryHero({ onExplore }) {
 
       <div className="park-gallery-polaroid-collage" aria-label="A collection of park photographs">
         <figure className="park-gallery-polaroid polaroid-left">
-          <img src="/Activities/Horse Riding.jpg" alt="Horse riding at Qetsiyah Eco Park" />
+          <img
+            src="/gallery/facebook/scenery-atmosphere/1414406397372320.webp"
+            alt="Colorful flower garden at sunset in Qetsiyah Eco Park"
+            decoding="async"
+          />
         </figure>
 
         <figure className="park-gallery-polaroid polaroid-center">
-          <img src="/about-adventure-sanctuary.jpg" alt="Qetsiyah Eco Park landscape" />
+          <img
+            src="/gallery/facebook/scenery-atmosphere/1455627183250241.webp"
+            alt="Sunset overlooking Qetsiyah Eco Park"
+            fetchPriority="high"
+          />
         </figure>
 
         <figure className="park-gallery-polaroid polaroid-right">
-          <img src="/about-verde-villa.jpg" alt="Verde Villa at Qetsiyah Eco Park" />
+          <img
+            src="/gallery/facebook/scenery-atmosphere/1413818884097738.webp"
+            alt="Illuminated viewing tower and gardens at Qetsiyah Eco Park"
+            decoding="async"
+          />
         </figure>
       </div>
     </section>
