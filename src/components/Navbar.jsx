@@ -184,7 +184,7 @@ export function Navbar({ activeFrame, onNavigate }) {
   const showSolidNav = isScrolled || isAnyMenuOpen;
 
   const isLightHeader = isScrolled && !isAnyMenuOpen;
-  const hasDarkOpeningHero = activeFrame === 'about' || activeFrame === 'must-visit';
+  const hasDarkOpeningHero = activeFrame === 'about';
   const headerBgColor = isAnyMenuOpen ? '#151b18' : (isScrolled ? '#eae3d4' : 'transparent');
   const addLightTextClass = isLightHeader || (!showSolidNav && !isHome && !hasDarkOpeningHero);
 
@@ -436,68 +436,18 @@ export function Navbar({ activeFrame, onNavigate }) {
             
             <div className="mega-menu-left-content">
               <div className="mega-menu-main-header">
-                <h2 className="mega-menu-heading-title">Must visit & Partners</h2>
+                <h2 className="mega-menu-heading-title">Must Visit</h2>
                 <div className="mega-menu-heading-divider"></div>
               </div>
 
-              <div className="mega-menu-three-cols-grid">
+              <div className="mega-menu-three-cols-grid" style={{ gridTemplateColumns: '1fr' }}>
                 <div className="mega-links-column">
                   <ul className="mega-clean-links-list">
-                    <li><a href="#must-visit" onClick={(e) => handleNavClick(e, 'must-visit')}>Wyattel Hotel (Tacurong City)</a></li>
-                    <li><a href="#must-visit" onClick={(e) => handleNavClick(e, 'must-visit')}>Executive Suites & Rooms</a></li>
-                    <li><a href="#must-visit" onClick={(e) => handleNavClick(e, 'must-visit')}>Air-Conditioned Modern Rooms</a></li>
-                    <li><a href="#must-visit" onClick={(e) => handleNavClick(e, 'must-visit')}>Downtown Tacurong Location</a></li>
-                  </ul>
-                </div>
-
-                <div className="mega-links-column">
-                  <ul className="mega-clean-links-list">
-                    <li><a href="#must-visit" onClick={(e) => handleNavClick(e, 'must-visit')}>Tacurong City Bird Sanctuary</a></li>
-                    <li><a href="#must-visit" onClick={(e) => handleNavClick(e, 'must-visit')}>Sultan Kudarat Provincial Capitol</a></li>
-                    <li><a href="#must-visit" onClick={(e) => handleNavClick(e, 'must-visit')}>Regional Cultural Heritage</a></li>
-                    <li><a href="#must-visit" onClick={(e) => handleNavClick(e, 'must-visit')}>Local Ecotourism Destinations</a></li>
-                  </ul>
-                </div>
-
-                <div className="mega-links-column">
-                  <ul className="mega-clean-links-list">
-                    <li><a href="#must-visit" onClick={(e) => handleNavClick(e, 'must-visit')}>Wyattel Fine Dining & Restaurant</a></li>
-                    <li><a href="#must-visit" onClick={(e) => handleNavClick(e, 'must-visit')}>Affiliated Regional Tourism Partners</a></li>
-                    <li><a href="#must-visit" onClick={(e) => handleNavClick(e, 'must-visit')}>Partner Inquiry via Qetsiyah</a></li>
-                  </ul>
-                </div>
-              </div>
-
-              <div className="mega-menu-bottom-subsections-grid">
-                <div className="mega-sub-col">
-                  <div className="mega-sub-header">
-                    <h3 className="mega-sub-title">Hotel partnership</h3>
-                    <div className="mega-sub-divider"></div>
-                  </div>
-                  <ul className="mega-clean-links-list">
-                    <li><a href="#must-visit" onClick={(e) => handleNavClick(e, 'must-visit')}>Tour & Stay Packages</a></li>
-                    <li><a href="#must-visit" onClick={(e) => handleNavClick(e, 'must-visit')}>Direct Reception Coordination</a></li>
-                  </ul>
-                </div>
-
-                <div className="mega-sub-col">
-                  <div className="mega-sub-header">
-                    <h3 className="mega-sub-title">Regional tourism</h3>
-                    <div className="mega-sub-divider"></div>
-                  </div>
-                  <ul className="mega-clean-links-list">
-                    <li><a href="#must-visit" onClick={(e) => handleNavClick(e, 'must-visit')}>Sultan Kudarat Travel Guide</a></li>
-                    <li><a href="#must-visit" onClick={(e) => handleNavClick(e, 'must-visit')}>Tacurong City Tourism Hub</a></li>
-                  </ul>
-                </div>
-
-                <div className="mega-sub-col">
-                  <div className="mega-sub-header">
-                    <h3 className="mega-sub-title">Inquiries</h3>
-                    <div className="mega-sub-divider"></div>
-                  </div>
-                  <ul className="mega-clean-links-list">
-                    <li><a href="#booking" onClick={(e) => handleNavClick(e, 'home', '#booking')}>Partner Promotion Inquiries</a></li>
+                    <li>
+                      <a href="#must-visit" onClick={(e) => handleNavClick(e, 'must-visit')}>
+                        Wyattel Hotel (Tacurong City)
+                      </a>
+                    </li>
                   </ul>
                 </div>
               </div>
