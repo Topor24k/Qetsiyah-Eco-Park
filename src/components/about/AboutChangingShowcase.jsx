@@ -66,20 +66,6 @@ export function AboutChangingShowcase() {
   // Track sub-image rotation index for each of the 5 slides
   const [subImageIndices, setSubImageIndices] = useState(() => aboutShowcaseSlides.map(() => 0));
 
-  // Rotate images every 5 seconds (5000ms)
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setSubImageIndices((prev) =>
-        prev.map((idx, sIdx) => {
-          const slideImages = aboutShowcaseSlides[sIdx].images;
-          return (idx + 1) % slideImages.length;
-        })
-      );
-    }, 5000);
-
-    return () => clearInterval(timer);
-  }, [activeSlide]);
-
   const selectPrevious = () => {
     setActiveSlide((current) => (current - 1 + total) % total);
   };
@@ -133,6 +119,8 @@ export function AboutChangingShowcase() {
                       src={imgSrc}
                       alt={`${slide.alt} ${imgIdx + 1}`}
                       className={`about-slide-subimg ${isCurrentImg ? 'active' : ''}`}
+                      loading="lazy"
+                      decoding="async"
                     />
                   );
                 })}

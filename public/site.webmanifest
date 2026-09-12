@@ -1,0 +1,17 @@
+{
+  "name": "The Qetsiyah Eco Park",
+  "short_name": "Qetsiyah",
+  "description": "Plan visits, discover activities, browse dining, and explore Qetsiyah Eco Park.",
+  "start_url": "/#home",
+  "display": "standalone",
+  "background_color": "#f7f2e8",
+  "theme_color": "#10241f",
+  "icons": [
+    {
+      "src": "/qetsiyah-logo.png",
+      "sizes": "any",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

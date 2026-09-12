@@ -1,0 +1,973 @@
+/* Mobile application layer
+   Loaded after the desktop editorial stylesheet so phones receive a deliberate
+   interface rather than a scaled-down desktop composition. */
+
+.skip-to-content {
+  position: fixed;
+  z-index: 1000001;
+  top: 12px;
+  left: 12px;
+  padding: 12px 16px;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #102a25;
+  font-weight: 800;
+  transform: translateY(-160%);
+  transition: transform 0.2s ease;
+}
+
+.skip-to-content:focus {
+  transform: translateY(0);
+}
+
+.mobile-app-navigation {
+  display: none;
+}
+
+main:focus {
+  outline: none;
+}
+
+@media (max-width: 768px) {
+  :root {
+    --mobile-header-height: 70px;
+    --mobile-nav-height: 72px;
+    --mobile-gutter: 14px;
+    --mobile-card-radius: 24px;
+    --mobile-paper: #f7f2e8;
+    --mobile-paper-deep: #eee5d6;
+    --mobile-forest: #17322d;
+    --mobile-copper: #b9784d;
+  }
+
+  html {
+    scroll-padding-top: calc(var(--mobile-header-height) + 14px);
+  }
+
+  body {
+    min-width: 320px;
+    background: #dfd5c5;
+    color: #20302b;
+    font-size: 16px;
+    line-height: 1.6;
+    overscroll-behavior-y: none;
+  }
+
+  body,
+  button,
+  input,
+  select,
+  textarea {
+    font-size: 1rem;
+  }
+
+  button,
+  a,
+  input,
+  select,
+  textarea,
+  [role='button'] {
+    touch-action: manipulation;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+
+  .site-root {
+    padding-bottom: calc(var(--mobile-nav-height) + env(safe-area-inset-bottom));
+  }
+
+  /* Stable app header: it stays reachable instead of disappearing during a
+     touch scroll, while the bottom bar handles frequent destinations. */
+  .primary-nav-header,
+  .primary-nav-header.nav-hidden {
+    top: 0 !important;
+    min-height: calc(var(--mobile-header-height) + env(safe-area-inset-top));
+    padding: calc(8px + env(safe-area-inset-top)) 0 8px !important;
+    border-bottom: 1px solid rgba(38, 51, 45, 0.1) !important;
+    background: rgba(247, 242, 232, 0.94) !important;
+    box-shadow: 0 8px 28px rgba(25, 38, 31, 0.09) !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    transform: translateY(0) !important;
+    backdrop-filter: blur(18px) saturate(1.15);
+    -webkit-backdrop-filter: blur(18px) saturate(1.15);
+  }
+
+  .primary-nav-container {
+    min-height: 52px;
+    padding-inline: max(16px, env(safe-area-inset-left)) max(16px, env(safe-area-inset-right));
+  }
+
+  .qetsiyah-brand-logo,
+  .primary-nav-header .brand-letter-q,
+  .primary-nav-header .brand-letters-rest,
+  .primary-nav-header .brand-eco-row span {
+    color: #26322d !important;
+    text-shadow: none !important;
+  }
+
+  .primary-nav-header .brand-underline {
+    background: #b9784d !important;
+    box-shadow: none !important;
+  }
+
+  .qetsiyah-brand-logo {
+    min-height: 44px;
+    transform: none;
+    transform-origin: left center;
+  }
+
+  .phone-only-burger-btn {
+    display: inline-grid;
+    width: 48px;
+    height: 48px;
+    flex: 0 0 48px;
+    padding: 0;
+    place-items: center;
+    border: 1px solid rgba(32, 55, 47, 0.13);
+    border-radius: 15px;
+    background: rgba(255, 255, 255, 0.66);
+    color: #17322d !important;
+  }
+
+  .mobile-nav-panel {
+    /* The header uses transform for desktop scroll motion, which makes fixed
+       descendants use the header as their containing block. Anchor this
+       drawer below the header and give it an explicit viewport height. */
+    position: absolute;
+    top: 100%;
+    right: 0;
+    bottom: auto;
+    left: 0;
+    width: 100%;
+    height: calc(100svh - var(--mobile-header-height) - var(--mobile-nav-height) - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    max-height: none;
+    padding: 16px max(18px, env(safe-area-inset-right)) 28px max(18px, env(safe-area-inset-left));
+    gap: 0;
+    border: 0;
+    border-radius: 0 0 26px 26px;
+    background:
+      radial-gradient(circle at 88% 8%, rgba(222, 163, 96, 0.18), transparent 28%),
+      linear-gradient(145deg, #1e382f, #10241f);
+    box-shadow: 0 24px 50px rgba(5, 18, 14, 0.32);
+  }
+
+  .mobile-nav-item,
+  .mobile-accordion-header {
+    min-height: 56px;
+    padding: 0 6px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 0.86rem;
+    letter-spacing: 0.14em;
+  }
+
+  .mobile-accordion-body {
+    margin: 8px 0 12px;
+    padding: 8px;
+    gap: 2px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.06);
+  }
+
+  .mobile-accordion-body a {
+    min-height: 46px;
+    padding: 10px 12px;
+    align-items: center;
+    border-radius: 11px;
+    color: #edf3ed;
+    font-size: 0.9rem;
+  }
+
+  .mobile-group-header {
+    padding-inline: 12px;
+  }
+
+  /* Native-app-style primary destinations, sized for one-handed use. */
+  .mobile-app-navigation {
+    position: fixed;
+    z-index: 999990;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    display: block;
+    min-height: calc(var(--mobile-nav-height) + env(safe-area-inset-bottom));
+    padding: 6px max(8px, env(safe-area-inset-right)) calc(6px + env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left));
+    border-top: 1px solid rgba(36, 54, 46, 0.13);
+    background: rgba(250, 247, 240, 0.95);
+    box-shadow: 0 -12px 34px rgba(20, 35, 29, 0.14);
+    backdrop-filter: blur(20px) saturate(1.2);
+    -webkit-backdrop-filter: blur(20px) saturate(1.2);
+  }
+
+  .mobile-app-navigation-inner {
+    display: grid;
+    max-width: 560px;
+    margin-inline: auto;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    align-items: stretch;
+  }
+
+  .mobile-app-nav-item {
+    display: flex;
+    min-width: 0;
+    min-height: 58px;
+    padding: 4px 2px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    border-radius: 14px;
+    color: #707972;
+    font-size: 0.65rem;
+    font-weight: 750;
+    letter-spacing: 0.015em;
+    line-height: 1.15;
+  }
+
+  .mobile-app-nav-icon {
+    display: grid;
+    width: 34px;
+    height: 30px;
+    place-items: center;
+    border-radius: 11px;
+  }
+
+  .mobile-app-nav-item.is-active {
+    color: #17322d;
+  }
+
+  .mobile-app-nav-item.is-active .mobile-app-nav-icon {
+    background: #17322d;
+    color: #ffffff;
+    box-shadow: 0 5px 14px rgba(23, 50, 45, 0.22);
+  }
+
+  .mobile-app-nav-item.is-booking {
+    color: #9c603a;
+  }
+
+  .mobile-app-nav-item.is-booking .mobile-app-nav-icon {
+    background: rgba(185, 120, 77, 0.12);
+  }
+
+  .mobile-app-nav-item.is-booking.is-active .mobile-app-nav-icon {
+    background: #b9784d;
+    color: #ffffff;
+    box-shadow: 0 5px 14px rgba(156, 96, 58, 0.24);
+  }
+
+  /* Home becomes a stack of tactile, clearly separated app surfaces. */
+  .home-frame-view {
+    background: #dfd5c5;
+    padding-bottom: 10px;
+  }
+
+  .exact-hero-section {
+    min-height: 100svh;
+    padding-top: calc(var(--mobile-header-height) + env(safe-area-inset-top));
+    border-radius: 0 0 28px 28px;
+  }
+
+  .exact-hero-bg-img {
+    object-position: 57% center;
+  }
+
+  .hero-content-container {
+    padding: 24px 22px calc(104px + env(safe-area-inset-bottom));
+  }
+
+  .hero-serif-title {
+    max-width: 100%;
+    font-size: clamp(3.55rem, 16.5vw, 4.65rem);
+    line-height: 0.88;
+  }
+
+  .hero-subheadline {
+    max-width: 32ch;
+    font-size: 0.84rem;
+    line-height: 1.5;
+    letter-spacing: 0.045em;
+  }
+
+  .hero-cta-button-group {
+    width: 100%;
+  }
+
+  .hero-cta-btn {
+    width: 100%;
+    min-height: 52px;
+  }
+
+  .home-frame-view > .welcome-banner-section,
+  .home-frame-view > .editorial-food-section,
+  .home-frame-view > .booking-section-wrapper {
+    width: calc(100% - (var(--mobile-gutter) * 2));
+    margin: var(--mobile-gutter) auto 0;
+    border: 0;
+    border-radius: var(--mobile-card-radius);
+    overflow: clip;
+  }
+
+  .welcome-banner-section,
+  .editorial-food-section,
+  .booking-section-wrapper {
+    padding-block: 54px;
+  }
+
+  .welcome-banner-container,
+  .editorial-food-container,
+  .booking-section-container,
+  .food-catalog-container,
+  .contact-section-container {
+    padding-inline: 18px;
+  }
+
+  .welcome-banner-inner {
+    gap: 28px;
+  }
+
+  .welcome-headline-title {
+    font-size: clamp(3rem, 15.5vw, 4rem);
+    line-height: 0.88;
+  }
+
+  .welcome-eyebrow-tag,
+  .editorial-eyebrow-tag,
+  .booking-eyebrow,
+  .field-line-label {
+    line-height: 1.45;
+  }
+
+  .supporting-line-item {
+    font-size: 0.79rem;
+    line-height: 1.55;
+  }
+
+  .editorial-food-header {
+    margin-bottom: 30px;
+    text-align: left;
+  }
+
+  .title-row-dark,
+  .title-row-accent {
+    font-size: clamp(2.45rem, 11.8vw, 3.25rem);
+    line-height: 0.94;
+  }
+
+  .editorial-food-tagline {
+    font-size: 0.98rem;
+  }
+
+  .equal-food-grid {
+    display: grid;
+    max-width: none;
+    margin-inline: -18px;
+    padding: 0 18px 10px;
+    grid-template-columns: none;
+    grid-auto-flow: column;
+    grid-auto-columns: min(82vw, 310px);
+    gap: 12px;
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    scroll-snap-type: inline mandatory;
+    scrollbar-width: none;
+  }
+
+  .equal-food-grid::-webkit-scrollbar {
+    display: none;
+  }
+
+  .equal-food-tile {
+    scroll-snap-align: center;
+  }
+
+  .equal-food-media {
+    height: auto;
+    aspect-ratio: 4 / 3;
+    border-radius: 18px;
+  }
+
+  .editorial-food-footer {
+    margin-top: 26px;
+  }
+
+  .editorial-explore-cta-btn,
+  .booking-submit-btn {
+    width: 100%;
+    min-height: 52px;
+    padding: 13px 16px;
+    border-radius: 14px;
+    letter-spacing: 0.1em;
+  }
+
+  /* The reservation flow becomes a single, readable form stack with native
+     keyboard hints and controls large enough to tap reliably. */
+  .booking-grid-layout {
+    gap: 26px;
+  }
+
+  .booking-left-title {
+    margin-bottom: 24px;
+    font-size: clamp(2.4rem, 11.5vw, 3.1rem);
+  }
+
+  .booking-step-item {
+    gap: 13px;
+    padding: 14px 0;
+  }
+
+  .step-title {
+    font-size: 0.97rem;
+    line-height: 1.4;
+  }
+
+  .step-desc,
+  .detail-texts span,
+  .success-desc {
+    font-size: 0.91rem;
+    line-height: 1.58;
+  }
+
+  .booking-contact-info-card,
+  .booking-form-card {
+    padding: 22px 18px;
+    border-radius: 18px;
+  }
+
+  .booking-form-title {
+    margin-bottom: 28px;
+    font-size: clamp(2.15rem, 10vw, 2.75rem);
+  }
+
+  .booking-stay-form,
+  .form-line-row {
+    gap: 18px;
+  }
+
+  .form-line-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .line-input {
+    min-height: 52px;
+    padding: 0 14px;
+    border: 1px solid rgba(42, 61, 52, 0.2);
+    border-radius: 12px;
+    background: #fbfaf6;
+    font-size: 1rem;
+  }
+
+  .line-input:focus {
+    border-color: #a56a42;
+    box-shadow: 0 0 0 3px rgba(165, 106, 66, 0.13);
+  }
+
+  .line-select {
+    padding-right: 42px;
+    background-position: right 12px center;
+  }
+
+  .addons-checkbox-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 5px;
+  }
+
+  .addon-check-label {
+    min-height: 48px;
+    padding: 8px 10px;
+    border-radius: 11px;
+    background: rgba(247, 242, 232, 0.72);
+    font-size: 0.92rem;
+  }
+
+  .custom-square-checkbox {
+    width: 22px;
+    height: 22px;
+    flex-basis: 22px;
+  }
+
+  /* Category pages use a media-first card immediately on arrival. The visual
+     remains tappable for video playback, but no longer opens as a blank page. */
+  .activities-opening-hero-frame {
+    width: 100%;
+    height: 100svh;
+    min-height: 620px;
+    padding: calc(var(--mobile-header-height) + env(safe-area-inset-top) + 10px) 12px calc(var(--mobile-nav-height) + env(safe-area-inset-bottom) + 12px);
+    background: #dfd5c5;
+  }
+
+  .opening-parchment-backdrop {
+    background: #dfd5c5;
+  }
+
+  .expanding-image-container {
+    top: 50%;
+    width: calc(100% - 24px) !important;
+    height: calc(100% - var(--mobile-header-height) - var(--mobile-nav-height) - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 22px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    border-radius: 26px !important;
+    opacity: 1 !important;
+    box-shadow: 0 22px 46px rgba(25, 38, 31, 0.2);
+  }
+
+  .expanding-image-container::after {
+    position: absolute;
+    z-index: 3;
+    inset: 0;
+    content: '';
+    pointer-events: none;
+    background: linear-gradient(180deg, rgba(8, 22, 17, 0.06) 25%, rgba(8, 22, 17, 0.78) 100%);
+  }
+
+  .expanding-image-content {
+    width: 100%;
+    height: 100%;
+    object-position: center;
+  }
+
+  .opening-hero-text-block {
+    position: absolute;
+    z-index: 12;
+    right: 34px;
+    bottom: calc(var(--mobile-nav-height) + env(safe-area-inset-bottom) + 94px);
+    left: 34px;
+    align-items: flex-start;
+    text-align: left;
+    gap: 0;
+  }
+
+  .opening-title-top,
+  .opening-title-bottom {
+    width: 100%;
+    max-width: 100%;
+    padding: 0;
+    color: #ffffff;
+    font-size: clamp(2.55rem, 12vw, 3.4rem);
+    line-height: 0.93;
+    text-align: left;
+    text-shadow: 0 5px 24px rgba(0, 0, 0, 0.48);
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .opening-scroll-hint,
+  .opening-explore-menu-btn {
+    z-index: 16;
+    bottom: calc(var(--mobile-nav-height) + env(safe-area-inset-bottom) + 30px);
+    min-width: 0;
+    width: calc(100% - 68px);
+    min-height: 50px;
+    padding: 12px 18px;
+    justify-content: center;
+    border: 0;
+    border-radius: 15px;
+    background: rgba(255, 255, 255, 0.92);
+    color: #17322d;
+    font-size: 0.7rem;
+    letter-spacing: 0.14em;
+    box-shadow: 0 12px 28px rgba(7, 20, 15, 0.2);
+    animation: none;
+  }
+
+  .opening-explore-menu-btn {
+    background: #dea360;
+    color: #10241f;
+  }
+
+  /* Menu content is presented as a series of compact, scan-friendly cards. */
+  .food-catalog-sheet-section {
+    padding: 18px 0 30px;
+  }
+
+  .food-catalog-container {
+    padding-inline: 12px;
+  }
+
+  .menu-category-block {
+    margin-bottom: 14px;
+    padding: 22px 16px 12px;
+    border: 1px solid rgba(38, 57, 49, 0.1);
+    border-radius: 22px;
+    background: rgba(255, 255, 255, 0.68);
+    box-shadow: 0 10px 28px rgba(31, 43, 36, 0.07);
+  }
+
+  .menu-category-top-split {
+    gap: 0;
+  }
+
+  .category-giant-title-box,
+  .category-top-items-box {
+    height: auto;
+  }
+
+  .category-giant-title-box {
+    margin-bottom: 10px;
+    align-items: flex-start !important;
+    text-align: left !important;
+  }
+
+  .category-giant-title,
+  .category-giant-title-box.title-align-right .category-giant-title,
+  .category-giant-title-box.title-align-right .title-word-line1,
+  .category-giant-title-box.title-align-right .title-word-line2 {
+    align-items: flex-start;
+    font-size: clamp(2.35rem, 11vw, 3rem);
+    line-height: 0.94;
+    text-align: left;
+  }
+
+  .menu-single-item-row {
+    min-height: 54px;
+    padding-block: 12px;
+  }
+
+  .item-name-text {
+    font-size: 0.94rem;
+    line-height: 1.35;
+  }
+
+  .item-price-text {
+    font-size: 0.86rem;
+    white-space: nowrap;
+  }
+
+  .mobile-food-modal-backdrop {
+    padding: 14px 14px calc(var(--mobile-nav-height) + env(safe-area-inset-bottom) + 14px);
+  }
+
+  .mobile-food-modal-card {
+    max-height: calc(100svh - var(--mobile-header-height) - var(--mobile-nav-height) - 36px);
+    border-radius: 22px;
+  }
+
+  /* Gallery stays image-first, with controls and images sized like an app
+     collection rather than squeezed desktop tiles. */
+  .park-gallery-editorial-hero {
+    min-height: 680px;
+    padding-top: calc(var(--mobile-header-height) + env(safe-area-inset-top));
+    border-radius: 0 0 28px 28px;
+  }
+
+  .park-gallery-editorial-section {
+    padding: 18px 12px 34px;
+  }
+
+  .gallery-category-filter-bar {
+    margin-bottom: 14px;
+    padding: 6px;
+    border-radius: 18px;
+    background: rgba(255, 253, 248, 0.9);
+  }
+
+  .gallery-category-pill-btn {
+    min-height: 48px;
+    padding: 8px 7px;
+    font-size: 0.63rem;
+    line-height: 1.3;
+  }
+
+  .gallery-reference-mosaic-grid.gallery-photo-only-grid {
+    gap: 10px;
+  }
+
+  .gallery-photo-only-grid .mosaic-card-wrapper {
+    aspect-ratio: 4 / 3;
+    border-radius: 17px;
+    box-shadow: 0 10px 24px rgba(25, 38, 31, 0.11);
+  }
+
+  .gallery-lightbox-backdrop {
+    padding: calc(var(--mobile-header-height) + 8px) 10px calc(var(--mobile-nav-height) + env(safe-area-inset-bottom) + 8px);
+  }
+
+  .gallery-lightbox-modal,
+  .lightbox-image-stage {
+    max-height: calc(100svh - var(--mobile-header-height) - var(--mobile-nav-height) - 24px);
+  }
+
+  .lightbox-display-img {
+    max-height: calc(100svh - var(--mobile-header-height) - var(--mobile-nav-height) - 38px);
+  }
+
+  /* About text and carousel use comfortable reading widths and edge controls. */
+  .about-landing-hero {
+    min-height: 100svh;
+  }
+
+  .about-us-drop-stage {
+    padding: calc(var(--mobile-header-height) + 20px) 20px calc(var(--mobile-nav-height) + 20px);
+  }
+
+  .about-us-drop-title {
+    font-size: clamp(3.15rem, 15vw, 4.25rem);
+  }
+
+  .about-us-subheadline {
+    max-width: 32ch;
+    font-size: 0.84rem;
+    line-height: 1.55;
+  }
+
+  .story-sentence.teleprompter-text {
+    max-width: 100%;
+    padding-inline: 22px;
+    font-size: clamp(1.85rem, 8.6vw, 2.5rem);
+    line-height: 1.42;
+  }
+
+  .about-changing-showcase {
+    padding: 42px 0 34px;
+  }
+
+  .about-changing-copy {
+    width: calc(100% - 36px);
+    min-height: 0;
+    margin-bottom: 24px;
+  }
+
+  .about-changing-copy h2 {
+    font-size: clamp(2.15rem, 10.5vw, 2.9rem);
+    line-height: 0.94;
+  }
+
+  .about-changing-subtitle {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+  }
+
+  .about-changing-subtitle > span {
+    display: none;
+  }
+
+  .about-changing-subtitle p {
+    font-size: 0.91rem;
+    line-height: 1.65;
+  }
+
+  .about-changing-full-slider {
+    --slide-width: calc(100vw - 42px);
+    --slide-gap: 12px;
+    height: clamp(340px, 112vw, 460px);
+  }
+
+  .about-slide-item-absolute {
+    border-radius: 20px;
+  }
+
+  .global-slider-arrows button {
+    width: 48px;
+    height: 48px;
+  }
+
+  .global-slider-arrows button.prev-arrow {
+    left: 28px;
+  }
+
+  .global-slider-arrows button.next-arrow {
+    left: calc(100% - 28px);
+  }
+
+  .about-gallery-dots {
+    width: calc(100% - 28px);
+  }
+
+  .about-gallery-dots button {
+    min-height: 48px;
+  }
+
+  /* Placeholder pages remain concise and intentionally framed on a phone. */
+  .announcements-page,
+  .must-visit-page {
+    min-height: calc(100svh - var(--mobile-nav-height) - env(safe-area-inset-bottom)) !important;
+    padding: calc(var(--mobile-header-height) + env(safe-area-inset-top) + 24px) 22px 36px !important;
+    border-radius: 0 0 28px 28px;
+  }
+
+  .announcements-page h1,
+  .must-visit-page h1 {
+    font-size: clamp(2.65rem, 13vw, 3.5rem) !important;
+  }
+
+  /* The footer is information architecture, not a compressed four-column
+     desktop block. Each group becomes a spacious phone list. */
+  .park-site-footer {
+    margin-top: 12px;
+    border-radius: 26px 26px 0 0;
+    overflow: clip;
+  }
+
+  .footer-top-container {
+    padding: 44px 20px 30px;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 34px;
+  }
+
+  .footer-brand-col {
+    max-width: none;
+  }
+
+  .footer-brand-desc {
+    font-size: 0.92rem;
+    line-height: 1.65;
+  }
+
+  .footer-map-card {
+    height: 156px;
+    border-radius: 17px;
+  }
+
+  .footer-link-list {
+    gap: 1px;
+  }
+
+  .footer-link-list a,
+  .footer-link-list button,
+  .footer-contact-line {
+    min-height: 48px;
+    padding-block: 10px;
+    font-size: 0.92rem;
+  }
+
+  .footer-bottom-container {
+    padding: 0 20px;
+  }
+
+  .footer-copy-text {
+    font-size: 0.78rem;
+    line-height: 1.6;
+  }
+
+  /* Delay expensive below-the-fold rendering without hiding it from search or
+     assistive technology. Sticky narrative sections are intentionally omitted. */
+  .editorial-food-section,
+  .booking-section-wrapper,
+  .food-catalog-sheet-section,
+  .park-gallery-editorial-section,
+  .park-site-footer {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 800px;
+  }
+}
+
+/* Compact tablets retain their editorial grid while keeping the header and
+   touch navigation reliably available. */
+@media (min-width: 769px) and (max-width: 1180px) {
+  .primary-nav-header.nav-hidden {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    transform: translateY(0) !important;
+  }
+
+  button,
+  a,
+  input,
+  select,
+  textarea,
+  [role='button'] {
+    touch-action: manipulation;
+  }
+}
+
+@media (max-width: 360px) {
+  .mobile-app-nav-item {
+    font-size: 0.6rem;
+  }
+
+  .mobile-app-nav-icon {
+    width: 30px;
+  }
+
+  .hero-serif-title {
+    font-size: clamp(3.1rem, 16vw, 3.65rem);
+  }
+
+  .opening-title-top,
+  .opening-title-bottom {
+    font-size: clamp(2.25rem, 11.5vw, 2.8rem);
+  }
+}
+
+@media (max-height: 560px) and (orientation: landscape) {
+  .mobile-app-navigation {
+    display: none;
+  }
+
+  .site-root {
+    padding-bottom: 0;
+  }
+
+  .activities-opening-hero-frame {
+    min-height: 420px;
+    padding-bottom: 12px;
+  }
+
+  .expanding-image-container {
+    height: calc(100% - var(--mobile-header-height) - 18px) !important;
+  }
+
+  .opening-hero-text-block {
+    bottom: 82px;
+  }
+
+  .opening-scroll-hint,
+  .opening-explore-menu-btn {
+    bottom: 26px;
+  }
+}
+
+@media (hover: none), (pointer: coarse) {
+  .mobile-app-nav-item,
+  .phone-only-burger-btn,
+  .opening-scroll-hint,
+  .opening-explore-menu-btn,
+  .gallery-category-pill-btn,
+  .menu-single-item-row {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .mobile-app-nav-item:active,
+  .phone-only-burger-btn:active,
+  .gallery-category-pill-btn:active,
+  .menu-single-item-row:active {
+    filter: brightness(0.94);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@media (prefers-contrast: more) {
+  .mobile-app-navigation,
+  .primary-nav-header {
+    background: #ffffff !important;
+  }
+
+  .mobile-app-nav-item,
+  .phone-only-burger-btn,
+  .line-input {
+    color: #07130f !important;
+    border-color: currentColor;
+  }
+}

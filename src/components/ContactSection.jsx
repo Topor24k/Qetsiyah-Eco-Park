@@ -144,7 +144,7 @@ export function ContactSection() {
             <h2 className="booking-form-title">Tell us about your visit.</h2>
 
             {submitted ? (
-              <div className="booking-success-banner">
+              <div className="booking-success-banner" role="status" aria-live="polite">
                 <CheckCircle2 size={32} className="success-check-icon" />
                 <div>
                   <h4 className="success-heading">Reservation Inquiry Sent!</h4>
@@ -159,10 +159,13 @@ export function ContactSection() {
                 {/* Row 1: Full Name & Mobile Number */}
                 <div className="form-line-row">
                   <div className="form-line-field">
-                    <label className="field-line-label">FULL NAME</label>
+                    <label className="field-line-label" htmlFor="booking-full-name">FULL NAME</label>
                     <input
+                      id="booking-full-name"
+                      name="fullName"
                       type="text"
                       required
+                      autoComplete="name"
                       placeholder="e.g. Maria Santos"
                       className="line-input"
                       value={formData.fullName}
@@ -170,10 +173,14 @@ export function ContactSection() {
                     />
                   </div>
                   <div className="form-line-field">
-                    <label className="field-line-label">MOBILE NUMBER</label>
+                    <label className="field-line-label" htmlFor="booking-mobile-number">MOBILE NUMBER</label>
                     <input
+                      id="booking-mobile-number"
+                      name="mobileNumber"
                       type="tel"
                       required
+                      autoComplete="tel"
+                      inputMode="tel"
                       placeholder="09XX XXX XXXX"
                       className="line-input"
                       value={formData.mobileNumber}
@@ -185,10 +192,14 @@ export function ContactSection() {
                 {/* Row 2: Email & Number of Guests */}
                 <div className="form-line-row">
                   <div className="form-line-field">
-                    <label className="field-line-label">EMAIL</label>
+                    <label className="field-line-label" htmlFor="booking-email">EMAIL</label>
                     <input
+                      id="booking-email"
+                      name="email"
                       type="email"
                       required
+                      autoComplete="email"
+                      inputMode="email"
                       placeholder="name@example.com"
                       className="line-input"
                       value={formData.email}
@@ -196,10 +207,13 @@ export function ContactSection() {
                     />
                   </div>
                   <div className="form-line-field">
-                    <label className="field-line-label">NUMBER OF GUESTS</label>
+                    <label className="field-line-label" htmlFor="booking-guests">NUMBER OF GUESTS</label>
                     <input
+                      id="booking-guests"
+                      name="guests"
                       type="number"
                       min="1"
+                      inputMode="numeric"
                       placeholder="e.g. 4"
                       className="line-input"
                       value={formData.guests}
@@ -211,9 +225,11 @@ export function ContactSection() {
                 {/* Row 3: Target Date of Visit & Our Services */}
                 <div className="form-line-row">
                   <div className="form-line-field">
-                    <label className="field-line-label">TARGET DATE OF VISIT</label>
+                    <label className="field-line-label" htmlFor="booking-visit-date">TARGET DATE OF VISIT</label>
                     <div className="date-input-wrapper">
                       <input
+                        id="booking-visit-date"
+                        name="visitDate"
                         type="date"
                         required
                         className="line-input date-input"
@@ -223,9 +239,11 @@ export function ContactSection() {
                     </div>
                   </div>
                   <div className="form-line-field">
-                    <label className="field-line-label">OUR SERVICES (EVENT TYPE)</label>
+                    <label className="field-line-label" htmlFor="booking-service-type">OUR SERVICES (EVENT TYPE)</label>
                     <div className="select-dropdown-wrapper">
                       <select
+                        id="booking-service-type"
+                        name="serviceType"
                         className="line-input line-select"
                         value={formData.serviceType}
                         onChange={(e) => setFormData({ ...formData, serviceType: e.target.value })}
@@ -245,9 +263,11 @@ export function ContactSection() {
                 {/* Row 4: Stays & Venues & Number of Units */}
                 <div className="form-line-row">
                   <div className="form-line-field">
-                    <label className="field-line-label">STAYS & VENUES</label>
+                    <label className="field-line-label" htmlFor="booking-venue-type">STAYS & VENUES</label>
                     <div className="select-dropdown-wrapper">
                       <select
+                        id="booking-venue-type"
+                        name="venueType"
                         className="line-input line-select"
                         value={formData.venueType}
                         onChange={(e) => setFormData({ ...formData, venueType: e.target.value })}
@@ -262,9 +282,11 @@ export function ContactSection() {
                     </div>
                   </div>
                   <div className="form-line-field">
-                    <label className="field-line-label">NUMBER OF UNITS / COTTAGES</label>
+                    <label className="field-line-label" htmlFor="booking-unit-count">NUMBER OF UNITS / COTTAGES</label>
                     <div className="select-dropdown-wrapper">
                       <select
+                        id="booking-unit-count"
+                        name="numUnits"
                         className="line-input line-select"
                         value={formData.numUnits}
                         onChange={(e) => setFormData({ ...formData, numUnits: e.target.value })}

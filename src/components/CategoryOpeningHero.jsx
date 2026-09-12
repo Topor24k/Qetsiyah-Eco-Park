@@ -25,6 +25,7 @@ export function CategoryOpeningHero({
 
   const isVideo = Boolean(video || (typeof image === 'string' && image.toLowerCase().endsWith('.mp4')));
   const mediaSrc = video || image;
+  const saveDataEnabled = typeof navigator !== 'undefined' && Boolean(navigator.connection?.saveData);
 
   // Global AudioContext and element sound activator
   const activateAudioEngine = () => {
@@ -270,10 +271,11 @@ export function CategoryOpeningHero({
           <video 
             ref={videoRef}
             src={mediaSrc} 
+            poster={image}
             loop 
             playsInline 
             muted
-            preload="auto"
+            preload={saveDataEnabled ? 'none' : 'metadata'}
             className="expanding-image-content expanding-video-content"
           />
         ) : (
@@ -281,6 +283,8 @@ export function CategoryOpeningHero({
             src={image} 
             alt={titleBottom} 
             className="expanding-image-content"
+            loading="eager"
+            decoding="async"
           />
         )}
         
@@ -337,7 +341,7 @@ export function CategoryOpeningHero({
       </div>
 
       {/* Click / Scroll Hint Indicator at 0% */}
-      {p < 0.05 && (
+      {p < 0.05 && (isVideo || hasContentBelow) && (
         <button
           className="opening-scroll-hint"
           type="button"
@@ -347,7 +351,7 @@ export function CategoryOpeningHero({
           }}
           aria-label={`Reveal ${titleBottom.toLowerCase()}`}
         >
-          <span>CLICK TO REVEAL</span>
+          <span>VIEW EXPERIENCE</span>
         </button>
       )}
     </div>

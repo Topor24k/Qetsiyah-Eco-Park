@@ -47,7 +47,8 @@ export function FoodPreviewSection({ onNavigate }) {
                   src={dish.image} 
                   alt={dish.name} 
                   className="tile-img"
-                  loading="lazy" 
+                  loading="lazy"
+                  decoding="async"
                 />
               </div>
             </article>

@@ -49,7 +49,7 @@ export function Footer({ onNavigate }) {
             aria-label="View Qetsiyah Ecopark on Google Maps"
           >
             <div className="footer-map-static-preview" aria-hidden="true">
-              <img src="/about-adventure-sanctuary.jpg" alt="" loading="lazy" />
+              <img src="/about-adventure-sanctuary.jpg" alt="" loading="lazy" decoding="async" />
               <div className="footer-map-grid" />
               <span className="footer-map-pin"><MapPin size={22} /></span>
             </div>

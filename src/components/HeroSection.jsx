@@ -28,9 +28,13 @@ export function HeroSection({ onNavigate, variant = 'home', isExiting = false, i
     >
       <div className="exact-hero-backdrop">
         <img
-          src="/Background Pictures/Background Hero Section II.jpg"
+          src="/optimized/hero-park-1600.webp"
+          srcSet="/optimized/hero-park-720.webp 720w, /optimized/hero-park-1600.webp 1600w"
+          sizes="100vw"
           alt="Qetsiyah Eco Park Landscape at Sunset"
           className="exact-hero-bg-img"
+          fetchPriority="high"
+          decoding="async"
         />
         <div className="tropical-dusk-overlay" />
       </div>
@@ -39,8 +43,8 @@ export function HeroSection({ onNavigate, variant = 'home', isExiting = false, i
         {(!isAboutHero || playAboutEntrance) && (
           <div className={`hero-left-box ${(isAboutHero && playAboutEntrance) ? 'about-hero-left-exit' : ''} ${isEntering ? 'home-hero-left-enter' : ''}`}>
             <h1 className="hero-serif-title">
-              <span className="hero-title-row">QETSIYAH.</span>
-              <span className="hero-title-row">ECO PARK.</span>
+              <span className="hero-title-row">QETSIYAH</span>
+              <span className="hero-title-row">ECO PARK</span>
             </h1>
 
             <p className="hero-subheadline">

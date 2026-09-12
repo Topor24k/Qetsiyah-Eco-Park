@@ -6,6 +6,7 @@ import { FoodPreviewSection } from './components/FoodPreviewSection';
 import { ContactSection } from './components/ContactSection';
 import { Footer } from './components/Footer';
 import { CustomScrollbar } from './components/CustomScrollbar';
+import { MobileBottomNav } from './components/MobileBottomNav';
 
 // Dedicated Frames
 import { AboutFrame } from './components/frames/AboutFrame';
@@ -22,10 +23,12 @@ export function App() {
   const [previousFrame, setPreviousFrame] = useState(null);
   const [exitingFromAbout, setExitingFromAbout] = useState(false);
   const [enteringHomeFromAbout, setEnteringHomeFromAbout] = useState(false);
+  const [currentHash, setCurrentHash] = useState(() => window.location.hash || '#home');
 
   // Handle URL hash routing
   useEffect(() => {
     const handleHashChange = () => {
+      setCurrentHash(window.location.hash || '#home');
       const hash = window.location.hash.replace('#', '').replace('/', '');
       let targetFrame = 'home';
       if (['about', 'activities', 'food-offers', 'stays-venues', 'services', 'gallery', 'announcements', 'must-visit'].includes(hash)) {
@@ -57,6 +60,7 @@ export function App() {
         
         const hash = scrollTarget ? scrollTarget : '#home';
         window.history.pushState(null, '', hash);
+        setCurrentHash(hash);
         
         // Wait 50ms for Home components to mount
         setTimeout(() => {
@@ -84,6 +88,7 @@ export function App() {
     
     const hash = scrollTarget ? scrollTarget : (frameName === 'home' ? '#home' : '#' + frameName);
     window.history.pushState(null, '', hash);
+    setCurrentHash(hash);
     
     // Wait 50ms for components to mount
     setTimeout(() => {
@@ -101,11 +106,12 @@ export function App() {
 
   return (
     <div className="site-root">
+      <a className="skip-to-content" href="#main-content">Skip to main content</a>
       <CustomScrollbar />
       <Navbar activeFrame={activeFrame} onNavigate={navigateTo} />
 
       {activeFrame === 'home' && (
-        <main className="home-frame-view">
+        <main className="home-frame-view" id="main-content" tabIndex="-1">
           <HeroSection onNavigate={navigateTo} isEntering={enteringHomeFromAbout} />
           <WelcomeSection />
           <FoodPreviewSection onNavigate={navigateTo} />
@@ -114,7 +120,7 @@ export function App() {
       )}
 
       {activeFrame === 'about' && (
-        <main className="category-frame-view">
+        <main className="category-frame-view" id="main-content" tabIndex="-1">
           <AboutFrame 
             onNavigate={navigateTo} 
             isExiting={exitingFromAbout} 
@@ -124,48 +130,49 @@ export function App() {
       )}
 
       {activeFrame === 'activities' && (
-        <main className="category-frame-view">
+        <main className="category-frame-view" id="main-content" tabIndex="-1">
           <ActivitiesFrame onNavigate={navigateTo} />
         </main>
       )}
 
       {activeFrame === 'food-offers' && (
-        <main className="category-frame-view">
+        <main className="category-frame-view" id="main-content" tabIndex="-1">
           <FoodOffersFrame onNavigate={navigateTo} />
         </main>
       )}
 
       {activeFrame === 'stays-venues' && (
-        <main className="category-frame-view">
+        <main className="category-frame-view" id="main-content" tabIndex="-1">
           <StaysVenuesFrame onNavigate={navigateTo} />
         </main>
       )}
 
       {activeFrame === 'services' && (
-        <main className="category-frame-view">
+        <main className="category-frame-view" id="main-content" tabIndex="-1">
           <ServicesFrame onNavigate={navigateTo} />
         </main>
       )}
 
       {activeFrame === 'gallery' && (
-        <main className="category-frame-view">
+        <main className="category-frame-view" id="main-content" tabIndex="-1">
           <GalleryFrame onNavigate={navigateTo} />
         </main>
       )}
 
       {activeFrame === 'announcements' && (
-        <main className="category-frame-view">
+        <main className="category-frame-view" id="main-content" tabIndex="-1">
           <AnnouncementsFrame onNavigate={navigateTo} />
         </main>
       )}
 
       {activeFrame === 'must-visit' && (
-        <main className="category-frame-view">
+        <main className="category-frame-view" id="main-content" tabIndex="-1">
           <MustVisitFrame onNavigate={navigateTo} />
         </main>
       )}
 
       <Footer onNavigate={navigateTo} />
+      <MobileBottomNav activeFrame={activeFrame} currentHash={currentHash} onNavigate={navigateTo} />
     </div>
   );
 }

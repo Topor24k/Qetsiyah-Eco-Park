@@ -96,6 +96,7 @@ export function FoodOffersFrame({ onNavigate }) {
                 alt={item.name} 
                 className="anchored-card-img" 
                 loading="lazy"
+                decoding="async"
               />
               <div className="anchored-card-badge">
                 <span>AUTHENTIC PARK CUISINE</span>
@@ -125,6 +126,7 @@ export function FoodOffersFrame({ onNavigate }) {
         flankLeft="FINE DINING & MEALS"
         flankRight="TACURONG CITY"
         video="/Video/Food Offer Hero Section Video.mp4"
+        image="/food-plate-hero.jpg"
         id="food-offers"
         hasContentBelow={true}
         onExploreBelow={scrollToMenu}
@@ -202,7 +204,9 @@ export function FoodOffersFrame({ onNavigate }) {
               <img 
                 src={currentOpenItem.image} 
                 alt={currentOpenItem.name} 
-                className="mobile-modal-img" 
+                className="mobile-modal-img"
+                loading="lazy"
+                decoding="async"
               />
               <div className="mobile-modal-info">
                 <h4>{currentOpenItem.name}</h4>
