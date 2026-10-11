@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 
 const categories = [
@@ -58,6 +58,9 @@ const gallerySets = {
 export function ParkGallerySection() {
   const [activeCategory, setActiveCategory] = useState('scenery-atmosphere');
   const [lightboxIndex, setLightboxIndex] = useState(null);
+  const swipeStartRef = useRef(null);
+
+  const activeCategoryLabel = categories.find((category) => category.id === activeCategory)?.label ?? 'Park';
 
   const activeItems = useMemo(
     () => gallerySets[activeCategory].map((photoId) => ({
@@ -71,7 +74,7 @@ export function ParkGallerySection() {
   useEffect(() => {
     const handleKeyDown = (event) => {
       if (lightboxIndex === null) return;
-      if (event.key === 'Escape') setLightboxIndex(null);
+      if (event.key === 'Escape') closeLightbox();
       if (event.key === 'ArrowLeft') {
         setLightboxIndex((current) => current > 0 ? current - 1 : activeItems.length - 1);
       }
@@ -107,41 +110,32 @@ export function ParkGallerySection() {
     ));
   };
 
-  const handleTileKeyDown = (event, index) => {
-    if (event.key === 'Enter' || event.key === ' ') {
-      event.preventDefault();
-      openLightbox(index);
-    }
+  // Swipe left/right on the open photo to move through the set on phones.
+  const handleSwipeStart = (event) => {
+    const touch = event.touches?.[0];
+    swipeStartRef.current = touch ? { x: touch.clientX, y: touch.clientY } : null;
   };
 
-  const renderTile = (item, index, extraClassName = '') => (
-    <div
-      key={item.id}
-      className={`mosaic-card-wrapper ${extraClassName}`}
-      onClick={() => openLightbox(index)}
-      onKeyDown={(event) => handleTileKeyDown(event, index)}
-      role="button"
-      tabIndex={0}
-      aria-label={`Open park photo ${index + 1}`}
-    >
-      <img
-        src={item.image}
-        alt={`${item.categoryLabel} at Qetsiyah Eco Park — photo ${index + 1}`}
-        className="mosaic-img"
-        loading="lazy"
-        decoding="async"
-      />
-    </div>
-  );
+  const handleSwipeEnd = (event) => {
+    const start = swipeStartRef.current;
+    const touch = event.changedTouches?.[0];
+    swipeStartRef.current = null;
+    if (!start || !touch) return;
+
+    const deltaX = touch.clientX - start.x;
+    const deltaY = touch.clientY - start.y;
+    if (Math.abs(deltaX) < 48 || Math.abs(deltaX) < Math.abs(deltaY) * 1.2) return;
+    changeImage(deltaX < 0 ? 'next' : 'previous', event);
+  };
 
   return (
-    <section className="park-gallery-editorial-section" id="park-gallery-mosaic">
-      <div className="gallery-editorial-container">
-        <div className="gallery-category-filter-bar" aria-label="Park photo categories">
-          {categories.map((category) => (
+    <section className="gallery" id="park-gallery-mosaic">
+      <div className="tabs-bar gallery-tabs" aria-label="Park photo categories">
+        <div className="tabs-scroll shell">
+          {categories.map((category, index) => (
             <button
               key={category.id}
-              className={`gallery-category-pill-btn ${activeCategory === category.id ? 'is-active' : ''}`}
+              className={`tab ${activeCategory === category.id ? 'is-active' : ''}`}
               onClick={() => {
                 setActiveCategory(category.id);
                 setLightboxIndex(null);
@@ -149,49 +143,90 @@ export function ParkGallerySection() {
               type="button"
               aria-pressed={activeCategory === category.id}
             >
-              <span className="gallery-btn-label">{category.label}</span>
+              <span className="num tab-num">{String(index + 1).padStart(2, '0')}</span>
+              {category.label}
             </button>
           ))}
         </div>
+      </div>
 
-        <div key={activeCategory} className="gallery-reference-mosaic-grid gallery-photo-only-grid">
-          {activeItems.map((item, index) => renderTile(item, index))}
+      <div className="shell">
+        <div className="gallery-meta" key={`meta-${activeCategory}`} aria-live="polite">
+          <h2 className="display display-md gallery-meta-title">
+            <span className="ln"><span>{activeCategoryLabel}</span></span>
+          </h2>
+          <span className="label label-dim">{activeItems.length} photos</span>
+        </div>
+
+        <div key={activeCategory} className="mosaic">
+          {activeItems.map((item, index) => (
+            <button
+              key={item.id}
+              type="button"
+              className="mosaic-tile"
+              style={{ '--i': Math.min(index, 11) }}
+              onClick={() => openLightbox(index)}
+              aria-label={`Open park photo ${index + 1}`}
+            >
+              <img
+                src={item.image}
+                alt={`${item.categoryLabel} at Qetsiyah Eco Park, photo ${index + 1}`}
+                loading="lazy"
+                decoding="async"
+              />
+              <span className="label num mosaic-num" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
+            </button>
+          ))}
         </div>
       </div>
 
       {lightboxIndex !== null && activeItems[lightboxIndex] && (
-        <div className="gallery-lightbox-backdrop" onClick={closeLightbox}>
-          <div className="gallery-lightbox-modal" onClick={(event) => event.stopPropagation()}>
-            <button
-              className="lightbox-close-btn"
-              onClick={closeLightbox}
-              aria-label="Close photo"
-            >
-              <X size={24} />
+        <div className="lightbox" onClick={closeLightbox} role="dialog" aria-modal="true" aria-label="Photo viewer">
+          <div className="lightbox-bar" onClick={(event) => event.stopPropagation()}>
+            <span className="label">
+              <span className="accent num">{String(lightboxIndex + 1).padStart(2, '0')}</span>
+              {' / '}
+              <span className="num">{String(activeItems.length).padStart(2, '0')}</span>
+              <span className="lightbox-bar-name"> — {activeCategoryLabel}</span>
+            </span>
+            <button className="link-arrow lightbox-close" onClick={closeLightbox} aria-label="Close photo" type="button">
+              Close
+              <X size={14} aria-hidden="true" />
             </button>
+          </div>
 
+          <div
+            className="lightbox-stage"
+            onClick={(event) => event.stopPropagation()}
+            onTouchStart={handleSwipeStart}
+            onTouchEnd={handleSwipeEnd}
+          >
+            <img
+              key={activeItems[lightboxIndex].id}
+              src={activeItems[lightboxIndex].image}
+              alt={`${activeItems[lightboxIndex].categoryLabel} at Qetsiyah Eco Park, photo ${lightboxIndex + 1}`}
+              className="lightbox-img"
+            />
+          </div>
+
+          <div className="lightbox-nav" onClick={(event) => event.stopPropagation()}>
             <button
-              className="lightbox-arrow-btn arrow-prev"
+              className="link-arrow"
               onClick={(event) => changeImage('previous', event)}
               aria-label="Previous photo"
+              type="button"
             >
-              <ChevronLeft size={32} />
+              <ChevronLeft size={16} aria-hidden="true" />
+              Prev
             </button>
-
-            <div className="lightbox-image-stage">
-              <img
-                src={activeItems[lightboxIndex].image}
-                alt={`${activeItems[lightboxIndex].categoryLabel} at Qetsiyah Eco Park — photo ${lightboxIndex + 1}`}
-                className="lightbox-display-img"
-              />
-            </div>
-
             <button
-              className="lightbox-arrow-btn arrow-next"
+              className="link-arrow"
               onClick={(event) => changeImage('next', event)}
               aria-label="Next photo"
+              type="button"
             >
-              <ChevronRight size={32} />
+              Next
+              <ChevronRight size={16} aria-hidden="true" />
             </button>
           </div>
         </div>

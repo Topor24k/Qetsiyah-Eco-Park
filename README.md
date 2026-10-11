@@ -1,4 +1,4 @@
-﻿# 🌿 Qetsiyah Eco Park — Digital Experience & Tourism Platform
+# 🌿 Qetsiyah Eco Park — Digital Experience & Tourism Platform
 
 > **"A relaxing wide place. Perfect for all events and occasions. All are welcome here."**  
 > *Barangay Calean, Tacurong City, Sultan Kudarat, Philippines • Established October 20, 2023*

@@ -1,5 +1,7 @@
 import React from 'react';
-import { ArrowRight, Utensils } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
+import { Lines } from './ui/Lines';
+import { Media } from './ui/Media';
 
 export function FoodPreviewSection({ onNavigate }) {
   const dishes = [
@@ -21,56 +23,50 @@ export function FoodPreviewSection({ onNavigate }) {
   ];
 
   return (
-    <section id="food-preview" className="editorial-food-section" aria-label="Featured Culinary Highlights">
-      <div className="editorial-food-container">
-        
-        {/* =========================================================================
-            SECTION HEADER: HIGH-CONTRAST EDITORIAL DISPLAY
-           ========================================================================= */}
-        <header className="editorial-food-header">
-          <span className="editorial-eyebrow-tag">QETSIYAH CAFÉ & DINING</span>
-          <h2 className="editorial-food-title">
-            <span className="title-row-dark">WHERE EVERY</span>
-            <span className="title-row-accent">BITE IS A DELIGHT</span>
-          </h2>
-          <p className="editorial-food-tagline">Delicious Moments, Perfectly Served.</p>
+    <section id="food-preview" className="section section--paper dine" aria-labelledby="dine-title">
+      <div className="shell">
+        <header className="section-head">
+          <p className="section-head-label label" data-reveal="fade">
+            <span className="num">02</span>
+            <span>Qetsiyah Café &amp; Dining</span>
+          </p>
+          <Lines
+            id="dine-title"
+            className="display display-lg section-head-title"
+            lines={['Where every', { text: 'bite is a delight', className: 'hl' }]}
+          />
+          <p className="body section-head-aside" data-reveal>Delicious Moments, Perfectly Served.</p>
         </header>
 
-        {/* =========================================================================
-            EQUAL SIZE 3-ITEM FOOD GALLERY (BEEF, SOUP, CHICKEN - NO BADGES)
-           ========================================================================= */}
-        <div className="equal-food-grid">
-          {dishes.map((dish) => (
-            <article key={dish.id} className="equal-food-tile" tabIndex="0" aria-label={dish.name}>
-              <div className="equal-food-media">
-                <img 
-                  src={dish.image} 
-                  alt={dish.name} 
-                  className="tile-img"
-                  loading="lazy"
-                  decoding="async"
-                />
-              </div>
-            </article>
+        <div className="dine-grid">
+          {dishes.map((dish, index) => (
+            <figure key={dish.id} className="dine-item">
+              <Media
+                src={dish.image}
+                alt={dish.name}
+                className="dine-media"
+                parallax
+                delay={index * 140}
+              />
+              <figcaption data-reveal="fade" style={{ '--d': `${index * 140 + 300}ms` }}>
+                <span className="label num">{String(index + 1).padStart(2, '0')}</span>
+                <span className="label">{dish.name}</span>
+              </figcaption>
+            </figure>
           ))}
         </div>
 
-        {/* =========================================================================
-            CENTERED EDITORIAL CTA
-           ========================================================================= */}
-        <div className="editorial-food-footer">
-          <button 
+        <div className="dine-foot" data-reveal>
+          <button
             type="button"
-            className="editorial-explore-cta-btn"
+            className="btn btn--ink"
             onClick={() => onNavigate && onNavigate('food-offers')}
             aria-label="Navigate to full food offers and menu catalog"
           >
-            <Utensils size={16} aria-hidden="true" />
-            <span>EXPLORE FULL FOOD OFFERS & MENU</span>
+            <span>Explore full food offers &amp; menu</span>
             <ArrowRight size={16} aria-hidden="true" />
           </button>
         </div>
-
       </div>
     </section>
   );

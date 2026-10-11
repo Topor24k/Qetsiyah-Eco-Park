@@ -1,16 +1,55 @@
 import React, { useState, useEffect } from 'react';
 import { CategoryOpeningHero } from '../CategoryOpeningHero';
 import { foodMenuCatalog } from '../../data/foodMenuCatalog';
-import { X } from 'lucide-react';
+import { QuickNav } from '../shared/QuickNav';
+import { Lines } from '../ui/Lines';
+
+// Short labels for the sticky category bar.
+const menuTabLabels = {
+  'beef-meals': 'Beef',
+  'chicken-meals': 'Chicken',
+  'combo-meals': 'Combo',
+  'sizzling-grill': 'Sizzling & Grill',
+  'soup-meals': 'Soup',
+  'pasta-noodles': 'Pasta & Noodles',
+  'short-orders': 'Short Orders',
+  'snacks-meals': 'Snacks',
+  'drinks-beverages': 'Drinks'
+};
+
+const menuTabs = foodMenuCatalog.map((category) => ({
+  id: category.id,
+  label: menuTabLabels[category.id] || `${category.titleLine1} ${category.titleLine2}`
+}));
+
+// Each category's dishes in one list, keeping a stable id per dish.
+const menuSections = foodMenuCatalog.map((category) => ({
+  ...category,
+  dishes: [
+    ...category.topItems.map((item, idx) => ({ item, uid: `${category.id}-top-${idx}` })),
+    ...category.bottomLeft.map((item, idx) => ({ item, uid: `${category.id}-bl-${idx}` })),
+    ...category.bottomRight.map((item, idx) => ({ item, uid: `${category.id}-br-${idx}` }))
+  ]
+}));
 
 export function FoodOffersFrame({ onNavigate }) {
   // Track single open item by ID across the whole menu
   const [openItemId, setOpenItemId] = useState(null);
+  const [menuQuery, setMenuQuery] = useState('');
+  const [activeCategoryId, setActiveCategoryId] = useState(foodMenuCatalog[0].id);
+
+  const normalizedQuery = menuQuery.trim().toLowerCase();
+  const matchesQuery = ({ item }) => !normalizedQuery || item.name.toLowerCase().includes(normalizedQuery);
+
+  const visibleSections = menuSections
+    .map((section) => ({ ...section, dishes: section.dishes.filter(matchesQuery) }))
+    .filter((section) => section.dishes.length > 0);
+  const menuResultCount = visibleSections.reduce((total, section) => total + section.dishes.length, 0);
 
   // Close on Escape or click outside
   useEffect(() => {
     const handleOutsideClick = (e) => {
-      if (!e.target.closest('.menu-single-item-row') && !e.target.closest('.mobile-food-modal-card')) {
+      if (!e.target.closest('.menu-item')) {
         setOpenItemId(null);
       }
     };
@@ -28,101 +67,38 @@ export function FoodOffersFrame({ onNavigate }) {
     };
   }, []);
 
-  const handleToggleItem = (e, itemId) => {
-    e.stopPropagation();
-    setOpenItemId((prev) => (prev === itemId ? null : itemId));
-  };
+  // Highlight the tab for whichever category is crossing the upper part of
+  // the screen.
+  useEffect(() => {
+    if (!('IntersectionObserver' in window)) return undefined;
 
-  const handleKeyDownRow = (e, itemId) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      setOpenItemId((prev) => (prev === itemId ? null : itemId));
-    }
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) setActiveCategoryId(entry.target.id);
+        });
+      },
+      { rootMargin: '-28% 0px -62% 0px' }
+    );
+
+    document.querySelectorAll('.menu-cat').forEach((block) => observer.observe(block));
+    return () => observer.disconnect();
+  }, [normalizedQuery]);
+
+  const jumpToCategory = (categoryId) => {
+    setActiveCategoryId(categoryId);
+    if (onNavigate) onNavigate('food-offers', `#${categoryId}`);
   };
 
   const scrollToMenu = () => {
-    const el = document.querySelector('.food-catalog-sheet-section');
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
-  // Find currently open item for mobile modal rendering
-  let currentOpenItem = null;
-  if (openItemId) {
-    for (const cat of foodMenuCatalog) {
-      const allItems = [...cat.topItems, ...cat.bottomLeft, ...cat.bottomRight];
-      const match = allItems.find((_, idx) => `${cat.id}-${idx}` === openItemId || cat.topItems.some((it, i) => `${cat.id}-top-${i}` === openItemId && it === _) || cat.bottomLeft.some((it, i) => `${cat.id}-bl-${i}` === openItemId && it === _) || cat.bottomRight.some((it, i) => `${cat.id}-br-${i}` === openItemId && it === _));
-      if (match) {
-        currentOpenItem = match;
-        break;
-      }
-    }
-  }
-
-  // Row Renderer with anchored floating card directly below underline
-  const renderRow = (item, uniqueId) => {
-    const isOpen = openItemId === uniqueId;
-
-    return (
-      <div 
-        key={uniqueId}
-        className={`menu-single-item-row ${isOpen ? 'active-preview-row' : ''}`}
-        onClick={(e) => handleToggleItem(e, uniqueId)}
-        onKeyDown={(e) => handleKeyDownRow(e, uniqueId)}
-        role="button"
-        tabIndex={0}
-        aria-expanded={isOpen}
-      >
-        <div className="item-name-col">
-          <span className="item-name-text">{item.name}</span>
-        </div>
-
-        <div className="item-dots-leader"></div>
-
-        <div className="item-price-col">
-          <span className="item-price-text">{item.price}</span>
-        </div>
-
-        {/* Anchored Floating Food Photo Dropdown */}
-        {isOpen && (
-          <div 
-            className="item-anchored-card" 
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="anchored-card-img-wrap">
-              <img 
-                src={item.image} 
-                alt={item.name} 
-                className="anchored-card-img" 
-                loading="lazy"
-                decoding="async"
-              />
-              <div className="anchored-card-badge">
-                <span>AUTHENTIC PARK CUISINE</span>
-              </div>
-            </div>
-            <div className="anchored-card-details">
-              <div className="card-dish-header">
-                <span className="card-dish-name">{item.name}</span>
-                <span className="card-dish-price">{item.price}</span>
-              </div>
-              <p className="card-dish-desc">
-                Freshly prepared with authentic countryside spices and farm-fresh ingredients at Qetsiyah Eco Park.
-              </p>
-            </div>
-          </div>
-        )}
-      </div>
-    );
+    document.querySelector('#food-catalog')?.scrollIntoView({ behavior: 'smooth' });
   };
 
   return (
-    <div className="frame-view-wrapper food-offers-page">
-      {/* 1. Scroll-Driven Expanding Hero Opening with Video */}
-      <CategoryOpeningHero 
-        titleTop="DISCOVER" 
-        titleBottom="OUR FOOD OFFERS" 
+    <div className="food-page">
+      <CategoryOpeningHero
+        titleTop="DISCOVER"
+        titleBottom="OUR FOOD OFFERS"
         flankLeft="FINE DINING & MEALS"
         flankRight="TACURONG CITY"
         video="/Video/Food Offer Hero Section Video.mp4"
@@ -132,90 +108,94 @@ export function FoodOffersFrame({ onNavigate }) {
         onExploreBelow={scrollToMenu}
       />
 
-      {/* 2. Editorial Menu Catalog Section (Preserved in Full) */}
-      <section className="food-catalog-sheet-section">
-        <div className="food-catalog-container">
-          
-          {foodMenuCatalog.map((category) => {
-            const isTitleLeft = category.titleSide === 'left';
+      <section className={`carte ${normalizedQuery ? 'is-searching' : ''}`} id="food-catalog">
+        <QuickNav
+          items={menuTabs}
+          activeId={activeCategoryId}
+          onJump={jumpToCategory}
+          query={menuQuery}
+          onQueryChange={setMenuQuery}
+          resultCount={menuResultCount}
+          placeholder="Search dishes"
+          searchLabel="Search the menu"
+          ariaLabel="Menu search and categories"
+          singular="dish"
+          plural="dishes"
+        />
 
-            const TitleBlock = (
-              <div className={`category-giant-title-box ${isTitleLeft ? 'title-align-left' : 'title-align-right'}`}>
-                <h2 className="category-giant-title">
-                  <span className="title-word-line1">{category.titleLine1}</span>
-                  <span className="title-word-line2">{category.titleLine2}</span>
-                </h2>
-              </div>
-            );
+        <div className="shell menu-body">
+          {normalizedQuery && menuResultCount === 0 && (
+            <div className="menu-empty" role="status">
+              <p className="display display-md">Nothing matches “{menuQuery.trim()}”.</p>
+              <p className="body">Try a shorter word, like “sisig”, “soup”, or “chicken”.</p>
+              <button type="button" className="link-arrow" onClick={() => setMenuQuery('')}>
+                Show the full menu
+              </button>
+            </div>
+          )}
 
-            const TopItemsList = (
-              <div className="category-top-items-box">
-                {category.topItems.map((item, idx) => 
-                  renderRow(item, `${category.id}-top-${idx}`)
-                )}
-              </div>
-            );
+          {visibleSections.map((section) => {
+            const sectionNumber = foodMenuCatalog.findIndex((category) => category.id === section.id) + 1;
 
             return (
-              <div key={category.id} id={category.id} className="menu-category-block">
-                {/* Top Split */}
-                <div className={`menu-category-top-split ${isTitleLeft ? 'layout-title-left' : 'layout-title-right'}`}>
-                  <div className="top-split-left-col">
-                    {isTitleLeft ? TitleBlock : TopItemsList}
-                  </div>
-                  <div className="top-split-right-col">
-                    {isTitleLeft ? TopItemsList : TitleBlock}
-                  </div>
+              <div key={section.id} id={section.id} className="menu-cat">
+                <div className="menu-cat-head">
+                  <p className="label menu-cat-label" data-reveal="fade">
+                    <span className="num accent">{String(sectionNumber).padStart(2, '0')}</span>
+                    <span>{section.dishes.length} {section.dishes.length === 1 ? 'dish' : 'dishes'}</span>
+                  </p>
+                  <Lines
+                    className="display display-lg menu-cat-title"
+                    lines={[section.titleLine1, section.titleLine2]}
+                  />
                 </div>
 
-                {/* Bottom Balanced Columns */}
-                <div className="menu-category-bottom-grid">
-                  <div className="menu-col-subgrid">
-                    {category.bottomLeft.map((item, idx) => 
-                      renderRow(item, `${category.id}-bl-${idx}`)
-                    )}
-                  </div>
+                <ul className="menu-items" data-reveal>
+                  {section.dishes.map(({ item, uid }) => {
+                    const isOpen = openItemId === uid;
 
-                  <div className="menu-col-subgrid">
-                    {category.bottomRight.map((item, idx) => 
-                      renderRow(item, `${category.id}-br-${idx}`)
-                    )}
-                  </div>
-                </div>
+                    return (
+                      <li key={uid} className={`menu-item ${isOpen ? 'is-open' : ''}`}>
+                        <button
+                          type="button"
+                          className="menu-item-row"
+                          aria-expanded={isOpen}
+                          onClick={() => setOpenItemId((prev) => (prev === uid ? null : uid))}
+                        >
+                          <span className="menu-item-name">{item.name}</span>
+                          <span className="menu-item-price num">{item.price}</span>
+                        </button>
+
+                        {/* Dish photo, revealed in place under the row */}
+                        <div className="menu-item-peek">
+                          <div className="menu-item-peek-inner">
+                            {isOpen && (
+                              <div className="menu-item-card">
+                                <img
+                                  src={item.image}
+                                  alt={item.name}
+                                  loading="lazy"
+                                  decoding="async"
+                                />
+                                <div>
+                                  <p className="label accent">Authentic park cuisine</p>
+                                  <p className="menu-item-desc">
+                                    Freshly prepared with authentic countryside spices and farm-fresh ingredients at Qetsiyah Eco Park.
+                                  </p>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </li>
+                    );
+                  })}
+                </ul>
               </div>
             );
           })}
-
         </div>
       </section>
-
-      {/* Mobile Modal Backdrop & Centered Card (<640px) */}
-      {currentOpenItem && (
-        <div className="mobile-food-modal-backdrop" onClick={() => setOpenItemId(null)}>
-          <div className="mobile-food-modal-card" onClick={(e) => e.stopPropagation()}>
-            <button 
-              className="mobile-modal-close-btn" 
-              onClick={() => setOpenItemId(null)} 
-              aria-label="Close photo"
-            >
-              <X size={18} />
-            </button>
-            <div className="mobile-modal-image-wrap">
-              <img 
-                src={currentOpenItem.image} 
-                alt={currentOpenItem.name} 
-                className="mobile-modal-img"
-                loading="lazy"
-                decoding="async"
-              />
-              <div className="mobile-modal-info">
-                <h4>{currentOpenItem.name}</h4>
-                <span>{currentOpenItem.price}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

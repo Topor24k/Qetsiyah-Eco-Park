@@ -1,6 +1,10 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { ArrowDown } from 'lucide-react';
+import React, { useEffect, useRef, useState } from 'react';
+import { ArrowDown, Play, Volume2, VolumeX } from 'lucide-react';
 
+// Opening title card for a page: a full-bleed photograph or film with the
+// page name set very large in the corner. Films play silently on larger
+// screens; on phones (and for Save-Data visitors) they wait for a tap so a
+// large video is never downloaded uninvited.
 export function CategoryOpeningHero({
   titleTop = 'DISCOVER',
   titleBottom = 'ALL OUR ACTIVITIES',
@@ -9,352 +13,183 @@ export function CategoryOpeningHero({
   image = '/Background Pictures/Background Hero Section II.jpg',
   video = null,
   id = 'opening-hero',
+  lede = null,
   hasContentBelow = false,
   onExploreBelow = null,
   exploreLabel = 'SCROLL TO VIEW FULL MENU'
 }) {
-  const [progress, setProgress] = useState(0);
-  const [windowScrollY, setWindowScrollY] = useState(0);
-  const containerRef = useRef(null);
+  const sectionRef = useRef(null);
   const videoRef = useRef(null);
-  const audioCtxRef = useRef(null);
-  const targetProgressRef = useRef(0);
-  const currentProgressRef = useRef(0);
-  const animFrameRef = useRef(null);
-  const touchStartYRef = useRef(0);
+  const wantsPlaybackRef = useRef(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isMuted, setIsMuted] = useState(true);
 
-  const isVideo = Boolean(video || (typeof image === 'string' && image.toLowerCase().endsWith('.mp4')));
-  const mediaSrc = video || image;
-  const saveDataEnabled = typeof navigator !== 'undefined' && Boolean(navigator.connection?.saveData);
+  const isVideo = Boolean(video);
 
-  // Global AudioContext and element sound activator
-  const activateAudioEngine = () => {
-    try {
-      if (!audioCtxRef.current) {
-        const AudioCtx = window.AudioContext || window.webkitAudioContext;
-        if (AudioCtx) {
-          audioCtxRef.current = new AudioCtx();
-        }
-      }
-      if (audioCtxRef.current && audioCtxRef.current.state === 'suspended') {
-        audioCtxRef.current.resume().catch(() => {});
-      }
-    } catch (e) {}
-
-    if (isVideo && videoRef.current) {
-      videoRef.current.muted = false;
-      if (currentProgressRef.current >= 0.85 && (window.scrollY || 0) <= 40) {
-        videoRef.current.play().catch(() => {});
-      }
-    }
-  };
-
-  // Attach multiple global gesture listeners to ensure browser unlocks audio automatically on first scroll/interaction
-  useEffect(() => {
-    const events = ['wheel', 'keydown', 'touchstart', 'touchend', 'pointerdown', 'pointermove', 'scroll', 'click'];
-    events.forEach((evt) => {
-      window.addEventListener(evt, activateAudioEngine, { passive: true });
-      document.addEventListener(evt, activateAudioEngine, { passive: true });
-    });
-
-    return () => {
-      events.forEach((evt) => {
-        window.removeEventListener(evt, activateAudioEngine);
-        document.removeEventListener(evt, activateAudioEngine);
-      });
-    };
-  }, [isVideo]);
-
-  // Track window scroll & auto-shrink back to initial size on scroll down
-  useEffect(() => {
-    const handleWindowScroll = () => {
-      const currentScrollY = window.scrollY || window.pageYOffset || 0;
-      setWindowScrollY(currentScrollY);
-
-      // If user starts scrolling down while video is expanded, automatically shrink it back down
-      if (currentScrollY > 15 && targetProgressRef.current > 0) {
-        targetProgressRef.current = 0;
-      }
-    };
-
-    const handleWheel = (e) => {
-      // If user wheels down while expanded, immediately start shrinking back down
-      if (e.deltaY > 8 && targetProgressRef.current > 0) {
-        targetProgressRef.current = 0;
-      }
-    };
-
-    const handleTouchStart = (e) => {
-      if (e.touches && e.touches.length > 0) {
-        touchStartYRef.current = e.touches[0].clientY;
-      }
-    };
-
-    const handleTouchMove = (e) => {
-      if (!e.touches || e.touches.length === 0) return;
-      const currentY = e.touches[0].clientY;
-      const diff = touchStartYRef.current - currentY;
-      if (diff > 10 && targetProgressRef.current > 0) {
-        targetProgressRef.current = 0;
-      }
-      touchStartYRef.current = currentY;
-    };
-
-    window.addEventListener('scroll', handleWindowScroll, { passive: true });
-    window.addEventListener('wheel', handleWheel, { passive: true });
-    window.addEventListener('touchstart', handleTouchStart, { passive: true });
-    window.addEventListener('touchmove', handleTouchMove, { passive: true });
-    handleWindowScroll();
-
-    return () => {
-      window.removeEventListener('scroll', handleWindowScroll);
-      window.removeEventListener('wheel', handleWheel);
-      window.removeEventListener('touchstart', handleTouchStart);
-      window.removeEventListener('touchmove', handleTouchMove);
-    };
-  }, []);
-
-  // Playback & Sound Control Engine:
-  // - Plays with full audio automatically when expanded (progress >= 0.85) AND in hero frame (windowScrollY <= 40).
-  // - Turns OFF sound & pauses when scrolled up (progress < 0.85) OR scrolled down to menu (windowScrollY > 40).
-  // - Resets to beginning (currentTime = 0) when shrunk back to original size.
+  // Quiet autoplay where it is welcome.
   useEffect(() => {
     if (!isVideo || !videoRef.current) return;
+    const saveData = Boolean(navigator.connection?.saveData);
+    const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    const smallScreen = window.matchMedia?.('(max-width: 768px)').matches;
+    if (saveData || reducedMotion || smallScreen) return;
 
-    const isHeroActive = progress >= 0.85 && windowScrollY <= 40;
+    videoRef.current.muted = true;
+    wantsPlaybackRef.current = true;
+    videoRef.current.play().then(() => setIsPlaying(true)).catch(() => {});
+  }, [isVideo]);
 
-    if (isHeroActive) {
-      videoRef.current.muted = false;
-      videoRef.current.play().catch(() => {
-        if (videoRef.current) {
-          videoRef.current.muted = true;
-          videoRef.current.play().catch(() => {});
-        }
-      });
-    } else {
-      videoRef.current.pause();
-      videoRef.current.muted = true;
-      if (progress < 0.85) {
-        try {
-          videoRef.current.currentTime = 0;
-        } catch (e) {}
-      }
-    }
-  }, [progress, windowScrollY, isVideo]);
-
-  // Smooth lerp animation loop for 60fps/120fps buttery easing (slower, cinematic pace)
+  // Stop the film (and its sound) once the visitor scrolls past the hero,
+  // and pick it back up when they return.
   useEffect(() => {
-    let isRunning = true;
+    if (!isVideo || !('IntersectionObserver' in window) || !sectionRef.current) return undefined;
 
-    const animate = () => {
-      if (!isRunning) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        const el = videoRef.current;
+        if (!el) return;
+        if (!entry.isIntersecting) {
+          el.pause();
+          setIsPlaying(false);
+        } else if (wantsPlaybackRef.current && el.paused) {
+          el.play().then(() => setIsPlaying(true)).catch(() => {});
+        }
+      },
+      { threshold: 0.2 }
+    );
 
-      const diff = targetProgressRef.current - currentProgressRef.current;
-      if (Math.abs(diff) > 0.0005) {
-        currentProgressRef.current += diff * 0.055; // slower, cinematic smooth easing
-        setProgress(currentProgressRef.current);
-      } else if (currentProgressRef.current !== targetProgressRef.current) {
-        currentProgressRef.current = targetProgressRef.current;
-        setProgress(targetProgressRef.current);
-      }
+    observer.observe(sectionRef.current);
+    return () => observer.disconnect();
+  }, [isVideo]);
 
-      animFrameRef.current = requestAnimationFrame(animate);
+  // Depth on scroll: the media drifts slower than the page.
+  useEffect(() => {
+    const prefersReducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReducedMotion) return undefined;
+
+    let frame = null;
+    const update = () => {
+      frame = null;
+      const el = sectionRef.current;
+      if (!el) return;
+      const progress = Math.min(1, Math.max(0, window.scrollY / el.offsetHeight));
+      el.style.setProperty('--sy', progress.toFixed(4));
+    };
+    const schedule = () => {
+      if (frame === null) frame = window.requestAnimationFrame(update);
     };
 
-    animFrameRef.current = requestAnimationFrame(animate);
-
+    window.addEventListener('scroll', schedule, { passive: true });
+    update();
     return () => {
-      isRunning = false;
-      if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
+      if (frame !== null) window.cancelAnimationFrame(frame);
+      window.removeEventListener('scroll', schedule);
     };
   }, []);
 
-  // Keep the header out of the way only while this opening hero is expanded at
-  // the top of the page. Once the visitor moves into the page content, release
-  // its lock without forcing the header open (the navbar then controls itself).
-  useEffect(() => {
-    const isAtHeroTop = windowScrollY <= 10;
-    const isOpeningHeroExpanded = progress > 0.005 || targetProgressRef.current > 0.01;
+  // One control: start the film with sound, then toggle the sound.
+  const handleFilmControl = () => {
+    const el = videoRef.current;
+    if (!el) return;
 
-    if (isAtHeroTop && isOpeningHeroExpanded) {
-      window.dispatchEvent(new CustomEvent('nav-visible', { detail: false }));
-    } else if (isAtHeroTop) {
-      window.dispatchEvent(new CustomEvent('nav-visible', { detail: true }));
-    } else {
-      window.isHeroExpanded = false;
-    }
-  }, [progress, windowScrollY]);
-
-  // Click to expand / reveal full frame video or image (ONLY triggers on click, NOT on scroll)
-  const handleFrameClick = (e) => {
-    // If clicking on the explore menu button or any interactive button, ignore frame click
-    if (e.target.closest('.opening-explore-menu-btn') || e.target.closest('button.opening-explore-menu-btn')) {
+    if (!isPlaying) {
+      el.muted = false;
+      wantsPlaybackRef.current = true;
+      el.play()
+        .then(() => {
+          setIsPlaying(true);
+          setIsMuted(false);
+        })
+        .catch(() => {
+          // Sound was refused: fall back to silent playback.
+          el.muted = true;
+          el.play().then(() => setIsPlaying(true)).catch(() => {});
+          setIsMuted(true);
+        });
       return;
     }
 
-    activateAudioEngine();
-
-    if (targetProgressRef.current < 0.5) {
-      targetProgressRef.current = 1;
-      window.dispatchEvent(new CustomEvent('nav-visible', { detail: false }));
-    }
+    el.muted = !el.muted;
+    setIsMuted(el.muted);
   };
 
-  // Smooth interpolation calculations
-  const p = Math.min(1, Math.max(0, progress));
-  
-  // Power easing for cinematic acceleration matching Animated Opening.mp4
-  const eased = p < 0.5 
-    ? 2 * p * p 
-    : 1 - Math.pow(-2 * p + 2, 2) / 2;
+  const handleExplore = () => {
+    if (onExploreBelow) onExploreBelow();
+  };
 
-  // Text translations (0px at start, parting smoothly up & down on scroll)
-  const textTranslateY = eased * 360;
-  const textOpacity = Math.max(0, 1 - p * 1.25);
-
-  // Flank text translations
-  const flankTranslateX = eased * 140;
-  const flankOpacity = Math.max(0, 1 - p * 2.0);
-
-  // Image dimensions: starts small in center gap, expands to 100vw x 100vh
-  const initialWidth = 220;
-  const initialHeight = 120;
-  const imageWidthPercent = Math.min(100, 15 + eased * 85);
-  const imageHeightPercent = Math.min(100, eased * 100);
-
-  // Border radius: 4px down to 0px
-  const borderRadius = Math.max(0, (1 - eased) * 4);
+  // Icon-only control showing the current state: a play mark before the film
+  // starts, then the sound-off or sound-on speaker.
+  let filmLabel = 'Play film with sound';
+  let FilmIcon = Play;
+  if (isPlaying) {
+    filmLabel = isMuted ? 'Turn sound on' : 'Turn sound off';
+    FilmIcon = isMuted ? VolumeX : Volume2;
+  }
 
   return (
-    <div 
-      className={`activities-opening-hero-frame ${p < 0.5 ? 'is-collapsed-clickable' : 'is-expanded'}`} 
-      ref={containerRef} 
-      id={id}
-      onClick={handleFrameClick}
-    >
-      {/* Subtle Marbled Warm Background with Fine Veins */}
-      <div className="opening-parchment-backdrop"></div>
-
-      {/* Left Flank Subtitle */}
-      <div 
-        className="opening-flank-text left"
-        style={{
-          transform: `translate3d(${-flankTranslateX}px, -50%, 0)`,
-          opacity: flankOpacity
-        }}
-      >
-        <span>{flankLeft}</span>
-      </div>
-
-      {/* Right Flank Subtitle */}
-      <div 
-        className="opening-flank-text right"
-        style={{
-          transform: `translate3d(${flankTranslateX}px, -50%, 0)`,
-          opacity: flankOpacity
-        }}
-      >
-        <span>{flankRight}</span>
-      </div>
-
-      {/* Center Expanding Media (Behind/Between the text) */}
-      <div 
-        className="expanding-image-container"
-        style={{
-          width: `${imageWidthPercent}vw`,
-          height: `${imageHeightPercent}vh`,
-          borderRadius: `${borderRadius}px`,
-          opacity: p > 0.005 ? 1 : 0
-        }}
-      >
+    <section className={`phero ${isPlaying ? 'is-playing' : ''}`} id={id} ref={sectionRef}>
+      <div className="phero-media" data-intro aria-hidden="true">
         {isVideo ? (
-          <video 
+          <video
             ref={videoRef}
-            src={mediaSrc} 
+            src={video}
             poster={image}
-            loop 
-            playsInline 
+            loop
+            playsInline
             muted
-            preload={saveDataEnabled ? 'none' : 'metadata'}
-            className="expanding-image-content expanding-video-content"
+            preload="metadata"
+            className="phero-asset"
           />
         ) : (
-          <img 
-            src={image} 
-            alt={titleBottom} 
-            className="expanding-image-content"
-            loading="eager"
-            decoding="async"
-          />
+          <img src={image} alt="" className="phero-asset" fetchPriority="high" decoding="async" />
         )}
-        
-        {/* Subtle atmospheric vignette when fully expanded */}
-        <div 
-          className="expanding-image-scrim"
-          style={{
-            opacity: Math.min(0.35, Math.max(0, (p - 0.7) / 0.3))
-          }}
-        />
-
-        {/* Action button to scroll down to the frame's next content section. */}
-        {hasContentBelow && p >= 0.85 && (
-          <button 
-            className="opening-explore-menu-btn"
-            onClick={(e) => {
-              e.stopPropagation();
-              targetProgressRef.current = 0;
-              if (onExploreBelow) {
-                onExploreBelow();
-              } else {
-                const el = document.querySelector('#food-catalog') || document.querySelector('.food-catalog-sheet-section');
-                if (el) el.scrollIntoView({ behavior: 'smooth' });
-              }
-            }}
-          >
-            <span>{exploreLabel}</span>
-            <ArrowDown size={15} />
-          </button>
-        )}
+        <div className="phero-shade" />
       </div>
 
-      {/* Main Center Display Typography */}
-      <div className="opening-hero-text-block">
-        <h2 
-          className="opening-title-top"
-          style={{
-            transform: `translate3d(0, ${-textTranslateY}px, 0)`,
-            opacity: textOpacity
-          }}
-        >
-          {titleTop}
-        </h2>
+      <div className="phero-ui shell">
+        <div className="phero-meta" data-intro style={{ '--intro-delay': '1250ms' }}>
+          <span className="label">{flankLeft}</span>
+          <span className="label">{flankRight}</span>
+        </div>
 
-        <h2 
-          className="opening-title-bottom"
-          style={{
-            transform: `translate3d(0, ${textTranslateY}px, 0)`,
-            opacity: textOpacity
-          }}
-        >
-          {titleBottom}
-        </h2>
+        <div className="phero-foot">
+          <h1 className="display phero-title">
+            <span className="ln">
+              <span data-intro style={{ '--intro-delay': '380ms' }}>{titleTop}</span>
+            </span>
+            <span className="ln">
+              <span data-intro style={{ '--intro-delay': '520ms' }}><span className="accent">{titleBottom}</span></span>
+            </span>
+          </h1>
+
+          {lede && (
+            <p className="phero-lede" data-intro style={{ '--intro-delay': '1100ms' }}>{lede}</p>
+          )}
+
+          {(isVideo || hasContentBelow) && (
+            <div className="phero-actions" data-intro style={{ '--intro-delay': '1250ms' }}>
+              {isVideo && (
+                <button
+                  type="button"
+                  className="icon-btn"
+                  onClick={handleFilmControl}
+                  aria-label={filmLabel}
+                  title={filmLabel}
+                >
+                  <FilmIcon size={18} aria-hidden="true" />
+                </button>
+              )}
+              {hasContentBelow && (
+                <button type="button" className="link-arrow" onClick={handleExplore}>
+                  {exploreLabel}
+                  <ArrowDown size={14} aria-hidden="true" />
+                </button>
+              )}
+            </div>
+          )}
+        </div>
       </div>
-
-      {/* Click / Scroll Hint Indicator at 0% */}
-      {p < 0.05 && (isVideo || hasContentBelow) && (
-        <button
-          className="opening-scroll-hint"
-          type="button"
-          onClick={(event) => {
-            event.stopPropagation();
-            handleFrameClick(event);
-          }}
-          aria-label={`Reveal ${titleBottom.toLowerCase()}`}
-        >
-          <span>VIEW EXPERIENCE</span>
-        </button>
-      )}
-    </div>
+    </section>
   );
 }
 

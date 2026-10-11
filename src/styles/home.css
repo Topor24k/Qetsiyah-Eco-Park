@@ -1,0 +1,1368 @@
+/* Home page: hero, statement, experiences, dining, moments, visit, booking. */
+
+/* Entrance animations wait while the page curtain is still down. */
+[data-stage='covered'] [data-intro] {
+  animation-play-state: paused !important;
+}
+
+/* ---------------------------------------------------------------------------
+   Hero — the park's name set behind the landscape
+   --------------------------------------------------------------------------- */
+@keyframes hero-settle {
+  from { scale: 1.12; }
+  to { scale: 1; }
+}
+
+@keyframes hero-word-rise {
+  from { transform: translate3d(0, 78%, 0); }
+  to { transform: none; }
+}
+
+@keyframes intro-rise {
+  from { opacity: 0; transform: translate3d(0, 26px, 0); }
+  to { opacity: 1; transform: none; }
+}
+
+.hero {
+  --sy: 0;
+  position: relative;
+  height: var(--screen-h);
+  min-height: 620px;
+  overflow: hidden;
+  background: var(--ink);
+  color: var(--fg);
+}
+
+.hero-stage,
+.hero-photo,
+.hero-shade {
+  position: absolute;
+  inset: 0;
+}
+
+/* The photograph moves slower than the page, so the hero leaves with depth. */
+.hero-photo {
+  translate: 0 calc(var(--sy) * 16svh);
+  animation: hero-settle 3.2s var(--ease) both;
+  will-change: translate, scale;
+}
+
+.hero-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 60% 50%;
+  filter: var(--grade-deep);
+}
+
+/* Sits between the two photo layers; sinks behind the treeline on scroll. */
+.hero-word {
+  position: absolute;
+  top: 15.5svh;
+  right: 0;
+  left: calc(var(--gutter) - 0.035em);
+  font-family: var(--font-display);
+  /* The word is 3.4em wide: about four-fifths of the screen, so its last
+     letters meet the tower and the edge of the tree instead of hiding. */
+  font-size: min(23.4vw, 47svh);
+  line-height: 0.86;
+  letter-spacing: -0.008em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--accent-fg);
+  translate: 0 calc(var(--sy) * 62%);
+  will-change: translate;
+}
+
+.hero-word > span {
+  display: block;
+  animation: hero-word-rise 2.6s var(--ease) 0.25s both;
+}
+
+[data-stage='covered'] .hero-word > span {
+  animation-play-state: paused;
+}
+
+/* Scrim for legibility of the navigation above and the copy below. */
+.hero-shade {
+  background: linear-gradient(
+    180deg,
+    rgba(5, 7, 7, 0.42) 0%,
+    rgba(5, 7, 7, 0) 20%,
+    rgba(5, 7, 7, 0) 46%,
+    rgba(5, 7, 7, 0.76) 100%
+  );
+  pointer-events: none;
+}
+
+.hero-ui {
+  position: relative;
+  z-index: 5;
+  display: flex;
+  height: 100%;
+  padding-top: calc(var(--nav-h) + 14px);
+  padding-bottom: clamp(28px, 4.4vw, 60px);
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.hero-ui [data-intro] {
+  animation: intro-rise 1.4s var(--ease) var(--intro-delay, 900ms) both;
+}
+
+.hero-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  color: var(--fg-dim);
+}
+
+.hero-foot {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 32px;
+}
+
+.hero-sub {
+  font-size: clamp(3rem, 7.6vw, 8.2rem);
+}
+
+.hero-sub .ln > span {
+  animation: line-up 1.5s var(--ease) var(--intro-delay, 900ms) both;
+}
+
+.hero-tagline {
+  max-width: 34ch;
+  margin-top: clamp(14px, 1.6vw, 24px);
+  font-size: 0.78rem;
+  font-weight: 600;
+  line-height: 1.7;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--fg);
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px 32px;
+  margin-top: clamp(22px, 2.4vw, 36px);
+}
+
+/* ---------------------------------------------------------------------------
+   Statement — "All are welcome here."
+   --------------------------------------------------------------------------- */
+.statement {
+  overflow: hidden;
+  padding-block: clamp(72px, 9vw, 150px) clamp(48px, 6vw, 96px);
+}
+
+.statement-grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: clamp(16px, 2vw, 32px);
+}
+
+.statement-label {
+  grid-column: 1 / span 4;
+}
+
+.statement-list {
+  grid-column: 8 / -1;
+  border-top: 1px solid var(--line);
+}
+
+.statement-list li {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  padding: 15px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.statement-title {
+  margin-top: clamp(56px, 8vw, 150px);
+  margin-left: -0.035em;
+  grid-column: 1 / -1;
+  font-size: min(24.6vw, 31svh);
+  line-height: 0.9;
+}
+
+/* ---------------------------------------------------------------------------
+   Experiences index
+   --------------------------------------------------------------------------- */
+.exp-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1.18fr) minmax(0, 0.82fr);
+  gap: clamp(32px, 6vw, 120px);
+  align-items: start;
+}
+
+.exp-list {
+  border-top: 1px solid var(--line);
+}
+
+.exp-row {
+  border-bottom: 1px solid var(--line);
+}
+
+.exp-link {
+  display: grid;
+  grid-template-columns: 60px minmax(0, 1fr) auto 30px;
+  padding: clamp(16px, 1.9vw, 30px) 0;
+  align-items: center;
+  column-gap: clamp(12px, 1.6vw, 26px);
+  color: var(--fg);
+  transition: color 0.6s var(--ease);
+}
+
+.exp-media,
+.exp-blurb,
+.exp-hint {
+  display: none;
+}
+
+.exp-num {
+  color: var(--fg-faint);
+  transition: color 0.6s var(--ease);
+}
+
+/* The row in focus is marked by a highlighter band sweeping in behind its
+   name (on light surfaces) and by the photograph beside the list. */
+.exp-name {
+  padding: 0.04em 0.09em 0 0;
+  justify-self: start;
+  background: var(--hl) no-repeat 0 0 / 0% 100%;
+  font-size: clamp(2.3rem, 4.7vw, 5.2rem);
+  line-height: 0.96;
+  transition: transform 0.9s var(--ease), background-size 0.9s var(--ease);
+}
+
+.exp-arrow {
+  justify-self: end;
+  opacity: 0;
+  transform: translate3d(-10px, 10px, 0);
+  transition: opacity 0.6s var(--ease), transform 0.9s var(--ease);
+}
+
+.exp-row.is-active .exp-link {
+  color: var(--accent-fg);
+}
+
+.exp-row.is-active .exp-num {
+  color: var(--accent-fg);
+}
+
+.exp-row.is-active .exp-name {
+  background-size: 100% 100%;
+  transform: translate3d(clamp(10px, 1.4vw, 24px), 0, 0);
+}
+
+.exp-row.is-active .exp-arrow {
+  opacity: 1;
+  transform: none;
+}
+
+.exp-stage {
+  position: sticky;
+  top: calc(var(--nav-h) + 28px);
+  max-height: calc(100svh - var(--nav-h) - 56px);
+  overflow: hidden;
+  aspect-ratio: 4 / 5;
+  background: var(--bg-soft);
+}
+
+.exp-stage-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: var(--grade);
+  opacity: 0;
+  scale: 1.1;
+  transition: opacity 1s var(--ease-soft), scale 2s var(--ease);
+}
+
+.exp-stage-img.is-active {
+  opacity: 1;
+  scale: 1;
+}
+
+.exp-stage-caption {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: grid;
+  gap: 10px;
+  padding: 80px clamp(18px, 2vw, 30px) clamp(18px, 2vw, 28px);
+  background: linear-gradient(180deg, rgba(5, 7, 7, 0) 0%, rgba(5, 7, 7, 0.86) 100%);
+}
+
+.exp-stage-caption .num {
+  color: var(--accent-fg);
+}
+
+.exp-stage-caption p {
+  max-width: 36ch;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--fg);
+  animation: rise-in 0.9s var(--ease) backwards;
+}
+
+.exp-foot {
+  display: flex;
+  justify-content: flex-start;
+  margin-top: clamp(32px, 4vw, 60px);
+}
+
+/* ---------------------------------------------------------------------------
+   Moments — drifting strip of photographs
+   --------------------------------------------------------------------------- */
+.moments {
+  overflow: hidden;
+}
+
+.moments .section-head {
+  margin-bottom: clamp(36px, 5vw, 80px);
+}
+
+.film {
+  overflow: hidden;
+}
+
+.film-track {
+  display: flex;
+  width: max-content;
+  animation: drift 110s linear infinite;
+}
+
+.film:hover .film-track,
+.film:focus-within .film-track {
+  animation-play-state: paused;
+}
+
+.film-set {
+  display: flex;
+  flex: none;
+  gap: 10px;
+  padding-right: 10px;
+}
+
+.film-frame {
+  position: relative;
+  height: clamp(250px, 50svh, 560px);
+  flex: none;
+  overflow: hidden;
+  aspect-ratio: 3 / 4;
+  background: var(--bg-soft);
+}
+
+.film-frame.is-wide {
+  aspect-ratio: 4 / 3;
+}
+
+.film-frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: var(--grade);
+  transition: scale 1.8s var(--ease), filter 0.9s var(--ease);
+}
+
+.film-frame:hover img,
+.film-frame:focus-visible img {
+  scale: 1.05;
+  filter: saturate(1) contrast(1.04) brightness(1);
+}
+
+.film-label {
+  position: absolute;
+  bottom: 14px;
+  left: 14px;
+  color: var(--fg);
+  text-shadow: 0 1px 14px rgba(0, 0, 0, 0.7);
+}
+
+.moments-foot {
+  display: flex;
+  margin-top: clamp(32px, 4.4vw, 68px);
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 28px;
+}
+
+.moments-actions {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+/* ---------------------------------------------------------------------------
+   Visit guide
+   --------------------------------------------------------------------------- */
+.visit-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--fg-dim);
+}
+
+.visit-badge svg {
+  flex: none;
+  color: var(--accent-fg);
+}
+
+.facts {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.fact {
+  display: flex;
+  min-height: clamp(220px, 21vw, 320px);
+  padding: clamp(22px, 2.4vw, 38px) clamp(16px, 2vw, 32px) clamp(22px, 2.4vw, 38px) 0;
+  flex-direction: column;
+  align-items: flex-start;
+  border-right: 1px solid var(--line);
+}
+
+.fact + .fact {
+  padding-left: clamp(16px, 2vw, 32px);
+}
+
+.fact:last-child {
+  border-right: 0;
+}
+
+.fact-label {
+  display: flex;
+  gap: 14px;
+  margin-bottom: auto;
+  color: var(--fg-dim);
+}
+
+.fact-label .num {
+  color: var(--accent-fg);
+  background: var(--hl) no-repeat 0 94% / 100% 0.5em;
+}
+
+.fact-value {
+  margin-top: 28px;
+  margin-bottom: 14px;
+}
+
+.fact-value a {
+  transition: color 0.5s var(--ease);
+}
+
+.fact-value a:hover {
+  color: var(--accent-fg);
+}
+
+.fact-note {
+  font-size: 0.88rem;
+  line-height: 1.55;
+  color: var(--fg-dim);
+  overflow-wrap: anywhere;
+}
+
+.fact-mail {
+  transition: color 0.5s var(--ease);
+}
+
+.fact-mail:hover {
+  color: var(--accent-fg);
+}
+
+.faq {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: clamp(16px, 2vw, 32px);
+  padding-top: clamp(56px, 8vw, 128px);
+  border-top: 1px solid var(--line);
+}
+
+.faq-label {
+  grid-column: 1 / span 3;
+  padding-top: 26px;
+  color: var(--fg-dim);
+}
+
+.faq-list {
+  grid-column: 4 / -1;
+  border-top: 1px solid var(--line);
+}
+
+.faq-item {
+  border-bottom: 1px solid var(--line);
+}
+
+.faq-question {
+  display: grid;
+  width: 100%;
+  padding: clamp(20px, 2vw, 30px) 0;
+  grid-template-columns: 52px minmax(0, 1fr) 24px;
+  align-items: center;
+  text-align: left;
+  color: var(--fg);
+  transition: color 0.5s var(--ease);
+}
+
+.faq-num {
+  justify-self: start;
+  color: var(--fg-faint);
+}
+
+.faq-question-text {
+  font-size: clamp(1.1rem, 1.7vw, 1.6rem);
+  font-weight: 500;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+}
+
+.faq-icon {
+  justify-self: end;
+  transition: transform 0.7s var(--ease);
+}
+
+.faq-question:hover,
+.faq-item.is-open .faq-question {
+  color: var(--accent-fg);
+}
+
+.faq-item.is-open .faq-icon {
+  transform: rotate(45deg);
+}
+
+.faq-item.is-open .faq-num {
+  color: var(--fg);
+  background: var(--hl) no-repeat 0 94% / 100% 0.5em;
+}
+
+.faq-panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.8s var(--ease);
+}
+
+.faq-item.is-open .faq-panel {
+  grid-template-rows: 1fr;
+}
+
+.faq-panel-inner {
+  overflow: hidden;
+  visibility: hidden;
+  transition: visibility 0.8s;
+}
+
+.faq-item.is-open .faq-panel-inner {
+  visibility: visible;
+}
+
+.faq-panel-inner p {
+  max-width: 58ch;
+  padding: 0 24px clamp(22px, 2.2vw, 32px) 52px;
+  color: var(--fg-dim);
+}
+
+/* ---------------------------------------------------------------------------
+   Booking
+   One 12-column grid. The form takes seven columns and the notes take four,
+   and both open with the same title row so their rules line up. Inside the
+   form everything sits on the same two columns with one field height.
+   --------------------------------------------------------------------------- */
+.booking {
+  --field-h: 54px;
+  --field-gap: clamp(20px, 3vw, 48px);
+  --row-gap: 28px;
+  --block-gap: clamp(44px, 4.6vw, 72px);
+}
+
+.booking-anchor {
+  position: relative;
+  top: -80px;
+}
+
+.booking-head {
+  margin-bottom: clamp(40px, 5vw, 76px);
+}
+
+.booking-eyebrow {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 22px;
+  color: var(--fg-dim);
+}
+
+.booking-grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: clamp(16px, 2vw, 32px);
+  align-items: start;
+}
+
+.booking-form-wrap {
+  grid-column: 1 / span 7;
+}
+
+.booking-info {
+  display: grid;
+  grid-column: 9 / -1;
+  gap: var(--block-gap);
+}
+
+/* Title row shared by every block in both columns. */
+.group-title {
+  display: flex;
+  width: 100%;
+  gap: 14px;
+  padding-bottom: 14px;
+  margin-bottom: var(--row-gap);
+  border-bottom: 1px solid var(--line-strong);
+  color: var(--fg);
+}
+
+/* For blocks whose content is itself a list of ruled rows. */
+.group-title--flush {
+  margin-bottom: 0;
+}
+
+.group-title .num {
+  background: var(--hl) no-repeat 0 94% / 100% 0.5em;
+}
+
+.form {
+  display: grid;
+  gap: var(--block-gap);
+  scroll-margin-top: calc(var(--nav-h) + 20px);
+}
+
+.form-group {
+  display: grid;
+  min-width: 0;
+  border: 0;
+}
+
+.form-group[hidden] {
+  display: none;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: var(--field-gap);
+  row-gap: var(--row-gap);
+}
+
+.field {
+  display: grid;
+  min-width: 0;
+  gap: 6px;
+}
+
+.field .label {
+  color: var(--fg-dim);
+}
+
+.input {
+  width: 100%;
+  height: var(--field-h);
+  padding: 0;
+  border: 0;
+  border-bottom: 1px solid var(--line-strong);
+  border-radius: 0;
+  background-color: transparent;
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: 1.05rem;
+  color-scheme: light;
+  appearance: none;
+  transition: border-color 0.5s var(--ease), box-shadow 0.5s var(--ease), background-color 0.5s var(--ease);
+}
+
+.input::placeholder {
+  color: var(--fg-faint);
+}
+
+.input:hover {
+  border-bottom-color: var(--fg);
+}
+
+.input:focus {
+  outline: none;
+  border-bottom-color: var(--fg);
+  box-shadow: 0 3px 0 var(--accent);
+}
+
+.input--select {
+  padding-right: 28px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8' fill='none' stroke='%230d1211' stroke-width='1.4'%3E%3Cpath d='M1 1.5l5 5 5-5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 2px center;
+  background-size: 12px;
+  cursor: pointer;
+}
+
+/* Guests: an ordinary field with minus / plus at its right end. */
+.stepper {
+  display: grid;
+  height: var(--field-h);
+  grid-template-columns: minmax(0, 1fr) 44px 44px;
+  border-bottom: 1px solid var(--line-strong);
+  transition: border-color 0.5s var(--ease), box-shadow 0.5s var(--ease);
+}
+
+.stepper:hover {
+  border-bottom-color: var(--fg);
+}
+
+.stepper:focus-within {
+  border-bottom-color: var(--fg);
+  box-shadow: 0 3px 0 var(--accent);
+}
+
+.stepper .input,
+.stepper .input:focus {
+  height: 100%;
+  border-bottom: 0;
+  box-shadow: none;
+}
+
+.stepper-btn {
+  display: grid;
+  height: 100%;
+  place-items: center;
+  color: var(--fg-dim);
+  transition: background-color 0.4s var(--ease), color 0.4s var(--ease);
+}
+
+.stepper-btn:hover,
+.stepper-btn:active {
+  background: var(--accent);
+  color: var(--ink);
+}
+
+.stepper-input {
+  -moz-appearance: textfield;
+}
+
+.stepper-input::-webkit-outer-spin-button,
+.stepper-input::-webkit-inner-spin-button {
+  margin: 0;
+  -webkit-appearance: none;
+}
+
+/* Activities: ruled rows on the same two columns as the fields. */
+.checks-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: var(--field-gap);
+}
+
+.check {
+  display: flex;
+  height: var(--field-h);
+  align-items: center;
+  gap: 14px;
+  border-bottom: 1px solid var(--line-strong);
+  font-size: 1.05rem;
+  line-height: 1.25;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: border-color 0.5s var(--ease), background-color 0.4s var(--ease);
+}
+
+.check:hover {
+  border-bottom-color: var(--fg);
+}
+
+.check.is-checked > span {
+  background: var(--hl) no-repeat 0 92% / 100% 0.5em;
+}
+
+.check input {
+  position: relative;
+  width: 18px;
+  height: 18px;
+  flex: none;
+  border: 1px solid var(--line-strong);
+  border-radius: 0;
+  background: transparent;
+  appearance: none;
+  cursor: pointer;
+  transition: background-color 0.4s var(--ease), border-color 0.4s var(--ease);
+}
+
+.check input::after {
+  position: absolute;
+  top: 2px;
+  left: 6px;
+  width: 4px;
+  height: 9px;
+  border: solid var(--accent);
+  border-width: 0 2px 2px 0;
+  content: '';
+  opacity: 0;
+  transform: rotate(45deg);
+}
+
+.check.is-checked input {
+  border-color: var(--ink);
+  background: var(--ink);
+}
+
+.check.is-checked input::after {
+  opacity: 1;
+}
+
+.form-actions {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.form-back {
+  display: inline-flex;
+  min-height: 54px;
+  padding: 0 4px;
+  flex: none;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+/* Phone-only pieces of the stepped form. */
+.form-progress {
+  display: grid;
+  gap: 12px;
+}
+
+.form-progress-text {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.form-progress-text .label:first-child {
+  font-size: 0.82rem;
+}
+
+.form-progress-text .num {
+  color: var(--fg-dim);
+}
+
+.form-progress-bar {
+  height: 4px;
+  background: var(--line);
+}
+
+.form-progress-bar i {
+  display: block;
+  height: 100%;
+  background: var(--ink);
+  transform-origin: left center;
+  transition: transform 0.8s var(--ease);
+}
+
+.form-review {
+  margin-top: 22px;
+  border-top: 1px solid var(--line);
+}
+
+.form-review > div {
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr);
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--line);
+  align-items: baseline;
+}
+
+.form-review dt {
+  color: var(--fg-dim);
+}
+
+.form-review dd {
+  font-size: 0.96rem;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.booking-success {
+  display: grid;
+  gap: 16px;
+  padding-top: 28px;
+  border-top: 3px solid var(--accent);
+  animation: rise-in 1s var(--ease) backwards;
+}
+
+/* Notes column */
+.info-heading {
+  max-width: 14ch;
+}
+
+.steps {
+  margin-top: var(--row-gap);
+  border-top: 1px solid var(--line);
+}
+
+.step {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  padding: 18px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.step > .label {
+  padding-top: 4px;
+  color: var(--fg-dim);
+}
+
+.step-title {
+  display: block;
+  font-size: 1.02rem;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.step-text {
+  margin-top: 6px;
+  font-size: 0.93rem;
+  line-height: 1.6;
+  color: var(--fg-dim);
+}
+
+/* Contact: label and value in fixed columns, one ruled row each. */
+.contact-rows > li {
+  border-bottom: 1px solid var(--line);
+}
+
+.contact-row {
+  display: grid;
+  min-height: var(--field-h);
+  padding: 15px 0;
+  grid-template-columns: 140px minmax(0, 1fr) 18px;
+  align-items: baseline;
+  column-gap: 12px;
+}
+
+.contact-value {
+  font-size: 0.98rem;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.contact-arrow {
+  align-self: center;
+  color: var(--fg-dim);
+  transition: transform 0.6s var(--ease), color 0.4s var(--ease);
+}
+
+a.contact-row:hover .contact-value {
+  background: var(--hl) no-repeat 0 92% / 100% 0.5em;
+}
+
+a.contact-row:hover .contact-arrow {
+  color: var(--fg);
+  transform: translate3d(3px, -3px, 0);
+}
+
+/* ---------------------------------------------------------------------------
+   Responsive
+   --------------------------------------------------------------------------- */
+@media (max-width: 1024px) {
+  .facts {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .fact:nth-child(2) {
+    border-right: 0;
+  }
+
+  .fact:nth-child(n + 3) {
+    border-top: 1px solid var(--line);
+  }
+
+  .fact:nth-child(3) {
+    padding-left: 0;
+  }
+
+  .booking-grid {
+    row-gap: 72px;
+  }
+
+  .booking-form-wrap,
+  .booking-info {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 900px) {
+  /* Experiences: the index becomes a swipeable rail of photo cards. */
+  .exp-body {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .exp-stage {
+    display: none;
+  }
+
+  .exp-list {
+    display: flex;
+    margin-inline: calc(var(--gutter) * -1);
+    padding-inline: var(--gutter);
+    gap: 14px;
+    overflow-x: auto;
+    border-top: 0;
+    overscroll-behavior-inline: contain;
+    scroll-padding-inline: var(--gutter);
+    scroll-snap-type: inline mandatory;
+    scrollbar-width: none;
+  }
+
+  .exp-list::-webkit-scrollbar {
+    display: none;
+  }
+
+  .exp-row {
+    flex: 0 0 min(76vw, 380px);
+    border-bottom: 0;
+    scroll-snap-align: start;
+  }
+
+  .exp-link,
+  .exp-row.is-active .exp-link {
+    display: flex;
+    padding: 0;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0;
+    color: var(--fg);
+  }
+
+  .exp-media {
+    display: block;
+    width: 100%;
+    margin-bottom: 16px;
+    overflow: hidden;
+    aspect-ratio: 4 / 5;
+    background: var(--bg-soft);
+  }
+
+  .exp-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: var(--grade);
+  }
+
+  .exp-num,
+  .exp-row.is-active .exp-num {
+    order: 1;
+    color: var(--accent-fg);
+  }
+
+  .exp-kicker {
+    order: 2;
+    margin-top: 2px;
+  }
+
+  .exp-name,
+  .exp-row.is-active .exp-name {
+    margin-top: 10px;
+    order: 3;
+    padding: 0;
+    background-size: 0 0;
+    font-size: clamp(2.2rem, 10vw, 3.2rem);
+    transform: none;
+  }
+
+  .exp-blurb {
+    display: block;
+    margin-top: 10px;
+    order: 4;
+    font-size: 0.93rem;
+    line-height: 1.6;
+    color: var(--fg-dim);
+  }
+
+  .exp-arrow {
+    display: none;
+  }
+
+  .exp-foot {
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 28px;
+  }
+
+  .exp-hint {
+    display: block;
+  }
+
+  .faq {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .faq-label,
+  .faq-list {
+    grid-column: 1 / -1;
+  }
+
+  .faq-label {
+    padding: 0 0 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero {
+    min-height: 560px;
+  }
+
+  .hero-layer {
+    object-position: 71% 50%;
+  }
+
+  .hero-word {
+    top: 25svh;
+    left: 0;
+    font-size: 27.6vw;
+    text-align: center;
+  }
+
+  .hero-meta {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .hero-foot {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+  }
+
+  .hero-sub {
+    font-size: clamp(3.4rem, 17vw, 5rem);
+  }
+
+  .hero-tagline {
+    font-size: 0.7rem;
+    letter-spacing: 0.16em;
+  }
+
+  .hero-actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 14px;
+  }
+
+  .statement-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .statement-label,
+  .statement-list,
+  .statement-title {
+    grid-column: 1 / -1;
+  }
+
+  .statement-list {
+    margin-top: 22px;
+  }
+
+  .statement-list li {
+    grid-template-columns: 34px minmax(0, 1fr);
+    padding: 13px 0;
+  }
+
+  .statement-title {
+    margin-top: 56px;
+    font-size: 24.6vw;
+  }
+
+  .film-frame {
+    height: 300px;
+  }
+
+  .moments-foot {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .moments-actions {
+    align-items: flex-start;
+  }
+
+  /* Facts stack into four hairline rows. */
+  .facts {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .fact,
+  .fact + .fact,
+  .fact:nth-child(3) {
+    min-height: 0;
+    padding: 24px 0;
+    border-right: 0;
+    border-top: 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .fact:last-child {
+    border-bottom: 0;
+  }
+
+  .fact-label {
+    margin-bottom: 0;
+  }
+
+  .fact-value {
+    margin-top: 16px;
+    margin-bottom: 10px;
+  }
+
+  .faq-question {
+    grid-template-columns: 36px minmax(0, 1fr) 22px;
+  }
+
+  .faq-panel-inner p {
+    padding-left: 36px;
+    padding-right: 6px;
+  }
+
+  /* Booking on a phone: one part of the form at a time, large filled
+     fields, and the Next / Send button pinned above the dock. */
+  .booking {
+    --field-h: 58px;
+    --row-gap: 18px;
+    --block-gap: 44px;
+    padding-block: 64px 72px;
+  }
+
+  .booking-head {
+    margin-bottom: 26px;
+  }
+
+  .booking-grid {
+    row-gap: 64px;
+  }
+
+  .form {
+    gap: 22px;
+  }
+
+  .form--steps .form-group .group-title {
+    display: none;
+  }
+
+  .form-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .field {
+    gap: 8px;
+  }
+
+  .field .label {
+    color: var(--fg);
+  }
+
+  .input {
+    padding: 0 14px;
+    border-bottom: 2px solid var(--fg);
+    background-color: rgba(13, 18, 17, 0.055);
+    /* 16px or more keeps iOS from zooming the page on focus. */
+    font-size: 1.06rem;
+  }
+
+  .input:focus {
+    background-color: #ffffff;
+  }
+
+  .input--select {
+    padding-right: 42px;
+    background-position: right 16px center;
+  }
+
+  .stepper {
+    grid-template-columns: minmax(0, 1fr) 58px 58px;
+    border-bottom: 2px solid var(--fg);
+    background: rgba(13, 18, 17, 0.055);
+  }
+
+  .stepper .input,
+  .stepper .input:focus {
+    background-color: transparent;
+  }
+
+  .stepper-btn {
+    border-left: 1px solid var(--line);
+    color: var(--fg);
+  }
+
+  .checks-grid {
+    gap: 8px;
+  }
+
+  .check {
+    height: auto;
+    min-height: 60px;
+    padding: 0 12px;
+    gap: 12px;
+    border-bottom: 2px solid var(--fg);
+    background: rgba(13, 18, 17, 0.055);
+    font-size: 0.95rem;
+  }
+
+  .check.is-checked {
+    background: var(--accent);
+  }
+
+  .check.is-checked > span {
+    background: none;
+  }
+
+  .form-actions {
+    position: sticky;
+    z-index: 5;
+    bottom: calc(var(--dock-h) + env(safe-area-inset-bottom));
+    margin-inline: calc(var(--gutter) * -1);
+    padding: 12px var(--gutter);
+    gap: 14px;
+    border-top: 1px solid var(--line);
+    background: var(--bg-soft);
+  }
+
+  .form-actions .btn {
+    flex: 1;
+    white-space: normal;
+  }
+
+  .contact-row {
+    grid-template-columns: minmax(0, 1fr) 18px;
+    row-gap: 2px;
+  }
+
+  .contact-row .label,
+  .contact-row .contact-value {
+    grid-column: 1;
+  }
+
+  .contact-arrow {
+    grid-row: 1 / span 2;
+    grid-column: 2;
+  }
+}

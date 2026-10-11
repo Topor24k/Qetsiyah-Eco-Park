@@ -4,8 +4,8 @@
   "description": "Plan visits, discover activities, browse dining, and explore Qetsiyah Eco Park.",
   "start_url": "/#home",
   "display": "standalone",
-  "background_color": "#f7f2e8",
-  "theme_color": "#10241f",
+  "background_color": "#f7f4ed",
+  "theme_color": "#f7f4ed",
   "icons": [
     {
       "src": "/qetsiyah-logo.png",

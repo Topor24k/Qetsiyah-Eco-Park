@@ -25,6 +25,7 @@ A comprehensive reference for every page, component, design decision, and the re
 8. Animation and Motion Design
 9. Mobile Experience
 10. File and Folder Structure
+11. Cinematic Redesign (October 2026)
 
 ---
 
@@ -62,112 +63,82 @@ The project is a Single Page Application (SPA). There is no page reload when nav
 
 ## 3. Design Palette
 
-The entire website is built around a warm organic nature palette: earthy, calm, and inviting. Every color was chosen to evoke a sense of open land, tropical warmth, and genuine hospitality.
+The site is light and warm, with a single accent color. Every value is a CSS variable in src/styles/tokens.css, named by role rather than by shade.
 
 ### 3.1 Core Colors
 
 | Token | Hex Value | Name | Used For |
 | :--- | :--- | :--- | :--- |
-| --accent-gold | #df9039 | Amber Gold | Primary CTA buttons, active nav links, highlights |
-| --accent-gold-hover | #b45309 | Deep Amber | Hover state for gold elements |
-| --welcome-bg | #383e24 | Olive Forest Dark | Welcome Section background |
-| --about-canvas | #ede8df | Warm Parchment | About page, announcements, must-visit background |
-| --frame-bg-light | #fcfaf7 | Off-White Cream | Gallery, food catalog background |
-| --editorial-bg | #ffffff | White | Food menu catalog sheet |
-| --lux-paper | #f7f2e8 | Aged Paper | Luxury section backgrounds |
-| --lux-linen | #eee4d3 | Warm Linen | Card backgrounds in showcase sections |
-| --lux-copper | #b9784d | Warm Copper | Accent borders and decorative dividers |
-| --color-dark-bg | #090d0b | Near Black | Mega menu overlay background |
+| --bg | #f7f4ed | Paper | Default page background, navigation, full-screen menu, phone dock |
+| --bg-soft | #f0ebe1 | Soft Paper | Booking section, About chapters, image placeholders |
+| --bg-deep | #e8e2d6 | Sand | Park moments section, footer |
+| --bg-tint | #e4ece8 | Pale Mint | Visit guide section, coming-soon pages |
+| --ink | #0d1211 | Ink | All text and headlines, dark buttons |
+| --accent | #ffc42e | Warm Yellow | The only bright color: highlighter bands, primary buttons, the Welcome section, the page curtain |
 
-### 3.2 Color Philosophy
+### 3.2 How the accent works
 
-Warm side (golds, ambers, linens, parchments) is used for light backgrounds, hover states, and accent text. It feels welcoming, organic, and timeless.
+Yellow text cannot be read on a light page, so the accent is used as a highlighter:
 
-Dark side (olive forest, near-black) is used for section backgrounds and navigation overlays. It feels grounded, professional, and nature-inspired.
+- Display headlines: a yellow band the height of the capitals sits behind the key line (class .accent inside .display).
+- Small labels and numbers: a yellow marker stroke under the text.
+- Lists and links: a band or stroke sweeps in on hover.
+- Buttons: solid yellow with dark text.
 
-White and cream are used for readable content areas like the food menu and gallery mosaic.
+Over photographs (hero images, photo captions) the rule flips: text is light, and accent words are simply yellow. This switch is one block in tokens.css ("Over a photograph") that redefines the same role tokens, so no component needs its own dark styles.
 
-### 3.3 Gradient System
+### 3.3 Photography Grade
 
-The website uses radial gradients to make backgrounds feel organic rather than flat.
-
-About, Announcements, and Must Visit background:
-  background-image: radial-gradient(ellipse at 50% 50%, #f3ede2 0%, #eae3d4 100%);
-
-Hero expanded opening (dark cinematic):
-  background: radial-gradient(circle at 90% 4%, rgba(222, 163, 96, 0.16), transparent 27%),
-              linear-gradient(135deg, #112822 0%, #0d1d1b 100%);
+All photographs share one natural, bright grade (--grade). Hero photographs are held slightly deeper (--grade-deep) with a soft scrim so the type over them stays clear. Images are sharp-edged rectangles: no rounded corners, frames, or shadows.
 
 ---
 
 ## 4. Typography System
 
-The entire website uses a two-font editorial system:
-
 | Role | Font | Style | Usage |
 | :--- | :--- | :--- | :--- |
-| Display / Headings | Playfair Display | Serif, 700-800 | Hero title, About title, Section headers |
-| UI / Navigation / Body | Plus Jakarta Sans | Sans-serif, 400-800 | Nav links, buttons, taglines, body text |
+| Display / Headings | Anton | Heavy condensed grotesque, all caps | Page titles, section headlines, list names, the hero and footer word |
+| Body | Inter | 400 to 500, generous line height | Paragraphs, form fields, menu item names |
+| Labels | Inter | 600, tiny, uppercase, wide letter-spacing | Navigation, buttons, captions, numbered labels (01, 02, 03) |
 
-### 4.1 Why Playfair Display?
+### 4.1 Scale
 
-It carries the weight of a classic editorial magazine: timeless, elegant, and commanding. The QETSIYAH ECO PARK hero headline in Playfair reads like a brand, not just a name.
+Display sizes are fluid and deliberately oversized (classes .display-xxl down to .display-sm in src/styles/base.css). Headlines stay the dominant element on phones instead of shrinking to ordinary sizes. Labels stay very small, which creates the contrast in scale the design relies on.
 
-### 4.2 Why Plus Jakarta Sans?
+### 4.2 Notes
 
-It is a modern geometric sans-serif engineered for legibility on all screen sizes and pixel densities. At font-weight 800 and letter-spacing 0.2em, it renders navigation labels with crisp, confident precision.
+The capitals in Anton are 0.86em tall, so display line heights sit around 0.9 to 0.96. Anton has no peso sign, so prices and fees in display type are written as PHP.
 
-### 4.3 Typographic Scale
-
-All sizes use clamp() to scale smoothly between mobile and desktop without breakpoint jumps:
-
-- Hero Grand Title: clamp(3.8rem, 8.5vw, 6.8rem)
-- Section Headings: clamp(2.8rem, 6.8vw, 6.4rem)
-- Navigation Labels: 0.76rem, letter-spacing: 0.18em
-- Body / Descriptive Text: clamp(1rem, 1.2vw, 1.15rem)
-
-### 4.4 Available Accent Fonts (Not Active by Default)
-
-Loaded in index.html for future editorial use:
-- Italiana: Tall condensed luxury serif
-- Bodoni Moda: Ultra-high contrast Didone serif
-- Cormorant Garamond: Delicate classical display serif
-- Pinyon Script / Caveat / Great Vibes: Elegant script and handwriting styles
+Anton is loaded with display=block so headlines never flash in a fallback face.
 
 ---
 
 ## 5. Navigation Architecture
 
-### 5.1 Desktop Navbar (src/components/Navbar.jsx)
+### 5.1 Desktop Navigation (src/components/Navbar.jsx)
 
-The navbar is a fixed top header with three behavioral states:
+A minimal bar: the Qetsiyah wordmark, small uppercase links, and a Booking button.
 
 | State | Trigger | Appearance |
 | :--- | :--- | :--- |
-| Transparent | At the very top of the page | Invisible background, white text, no shadow |
-| Solid Light | After scrolling down ~240px | Warm #eae3d4 parchment background, dark text |
-| Mega Menu Open | Mouse hover on WHAT WE OFFER or MUST VISIT | Dark #151b18 full-width editorial overlay |
-
-Smart hide/show: The navbar hides when scrolling down (to give content room to breathe) and reappears instantly when scrolling up.
+| Transparent | At the top of a page | No background, light text over the hero photo |
+| Solid | After scrolling | Paper bar with dark text and a hairline |
+| Hidden | Scrolling down | Slides away; returns on the first scroll up |
+| Offers panel | Click WHAT WE OFFER | Full-width panel with four numbered columns of deep links and a gallery feature |
 
 Navigation order:
-  HOME > ABOUT > WHAT WE OFFER (+) > ANNOUNCEMENTS > BOOKING > MUST VISIT (+)
+  HOME > ABOUT > WHAT WE OFFER (+) > ANNOUNCEMENTS > MUST VISIT, plus the BOOKING button
 
-The WHAT WE OFFER item triggers a full-frame editorial mega menu with sub-categories:
-- Activities and Rides
-- Cafe and Dining
-- Verde Villa (Stays and Venues)
-- Exclusive Event Hall (Services)
-- Park Gallery
+The offers panel keeps every deep link (activities, menu categories, stays, services). MUST VISIT is now a direct link, because its dropdown only ever held one item.
 
-The MUST VISIT item links to the Wyattel Hotel Coming Soon page.
+### 5.2 Phone and Tablet Navigation
 
-### 5.2 Mobile Bottom Navigation (src/components/MobileBottomNav.jsx)
+Below 1180px the links collapse into a MENU button that opens a full-screen menu: nine numbered pages in large display type (the current page carries a yellow band), a Book your event button, and Call / Directions / Email links.
 
-On mobile devices, a bottom app bar appears with 5 quick shortcuts:
+On phones a flat dock is fixed to the bottom edge (src/components/MobileBottomNav.jsx):
   Home | Explore | Dining | Gallery | Book
 
-This follows the native mobile app pattern. Thumbs reach the bottom of the screen naturally.
+The active tab is marked in yellow and Book is a solid yellow block, so the main action is always one tap away.
 
 ### 5.3 Routing Logic (src/App.jsx)
 
@@ -185,7 +156,9 @@ The app uses hash-based SPA routing:
 | #announcements | Announcements |
 | #must-visit | Wyattel Hotel |
 
-Special case - About to Home transition: When navigating from About back to Home, a 900ms cinematic exit animation plays before the Home page mounts. If a scroll target like #booking was requested, it scrolls there after the transition completes.
+Anchors inside a page (for example #zip-lining or #beef-meals) open the correct page when shared or reloaded.
+
+Page changes run through a curtain: a yellow title card wipes up, names the destination, then lifts to reveal the new page. Visitors who prefer reduced motion get an instant switch.
 
 ---
 
@@ -195,7 +168,7 @@ Special case - About to Home transition: When navigating from About back to Home
 
 Route: #home
 
-Assembled from four sequential sections:
+Built around four core sections (Hero, Welcome, Food Preview, Booking). The October 2026 enhancement layer adds an experiences rail, a park-moments teaser, and a visit guide between them; see section 11 for the full order.
 
 SECTION 1: HERO (src/components/HeroSection.jsx)
 
@@ -369,7 +342,7 @@ Currently shows the CategoryOpeningHero animation:
 - Headline: DISCOVER / STAYS AND VENUES
 - Flank Labels: VERDE VILLA AND HALLS / SULTAN KUDARAT
 
-IN DEVELOPMENT: Verde Villa accommodation details and room listings are a planned addition.
+Below the hero, an editorial index (OfferingsIndex) lists Verde Villa Retreat, Cottage Stay, Qetsiyah Cafe, Dine-in Restaurant, and Lakeside Gazebos. Each row leads to the booking form. Room details, rates, and dedicated photos are still a planned addition.
 
 ---
 
@@ -382,7 +355,7 @@ Currently shows the CategoryOpeningHero animation:
 - Headline: DISCOVER / ALL OUR SERVICES
 - Flank Labels: CATERING AND CELEBRATIONS / SULTAN KUDARAT
 
-IN DEVELOPMENT: Event Hall capacity, pricing, and booking guide are a planned addition.
+Below the hero, an editorial index (OfferingsIndex) lists Food Catering, Weddings, Family Events, Birthday Event, Office Event, and Event Hall, each paired with a real event photo from the park. Capacity and pricing are still a planned addition.
 
 ---
 
@@ -417,7 +390,7 @@ Why 6 categories? Categorized browsing helps visitors find exactly what excites 
 Route: #announcements
 File: src/components/frames/AnnouncementsFrame.jsx
 
-Displays a centered COMING SOON placeholder on a warm parchment background.
+Displays a centered COMING SOON placeholder on a warm parchment background, now with a short explanation and two buttons (Explore the park, Book a visit) so the page is not a dead end.
 
 Why keep it visible if it is empty? Having the page in navigation establishes that Qetsiyah will communicate regularly with visitors: promotions, closures, events, and news. It signals a living, maintained presence.
 
@@ -477,51 +450,42 @@ A custom-styled scrollbar that matches the park warm brown/gold palette instead 
 
 ## 8. Animation and Motion Design
 
-### 8.1 Page Transitions
+Motion is slow and quiet: long ease-out curves, no bounce. Everything is disabled for visitors who prefer reduced motion.
 
-Home to About: The home hero content slides up and off. The ABOUT QETSIYAH title drops in from above after a 1.2s delay (graceful, cinematic). About to Home: A 900ms about-exit animation plays, then the home page mounts.
+| Effect | Where | How |
+| :--- | :--- | :--- |
+| Opening title card | Every first load | The curtain holds the page name until fonts are ready, then lifts |
+| Page curtain | Every page change | src/components/ui/PageCurtain.jsx, timed in App.jsx |
+| Layered hero | Home | The word QETSIYAH sits between the photo and a cutout of the tower, trees and lawn. It rises into place on load and sinks behind the treeline on scroll |
+| Line reveals | Headlines | Each line slides up out of its own mask (data-reveal="lines", component ui/Lines.jsx) |
+| Photo wipes | Images | A wipe reveals the photo while it settles from a slight zoom (data-reveal="clip", component ui/Media.jsx) |
+| Hairlines | Dividers | Draw from the left (data-reveal="rule") |
+| Parallax | Large images | Images drift slightly inside their frames (hooks/useParallax.js) |
+| Hover | Links, buttons, lists | A yellow highlighter stroke sweeps in behind links and list names; a dark panel rises through buttons; list rows slide and swap the photo beside them |
+| Film strip | Home, Park moments | A slow, looping strip of photographs that pauses on hover |
+| Story scroll | About | The sentence stays pinned while each word lights up with the scroll |
 
-Other navigations: Instant, no animation. Fast is better than fancy for secondary frames.
-
-### 8.2 Expanding Video Hero
-
-Driven by a lerp (linear interpolation) animation loop at 60fps:
-
-  progress 0 to 1 (controlled by scroll/click)
-  eased = quadratic ease-in-out
-  image width = 15% + eased x 85%    expands from 15vw to 100vw
-  image height = 0% + eased x 100%   expands from 0vh to 100vh
-  border-radius = 4px to 0px
-
-### 8.3 Teleprompter Text Reveal
-
-In AboutStorySection, each word has:
-- Base opacity: 0.22
-- Illuminated opacity: 1.0
-- Transition: 0.08s linear
-
-As the visitor scrolls, progress advances from 0 to 1, and each word wordStart / wordEnd boundaries determine when it lights up.
-
-### 8.4 Infinite Carousel
-
-The AboutChangingShowcase uses CSS custom properties (--offset, --slide-width, --total-slide-width) to position slides on an absolutely-positioned track. Navigation updates --offset to slide the whole track left or right, achieving a true infinite loop with no cloning glitches. Sub-images within each slide crossfade every 5 seconds using CSS opacity transitions layered with z-index.
+Scroll reveals are driven by hooks/useScrollReveal.js, which marks any element carrying data-reveal as it enters the screen.
 
 ---
 
 ## 9. Mobile Experience
 
-| Feature | Desktop | Mobile |
+| Feature | Desktop | Phone |
 | :--- | :--- | :--- |
-| Navigation | Fixed top navbar with mega menus | Fixed top navbar + bottom app bar |
-| Hero Title Size | clamp(3.8rem, 8.5vw, 6.8rem) | Scales down to ~3.8rem |
-| Food Preview | 3-column photo grid | 1 to 2 column stack |
-| About Showcase | Carousel with side peeks | Full-width single slide |
-| Gallery Mosaic | Multi-column editorial grid | 1 to 2 column responsive |
-| Contact Form | 2-column layout | Single-column stack |
-| Video Heroes | Full autoplay with audio toggle | Muted autoplay (browser policy) |
-| Bottom Navigation | Hidden | 5-icon bottom app bar |
+| Navigation | Top bar with links and offers panel | Top bar with MENU, full-screen menu (it stops above the dock), bottom dock |
+| Booking entry points | Booking button in the header, Book button in the hero and footer | The dock's Book tab only. The hero shows a single Explore the park button, and the menu, footer and coming-soon pages do not repeat Book |
+| Headlines | Oversized, corner-anchored | Still the dominant element, scaled fluidly |
+| Home hero | Name behind the landscape, corner labels | Same layered effect, actions stacked above the dock |
+| Activities index (Home) | Hairline list with a photo that follows the row | Swipeable rail of photo cards |
+| Film heroes | Play silently on arrival | Wait for a tap (Play film), so large videos are not downloaded uninvited |
+| Sticky tab bars | Under the header | Under the header, horizontally scrollable |
+| Menu search | Field beside the category tabs | Icon that opens across the bar |
+| Visit facts | Four columns | Four stacked rows |
+| Booking form | All fields on one page, in three groups | One group at a time (Your details, Your visit, Activities) with a progress bar, large filled fields, a guest stepper, toggle tiles, a review list, and Back / Next / Send pinned above the dock |
+| Gallery | Four-column mosaic | Two-column mosaic, swipe in the viewer |
 
-Touch gestures are supported in the expanding hero. touchstart and touchmove events control expansion just like mouse scroll.
+Full-screen sections on phones are sized to end at the top of the dock (--screen-h), so nothing important hides behind it.
 
 ---
 
@@ -600,5 +564,68 @@ Root documentation files:
 
 ---
 
-This document was generated based on the current codebase of the Qetsiyah Eco Park website as of September 2026.
+## 11. Cinematic Redesign (October 2026)
+
+The whole site was restyled to a bold, cinematic editorial look: very large all-caps headlines, one yellow accent, sharp-edged photography, and slow motion. It began dark and was then switched to a light palette at the owner's request (see section 3). Content, pages, routes, the menu, and the gallery sets are unchanged.
+
+### 11.1 Stylesheets
+
+| File | Contents |
+| :--- | :--- |
+| src/styles/tokens.css | Theme tokens: colors, fonts, spacing, easing, photo grade |
+| src/styles/base.css | Reset, type scale, layout primitives, buttons, reveal system |
+| src/styles/chrome.css | Navigation, offers panel, full-screen menu, dock, footer, curtain, scrollbar |
+| src/styles/home.css | Home page sections |
+| src/styles/pages.css | Page hero, tab bars, activities, menu, offerings index, gallery, about, coming soon |
+| src/styles/index.css | Entry file that imports the five above |
+
+The earlier stylesheets (src/index.css and src/mobile.css) are no longer imported. They are kept on disk for reference and can be deleted.
+
+### 11.2 Home page order
+
+  Hero > Welcome (yellow) > Experiences index > Park moments > Visit guide > Booking
+
+The dining preview was removed from Home at the owner's request; the full menu is on the Food Offers page. Its component (components/FoodPreviewSection.jsx) is kept but no longer rendered.
+
+| Section | File | What it does |
+| :--- | :--- | :--- |
+| Hero | components/HeroSection.jsx | Layered name behind the landscape, tagline, Book and Explore actions |
+| Welcome | components/WelcomeSection.jsx | ALL ARE WELCOME HERE. at full scale on the accent color |
+| Experiences | components/home/ExperiencesRail.jsx | Six activities as an oversized hairline list with a matching photo |
+| Park moments | components/home/MomentsTeaser.jsx | Drifting strip of park photographs leading to the gallery |
+| Visit guide | components/home/VisitGuideSection.jsx | Hours, fee, directions, contact, FAQ |
+| Booking | components/ContactSection.jsx | The inquiry form first (stepped on phones), then what happens next and tap-to-call / email contact rows |
+
+### 11.3 Inner pages
+
+| Page | Presentation |
+| :--- | :--- |
+| All offer pages and About | CategoryOpeningHero is now a full-bleed title card (film or photo) with the page name in the corner, an icon-only sound button on films, and a Scroll link |
+| Activities | A centered sticky bar with activity search and jump tabs (shared/QuickNav.jsx), then numbered entries with large photos, a full-bleed courts image, and a yellow call to action. No intro header |
+| Food Offers | The same sticky search and category tabs; each category has a large title beside a hairline price list; tapping a dish opens its photo in place |
+| Stays and Venues, Services | Numbered index with a photo that follows the row. No intro header |
+| Gallery | Three photographs at different depths above the title; text tabs; sharp mosaic; full-screen viewer with counter and swipe |
+| About | Pinned sentence that lights up word by word (360vh), then five chapters with rotating photographs |
+| Announcements, Must Visit | COMING SOON title card with next-step links (Must Visit shows only the hotel name and the links) |
+
+### 11.4 Shared pieces
+
+| File | Purpose |
+| :--- | :--- |
+| src/data/parkInfo.js | Address, phone, email, hours, entrance fee, activities, stays, services, FAQ. Edit facts here once |
+| src/components/ui/Lines.jsx | Headline split into masked lines |
+| src/components/ui/Media.jsx | Photo frame with wipe reveal and parallax |
+| src/components/ui/PageCurtain.jsx | Title card shown between pages |
+| src/hooks/useScrollReveal.js, useParallax.js, useMediaQuery.js | Reveals, image drift, phone/desktop switch for the booking form |
+| src/utils/scrollToAnchor.js | Anchor scrolling that clears the header and sticky bars |
+| public/optimized/hero-layers | The hero photo as two aligned layers: full picture and foreground cutout |
+| public/optimized/activities, public/optimized/moments | Lightweight WebP copies of park photos |
+
+### 11.5 Reading the older notes
+
+Sections 6 and 7 still explain what each page contains and why. Where they mention the earlier look (parchment backgrounds, serif headlines, the click-to-expand video hero, the polaroid collage, the 600vh story scroll, the map photo in the footer), this section is the current reference.
+
+---
+
+This document was generated based on the current codebase of the Qetsiyah Eco Park website as of September 2026 and updated in October 2026.
 It should be updated whenever a new page, component, or design change is introduced.

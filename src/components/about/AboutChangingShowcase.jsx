@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 
 const aboutShowcaseSlides = [
@@ -59,6 +59,9 @@ const aboutShowcaseSlides = [
   }
 ];
 
+// How long each photograph within a chapter stays on screen.
+const SUB_IMAGE_INTERVAL = 5000;
+
 export function AboutChangingShowcase() {
   const [activeSlide, setActiveSlide] = useState(0);
   const total = aboutShowcaseSlides.length;
@@ -75,112 +78,107 @@ export function AboutChangingShowcase() {
   };
 
   const activeContent = aboutShowcaseSlides[activeSlide];
+  const activeSubImage = subImageIndices[activeSlide] || 0;
+
+  // Rotate through the photographs of the chapter on screen.
+  useEffect(() => {
+    const imageCount = aboutShowcaseSlides[activeSlide].images.length;
+    if (imageCount < 2) return undefined;
+
+    const timer = window.setInterval(() => {
+      setSubImageIndices((prev) => {
+        const next = [...prev];
+        next[activeSlide] = ((prev[activeSlide] || 0) + 1) % imageCount;
+        return next;
+      });
+    }, SUB_IMAGE_INTERVAL);
+
+    return () => window.clearInterval(timer);
+  }, [activeSlide, activeSubImage]);
 
   return (
-    <section className="about-changing-showcase" aria-roledescription="carousel" aria-label="About Qetsiyah themes">
-      <div className="about-changing-copy" key={`copy-${activeSlide}`}>
-        <h2>
-          <span>{activeContent.titleTop}</span>
-          <span>{activeContent.titleBottom}</span>
-        </h2>
-        <div className="about-changing-subtitle">
-          <span aria-hidden="true" />
-          <p>{activeContent.subtitle}</p>
-          <span aria-hidden="true" />
-        </div>
-      </div>
+    <section className="section section--charcoal chapters" aria-roledescription="carousel" aria-label="About Qetsiyah themes">
+      <div className="shell">
+        <div className="chapters-grid">
+          <div className="chapters-copy">
+            <p className="label chapters-label">
+              <span className="num accent">{String(activeSlide + 1).padStart(2, '0')}</span>
+              <span className="num label-dim">/ {String(total).padStart(2, '0')}</span>
+              <span>{activeContent.label}</span>
+            </p>
 
-      <div className="about-changing-full-slider">
-        <div className="about-changing-track-absolute">
-          {aboutShowcaseSlides.map((slide, i) => {
-            let offset = (i - activeSlide) % total;
-            if (offset > Math.floor(total / 2)) offset -= total;
-            if (offset < -Math.floor(total / 2)) offset += total;
+            <h2 className="display display-md chapters-title" key={`title-${activeSlide}`}>
+              <span className="ln"><span>{activeContent.titleTop}</span></span>
+              <span className="ln"><span><span className="accent">{activeContent.titleBottom}</span></span></span>
+            </h2>
 
-            const isActive = offset === 0;
+            <p className="body chapters-text" key={`text-${activeSlide}`}>{activeContent.subtitle}</p>
 
-            return (
-              <div
-                className={`about-slide-item-absolute ${isActive ? 'is-active' : ''}`}
-                key={i}
-                data-offset={offset}
-                style={{ '--offset': offset }}
-                onClick={() => {
-                  if (offset === -1) selectPrevious();
-                  else if (offset === 1) selectNext();
-                  else if (!isActive) setActiveSlide(i);
-                }}
-              >
-                {slide.images.map((imgSrc, imgIdx) => {
-                  const isCurrentImg = imgIdx === (subImageIndices[i] || 0);
-                  return (
-                    <img
-                      key={imgSrc}
-                      src={imgSrc}
-                      alt={`${slide.alt} ${imgIdx + 1}`}
-                      className={`about-slide-subimg ${isCurrentImg ? 'active' : ''}`}
-                      loading="lazy"
-                      decoding="async"
-                    />
-                  );
-                })}
-                <div className="slide-overlay-gradient"></div>
-                {isActive && (
-                  <div className="slide-caption-bar">
-                    <div className="slide-caption-title-wrap">
-                      <span>{slide.label}</span>
-                      {slide.images.length > 1 && (
-                        <div className="sub-slide-pills" aria-label="Rotating gallery indicators">
-                          {slide.images.map((_, pIdx) => (
-                            <button
-                              key={pIdx}
-                              type="button"
-                              className={`sub-slide-pill ${pIdx === (subImageIndices[i] || 0) ? 'active' : ''}`}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setSubImageIndices((prev) => {
-                                  const next = [...prev];
-                                  next[i] = pIdx;
-                                  return next;
-                                });
-                              }}
-                              aria-label={`Show picture ${pIdx + 1} of ${slide.label}`}
-                            />
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                    <span>
-                      {String(i + 1).padStart(2, '0')} / {String(total).padStart(2, '0')}
-                    </span>
-                  </div>
-                )}
+            <div className="chapters-arrows">
+              <button className="chapters-arrow" onClick={selectPrevious} aria-label="Previous image" type="button">
+                <ArrowLeft size={18} />
+              </button>
+              <button className="chapters-arrow" onClick={selectNext} aria-label="Next image" type="button">
+                <ArrowRight size={18} />
+              </button>
+            </div>
+          </div>
+
+          <div className="chapters-stage">
+            {aboutShowcaseSlides.map((slide, i) =>
+              slide.images.map((imgSrc, imgIdx) => {
+                const isCurrent = i === activeSlide && imgIdx === (subImageIndices[i] || 0);
+                return (
+                  <img
+                    key={imgSrc}
+                    src={imgSrc}
+                    alt={isCurrent ? `${slide.alt} ${imgIdx + 1}` : ''}
+                    aria-hidden={isCurrent ? undefined : 'true'}
+                    className={`chapters-img ${isCurrent ? 'is-active' : ''}`}
+                    loading="lazy"
+                    decoding="async"
+                  />
+                );
+              })
+            )}
+
+            {activeContent.images.length > 1 && (
+              <div className="chapters-pills" aria-label="Rotating gallery indicators">
+                {activeContent.images.map((_, pIdx) => (
+                  <button
+                    key={pIdx}
+                    type="button"
+                    className={`chapters-pill ${pIdx === activeSubImage ? 'is-active' : ''}`}
+                    onClick={() => {
+                      setSubImageIndices((prev) => {
+                        const next = [...prev];
+                        next[activeSlide] = pIdx;
+                        return next;
+                      });
+                    }}
+                    aria-label={`Show picture ${pIdx + 1} of ${activeContent.label}`}
+                  />
+                ))}
               </div>
-            );
-          })}
+            )}
+          </div>
         </div>
 
-        <div className="global-slider-arrows">
-          <button className="nav-arrow prev-arrow" onClick={selectPrevious} aria-label="Previous image">
-            <ArrowLeft size={20} />
-          </button>
-          <button className="nav-arrow next-arrow" onClick={selectNext} aria-label="Next image">
-            <ArrowRight size={20} />
-          </button>
+        <div className="chapters-tabs">
+          {aboutShowcaseSlides.map((slide, i) => (
+            <button
+              key={slide.label}
+              type="button"
+              className={`chapters-tab ${i === activeSlide ? 'is-active' : ''}`}
+              onClick={() => setActiveSlide(i)}
+              aria-label={`Go to slide ${i + 1}`}
+              aria-current={i === activeSlide ? 'true' : undefined}
+            >
+              <span className="label num">{String(i + 1).padStart(2, '0')}</span>
+              <span className="label">{slide.label}</span>
+            </button>
+          ))}
         </div>
-      </div>
-
-      <div className="about-gallery-dots">
-        {aboutShowcaseSlides.map((_, i) => (
-          <button
-            key={i}
-            className={i === activeSlide ? 'is-active' : ''}
-            onClick={() => setActiveSlide(i)}
-            aria-label={`Go to slide ${i + 1}`}
-          >
-            {String(i + 1).padStart(2, '0')}
-          </button>
-        ))}
       </div>
     </section>
   );

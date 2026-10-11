@@ -1,12 +1,16 @@
 import React, { useEffect, useRef, useState } from 'react';
 
+const sentence = 'Where families come together, celebrations feel special, adventures begin, and every moment is yours to enjoy.';
+const words = sentence.split(' ');
+// The closing promise is set in the accent color.
+const accentFrom = words.indexOf('every');
+
+// Scroll-driven statement: the sentence stays pinned while each word lights
+// up in turn, so the visitor reads it at the pace they scroll.
 export function AboutStorySection() {
   const containerRef = useRef(null);
   const animationFrameRef = useRef(null);
   const [progress, setProgress] = useState(0);
-
-  const sentence = "Where families come together, celebrations feel special, adventures begin, and every moment is yours to enjoy.";
-  const words = sentence.split(' ');
 
   useEffect(() => {
     const updateProgress = () => {
@@ -14,10 +18,10 @@ export function AboutStorySection() {
       if (!containerRef.current) return;
       const rect = containerRef.current.getBoundingClientRect();
       const windowHeight = window.innerHeight;
-      
+
       const totalScrollDistance = Math.max(1, rect.height - windowHeight);
       let p = -rect.top / totalScrollDistance;
-      p = Math.max(0, Math.min(1, p)); 
+      p = Math.max(0, Math.min(1, p));
       setProgress(p);
     };
 
@@ -40,35 +44,46 @@ export function AboutStorySection() {
     };
   }, []);
 
+  // Finish lighting the sentence a little before the section releases.
+  const reading = Math.min(1, progress / 0.9);
+
   return (
-    <section className="about-story-section" ref={containerRef}>
-      <div className="about-story-container">
-        <h2 className="story-sentence teleprompter-text">
-          {words.map((word, i) => {
-            const wordStart = i / words.length;
-            const wordEnd = (i + 1) / words.length;
-            
-            let wordOpacity = 0.22;
-            if (progress > wordStart) {
-               let localProgress = (progress - wordStart) / (wordEnd - wordStart);
-               localProgress = Math.min(1, localProgress);
-               wordOpacity = 0.22 + (0.78 * localProgress);
-            }
-            
-            return (
-              <span 
-                key={i} 
-                style={{ 
-                  opacity: wordOpacity, 
-                  transition: 'opacity 0.08s linear',
-                  color: '#383e24'
-                }}
-              >
-                {word}{' '}
-              </span>
-            );
-          })}
-        </h2>
+    <section className="story" id="about-story" ref={containerRef}>
+      <div className="story-pin">
+        <div className="shell story-inner">
+          <p className="label story-label">
+            <span className="num accent">01</span>
+            <span>The promise</span>
+          </p>
+
+          <h2 className="display story-text">
+            {words.map((word, i) => {
+              const wordStart = i / words.length;
+              const wordEnd = (i + 1) / words.length;
+
+              let wordOpacity = 0.14;
+              if (reading > wordStart) {
+                 let localProgress = (reading - wordStart) / (wordEnd - wordStart);
+                 localProgress = Math.min(1, localProgress);
+                 wordOpacity = 0.14 + (0.86 * localProgress);
+              }
+
+              return (
+                <span
+                  key={i}
+                  className={i >= accentFrom ? 'accent' : undefined}
+                  style={{ opacity: wordOpacity }}
+                >
+                  {word}{' '}
+                </span>
+              );
+            })}
+          </h2>
+
+          <div className="story-progress" aria-hidden="true">
+            <i style={{ transform: `scaleX(${reading})` }} />
+          </div>
+        </div>
       </div>
     </section>
   );

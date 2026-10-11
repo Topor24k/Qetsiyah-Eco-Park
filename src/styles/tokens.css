@@ -1,0 +1,125 @@
+/* Theme tokens. Every color, font, and spacing value on the site comes from
+   here, so the look stays consistent across pages.
+
+   Colors are named by role. The page is light by default; areas that sit on
+   top of a photograph switch the same roles to light-on-dark (see the
+   "over a photograph" block below). */
+:root {
+  /* Fixed colors */
+  --ink: #0d1211;
+  --paper: #f7f4ed;
+  --accent: #ffc42e;
+
+  /* Surfaces: a light, warm base with three quiet variations */
+  --bg: #f7f4ed;
+  --bg-soft: #f0ebe1;
+  --bg-deep: #e8e2d6;
+  --bg-tint: #e4ece8;
+
+  /* Text and hairlines */
+  --fg: var(--ink);
+  --fg-dim: rgba(13, 18, 17, 0.68);
+  --fg-faint: rgba(13, 18, 17, 0.4);
+  --line: rgba(13, 18, 17, 0.16);
+  --line-strong: rgba(13, 18, 17, 0.38);
+
+  /* How the accent is expressed. Yellow text is unreadable on a light page,
+     so there the accent is a highlighter band behind dark text (--hl); over
+     photographs it is yellow text and the band is switched off. */
+  --accent-fg: var(--ink);
+  --hl: linear-gradient(var(--accent), var(--accent));
+
+  /* Type */
+  --font-display: 'Anton', 'Archivo Black', 'Arial Narrow', Impact, sans-serif;
+  --font-body: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --fs-label: 0.68rem;
+  --ls-label: 0.24em;
+  --fs-body: clamp(1rem, 1.08vw, 1.14rem);
+  --measure: 44ch;
+
+  /* Space */
+  --gutter: clamp(20px, 4.4vw, 76px);
+  --section-y: clamp(96px, 13vw, 208px);
+  --shell: 1760px;
+  --nav-h: 72px;
+  --dock-h: 62px;
+  /* Height of one full screen of content (shorter on phones, where the
+     dock occupies the bottom edge). */
+  --screen-h: 100svh;
+  /* Offset for sticky bars; raised while the top navigation is showing. */
+  --sticky-top: 0px;
+
+  /* Motion: slow starts, long soft landings. */
+  --ease: cubic-bezier(0.19, 1, 0.22, 1);
+  --ease-inout: cubic-bezier(0.76, 0, 0.24, 1);
+  --ease-soft: cubic-bezier(0.33, 1, 0.68, 1);
+
+  /* One color grade shared by every photograph: natural and bright. Hero
+     photographs are held slightly deeper so the type over them stays clear. */
+  --grade: saturate(0.98) contrast(1.03);
+  --grade-deep: saturate(0.96) contrast(1.05) brightness(0.9);
+}
+
+/* Over a photograph: light text, yellow accent, no highlighter band.
+   The navigation starts in this state because it opens over a hero image. */
+.hero,
+.phero,
+.courts,
+.exp-stage,
+.offer-stage,
+.film-frame,
+.mosaic-tile,
+.chapters-stage,
+.nav {
+  --fg: var(--paper);
+  --fg-dim: rgba(247, 244, 237, 0.78);
+  --fg-faint: rgba(247, 244, 237, 0.48);
+  --line: rgba(247, 244, 237, 0.22);
+  --line-strong: rgba(247, 244, 237, 0.44);
+  --accent-fg: var(--accent);
+  --hl: none;
+  color: var(--fg);
+}
+
+/* Back on a light surface: the navigation once it turns solid, and on pages
+   whose opening screen is light rather than a photograph. */
+.nav.is-solid,
+.nav.is-menu-open,
+.site[data-frame='gallery'] .nav,
+.site[data-frame='announcements'] .nav,
+.site[data-frame='must-visit'] .nav {
+  --fg: var(--ink);
+  --fg-dim: rgba(13, 18, 17, 0.68);
+  --fg-faint: rgba(13, 18, 17, 0.4);
+  --line: rgba(13, 18, 17, 0.16);
+  --line-strong: rgba(13, 18, 17, 0.38);
+  --accent-fg: var(--ink);
+  --hl: linear-gradient(var(--accent), var(--accent));
+  color: var(--fg);
+}
+
+/* On the accent color itself, emphasis is plain ink. */
+.section--accent,
+.curtain {
+  --hl: none;
+}
+
+html[data-nav='shown'] {
+  --sticky-top: var(--nav-h);
+}
+
+@media (max-width: 768px) {
+  :root {
+    --screen-h: calc(100svh - var(--dock-h) - env(safe-area-inset-bottom));
+    --nav-h: 60px;
+    --fs-label: 0.64rem;
+    --ls-label: 0.2em;
+    --section-y: clamp(80px, 22vw, 128px);
+  }
+}
+
+@media (max-height: 520px) and (orientation: landscape) {
+  :root {
+    --screen-h: 100svh;
+  }
+}

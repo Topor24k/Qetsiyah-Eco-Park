@@ -21,31 +21,27 @@ export function MobileBottomNav({ activeFrame, currentHash, onNavigate }) {
   };
 
   return (
-    <nav className="mobile-app-navigation" aria-label="Quick mobile navigation">
-      <div className="mobile-app-navigation-inner">
-        {mobileDestinations.map((item) => {
-          const Icon = item.icon;
-          const active = isActive(item);
+    <nav className="dock" aria-label="Quick mobile navigation">
+      {mobileDestinations.map((item) => {
+        const Icon = item.icon;
+        const active = isActive(item);
 
-          return (
-            <a
-              key={item.id}
-              href={item.hash || `#${item.frame}`}
-              className={`mobile-app-nav-item ${active ? 'is-active' : ''} ${item.id === 'booking' ? 'is-booking' : ''}`}
-              aria-current={active ? 'page' : undefined}
-              onClick={(event) => {
-                event.preventDefault();
-                onNavigate(item.frame, item.hash || null);
-              }}
-            >
-              <span className="mobile-app-nav-icon" aria-hidden="true">
-                <Icon size={20} strokeWidth={active ? 2.25 : 1.75} />
-              </span>
-              <span>{item.label}</span>
-            </a>
-          );
-        })}
-      </div>
+        return (
+          <a
+            key={item.id}
+            href={item.hash || `#${item.frame}`}
+            className={`dock-item ${active ? 'is-active' : ''} ${item.id === 'booking' ? 'dock-item--book' : ''}`}
+            aria-current={active ? 'page' : undefined}
+            onClick={(event) => {
+              event.preventDefault();
+              onNavigate(item.frame, item.hash || null);
+            }}
+          >
+            <Icon size={19} strokeWidth={1.6} aria-hidden="true" />
+            <span>{item.label}</span>
+          </a>
+        );
+      })}
     </nav>
   );
 }

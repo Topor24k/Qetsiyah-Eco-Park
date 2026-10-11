@@ -1,17 +1,29 @@
-﻿import React from 'react';
+import React from 'react';
 import { CategoryOpeningHero } from '../CategoryOpeningHero';
+import { ActivitiesShowcase } from '../activities/ActivitiesShowcase';
 
 export function ActivitiesFrame({ onNavigate }) {
+  const scrollToGuide = () => {
+    document.querySelector('#activities-guide')?.scrollIntoView({ behavior: 'smooth' });
+  };
+
   return (
-    <CategoryOpeningHero
-      titleTop="DISCOVER"
-      titleBottom="ALL OUR ACTIVITIES"
-      flankLeft="ECO-PARK EXPERIENCES"
-      flankRight="SULTAN KUDARAT"
-      video="/Video/Qetsiyah Activities Hero Section.mp4"
-      image="/Background Pictures/Background Hero Section II.jpg"
-      id="activities"
-    />
+    <div className="frame-view-wrapper activities-page">
+      <CategoryOpeningHero
+        titleTop="DISCOVER"
+        titleBottom="ALL OUR ACTIVITIES"
+        flankLeft="ECO-PARK EXPERIENCES"
+        flankRight="SULTAN KUDARAT"
+        video="/Video/Qetsiyah Activities Hero Section.mp4"
+        image="/optimized/activities-hero-poster-1600.webp"
+        id="activities"
+        hasContentBelow={true}
+        onExploreBelow={scrollToGuide}
+        exploreLabel="SCROLL TO EXPLORE ACTIVITIES"
+      />
+
+      <ActivitiesShowcase onNavigate={onNavigate} />
+    </div>
   );
 }
 

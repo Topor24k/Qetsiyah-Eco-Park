@@ -1,0 +1,630 @@
+/* Reset, typography, layout primitives, buttons, and the motion system. */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  width: 100%;
+  overflow-x: clip;
+  background: var(--bg);
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  -webkit-text-size-adjust: 100%;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  display: none;
+}
+
+body {
+  width: 100%;
+  min-height: 100svh;
+  overflow-x: clip;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+#root,
+.site {
+  width: 100%;
+  min-height: 100svh;
+}
+
+.site {
+  display: flex;
+  flex-direction: column;
+  overflow-x: clip;
+}
+
+main {
+  display: block;
+  min-width: 0;
+}
+
+main:focus {
+  outline: none;
+}
+
+img,
+video {
+  display: block;
+  max-width: 100%;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+ul,
+ol {
+  list-style: none;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--ink);
+}
+
+:focus-visible {
+  outline: 2px solid var(--fg);
+  outline-offset: 4px;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.skip-link {
+  position: fixed;
+  z-index: 400;
+  top: 12px;
+  left: 12px;
+  padding: 14px 18px;
+  background: var(--accent);
+  color: var(--ink);
+  font-size: var(--fs-label);
+  font-weight: 700;
+  letter-spacing: var(--ls-label);
+  text-transform: uppercase;
+  transform: translateY(-200%);
+  transition: transform 0.3s var(--ease);
+}
+
+.skip-link:focus {
+  transform: none;
+}
+
+/* ---------------------------------------------------------------------------
+   Typography
+   --------------------------------------------------------------------------- */
+.display {
+  font-family: var(--font-display);
+  font-weight: 400;
+  /* Anton's capitals are 0.86em tall, so 0.92 is already very tight. */
+  line-height: 0.92;
+  letter-spacing: -0.005em;
+  text-transform: uppercase;
+}
+
+.display-xxl { font-size: clamp(4.6rem, 21vw, 23rem); }
+.display-xl { font-size: clamp(3.6rem, 13.2vw, 14rem); }
+.display-lg { font-size: clamp(2.9rem, 8.4vw, 8.8rem); }
+.display-md { font-size: clamp(2.2rem, 5.2vw, 5.2rem); }
+.display-sm { font-size: clamp(1.5rem, 2.5vw, 2.3rem); line-height: 1; }
+
+.label {
+  font-family: var(--font-body);
+  font-size: var(--fs-label);
+  font-weight: 600;
+  line-height: 1.6;
+  letter-spacing: var(--ls-label);
+  text-transform: uppercase;
+}
+
+.label-dim {
+  color: var(--fg-dim);
+}
+
+.num {
+  font-variant-numeric: tabular-nums;
+}
+
+.body {
+  max-width: var(--measure);
+  color: var(--fg-dim);
+  text-wrap: pretty;
+}
+
+/* The accent. On light surfaces it is a highlighter: a band the height of
+   the capitals behind display type (repeated on each line the text wraps
+   onto), or a marker stroke under small labels. Over photographs --hl is off
+   and the text itself turns yellow. */
+.accent {
+  color: var(--accent-fg);
+  background: var(--hl) no-repeat 0 94% / 100% 0.5em;
+}
+
+.label.accent {
+  width: fit-content;
+}
+
+/* The band starts flush with the first letter, so an accent line begins on
+   exactly the same edge as the line above it and as everything else in the
+   column. It keeps a little room on the right only. */
+.display .accent,
+.display.accent {
+  padding: 0 0.1em 0 0;
+  background: var(--hl) no-repeat 0 50% / 100% 0.95em;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+/* A headline is split into lines; each line slides up out of its own mask. */
+.ln {
+  display: block;
+  overflow: hidden;
+  /* The capitals reach slightly past a tight line box, and a highlighter band
+     reaches slightly past the words; the padding keeps both inside the mask
+     and the margin cancels it so spacing is unchanged. */
+  padding: 0.08em 0.12em 0.04em;
+  margin: -0.08em -0.12em -0.04em;
+}
+
+.ln > span {
+  display: block;
+  will-change: transform;
+}
+
+/* ---------------------------------------------------------------------------
+   Layout
+   --------------------------------------------------------------------------- */
+.shell {
+  width: 100%;
+  max-width: var(--shell);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.section {
+  position: relative;
+  padding-block: var(--section-y);
+  background: var(--bg);
+  color: var(--fg);
+}
+
+.section--charcoal { background: var(--bg-soft); }
+.section--teal { background: var(--bg-tint); }
+.section--black { background: var(--bg-deep); }
+
+.section--paper {
+  background: var(--bg-soft);
+  color: var(--fg);
+}
+
+.section--accent {
+  background: var(--accent);
+  color: var(--ink);
+}
+
+.section--paper .body,
+.section--accent .body {
+  color: var(--fg-dim);
+}
+
+.section--paper .label-dim,
+.section--accent .label-dim {
+  color: var(--fg-dim);
+}
+
+.grid-12 {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: clamp(16px, 2vw, 32px);
+}
+
+/* Section opener: a small numbered label beside a very large headline. */
+.section-head {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: clamp(16px, 2vw, 32px);
+  align-items: start;
+  margin-bottom: clamp(48px, 7vw, 112px);
+}
+
+.section-head-label {
+  display: flex;
+  grid-column: 1 / span 3;
+  gap: 18px;
+  padding-top: 0.6em;
+}
+
+.section-head-label .num {
+  color: var(--accent-fg);
+  background: var(--hl) no-repeat 0 94% / 100% 0.5em;
+}
+
+.section--paper .section-head-label .num,
+.section--accent .section-head-label .num {
+  color: inherit;
+}
+
+.section-head-title {
+  grid-column: 4 / -1;
+}
+
+.section-head-aside {
+  grid-column: 4 / span 6;
+  margin-top: clamp(22px, 2.6vw, 40px);
+}
+
+.rule {
+  display: block;
+  width: 100%;
+  height: 1px;
+  border: 0;
+  background: var(--line);
+}
+
+.section--paper .rule,
+.section--accent .rule {
+  background: var(--line);
+}
+
+/* ---------------------------------------------------------------------------
+   Actions
+   --------------------------------------------------------------------------- */
+.btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  min-height: 56px;
+  padding: 18px 28px;
+  overflow: hidden;
+  background: var(--accent);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  isolation: isolate;
+  transition: color 0.5s var(--ease);
+}
+
+/* Hover: a flat panel rises through the button. */
+.btn::before {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  content: '';
+  background: var(--ink);
+  transform: translate3d(0, 101%, 0);
+  transition: transform 0.6s var(--ease);
+}
+
+.btn:hover::before,
+.btn:focus-visible::before {
+  transform: none;
+}
+
+.btn:hover,
+.btn:focus-visible {
+  color: var(--paper);
+}
+
+.btn svg {
+  flex: none;
+  transition: transform 0.6s var(--ease);
+}
+
+.btn:hover svg:last-child {
+  transform: translate3d(5px, 0, 0);
+}
+
+.btn--ink {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.btn--ink::before {
+  background: var(--accent);
+}
+
+.btn--ink:hover,
+.btn--ink:focus-visible {
+  color: var(--ink);
+}
+
+.section--accent .btn--ink::before {
+  background: var(--paper);
+}
+
+.btn--sm {
+  min-height: 42px;
+  padding: 12px 18px;
+  font-size: 0.64rem;
+}
+
+.btn--block {
+  width: 100%;
+}
+
+/* Secondary action: a text link. On hover a highlighter stroke sweeps in
+   behind it (light surfaces) or the text turns yellow (over photographs). */
+.link-arrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0;
+  background:
+    linear-gradient(currentColor, currentColor) no-repeat 0 100% / 100% 1px,
+    var(--hl) no-repeat 0 100% / 0% 0.66em;
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  transition: color 0.5s var(--ease), background-size 0.7s var(--ease), gap 0.6s var(--ease);
+}
+
+.link-arrow svg {
+  flex: none;
+  transition: transform 0.6s var(--ease);
+}
+
+.link-arrow:hover,
+.link-arrow:focus-visible {
+  gap: 18px;
+  color: var(--accent-fg);
+  background-size: 100% 1px, 100% 0.66em;
+}
+
+.section--accent .link-arrow:hover {
+  background-size: 0 1px, 0 0;
+}
+
+/* Square icon-only control. */
+.icon-btn {
+  display: grid;
+  width: 48px;
+  height: 48px;
+  flex: none;
+  place-items: center;
+  border: 1px solid var(--line-strong);
+  color: var(--fg);
+  transition: background-color 0.5s var(--ease), border-color 0.5s var(--ease), color 0.5s var(--ease);
+}
+
+.icon-btn:hover,
+.icon-btn:focus-visible {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--ink);
+}
+
+/* ---------------------------------------------------------------------------
+   Photography
+   --------------------------------------------------------------------------- */
+.graded {
+  filter: var(--grade);
+}
+
+.media {
+  position: relative;
+  overflow: hidden;
+  background: var(--bg-soft);
+}
+
+.media-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: var(--grade);
+}
+
+/* Parallax images are cut slightly taller than their frame and drift within
+   it as the page scrolls. `--py` runs from -1 to 1 and is set by useParallax. */
+.media-img[data-parallax] {
+  top: -8%;
+  height: 116%;
+  translate: 0 calc(var(--py, 0) * 6.6%);
+  will-change: translate;
+}
+
+.media--hover .media-img {
+  transition: scale 1.8s var(--ease), filter 0.9s var(--ease);
+}
+
+a:hover > .media--hover .media-img,
+button:hover > .media--hover .media-img,
+.media--hover:hover .media-img {
+  scale: 1.045;
+}
+
+/* ---------------------------------------------------------------------------
+   Motion: scroll reveals
+   Elements carry data-reveal; useScrollReveal adds data-revealed when they
+   enter the screen. `--d` delays, `--i` staggers.
+   --------------------------------------------------------------------------- */
+.reveal-on [data-reveal] {
+  opacity: 0;
+  transform: translate3d(0, 44px, 0);
+  transition:
+    opacity 1.2s var(--ease-soft) var(--d, 0ms),
+    transform 1.5s var(--ease) var(--d, 0ms);
+}
+
+.reveal-on [data-reveal][data-revealed] {
+  opacity: 1;
+  transform: none;
+}
+
+.reveal-on [data-reveal='fade'] {
+  transform: none;
+}
+
+/* Headline lines rise out of their masks one after another. */
+.reveal-on [data-reveal='lines'] {
+  opacity: 1;
+  transform: none;
+}
+
+.reveal-on [data-reveal='lines'] .ln > span {
+  transform: translate3d(0, 106%, 0);
+  transition: transform 1.35s var(--ease) calc(var(--d, 0ms) + var(--i, 0) * 120ms);
+}
+
+.reveal-on [data-reveal='lines'][data-revealed] .ln > span {
+  transform: none;
+}
+
+/* Photographs are unveiled by a wipe while they settle from a slight zoom. */
+.reveal-on [data-reveal='clip'] {
+  opacity: 1;
+  transform: none;
+  clip-path: inset(0 0 100% 0);
+  transition: clip-path 1.5s var(--ease-inout) var(--d, 0ms);
+}
+
+.reveal-on [data-reveal='clip'][data-revealed] {
+  clip-path: inset(0 0 0 0);
+}
+
+.reveal-on [data-reveal='clip'] .media-img {
+  scale: 1.22;
+  transition: scale 2.4s var(--ease) var(--d, 0ms), filter 0.9s var(--ease);
+}
+
+.reveal-on [data-reveal='clip'][data-revealed] .media-img {
+  scale: 1;
+}
+
+.reveal-on [data-reveal='clip'][data-revealed].media--hover:hover .media-img,
+.reveal-on a:hover > [data-reveal='clip'][data-revealed].media--hover .media-img,
+.reveal-on button:hover > [data-reveal='clip'][data-revealed].media--hover .media-img {
+  scale: 1.045;
+  transition: scale 1.8s var(--ease);
+}
+
+/* Hairlines draw themselves from the left. */
+.reveal-on [data-reveal='rule'] {
+  opacity: 1;
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 1.6s var(--ease-inout) var(--d, 0ms);
+}
+
+.reveal-on [data-reveal='rule'][data-revealed] {
+  transform: none;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes rise-in {
+  from { opacity: 0; transform: translate3d(0, 28px, 0); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes line-up {
+  from { transform: translate3d(0, 106%, 0); }
+  to { transform: none; }
+}
+
+@keyframes drift {
+  to { transform: translate3d(-50%, 0, 0); }
+}
+
+@keyframes scroll-cue {
+  0% { transform: scaleY(0); transform-origin: top; }
+  45% { transform: scaleY(1); transform-origin: top; }
+  55% { transform: scaleY(1); transform-origin: bottom; }
+  100% { transform: scaleY(0); transform-origin: bottom; }
+}
+
+@media (max-width: 900px) {
+  .section-head {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 22px;
+  }
+
+  .section-head-label,
+  .section-head-title,
+  .section-head-aside {
+    grid-column: 1 / -1;
+  }
+
+  .section-head-label {
+    padding-top: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .display-xl { font-size: clamp(3.4rem, 19vw, 6.4rem); }
+  .display-lg { font-size: clamp(2.9rem, 15.5vw, 5rem); }
+  .display-md { font-size: clamp(2.2rem, 11vw, 3.4rem); }
+  .display-sm { font-size: clamp(1.45rem, 6.4vw, 1.9rem); }
+
+  .btn {
+    min-height: 54px;
+    padding: 16px 22px;
+  }
+
+  .media-img[data-parallax] {
+    translate: 0 calc(var(--py, 0) * 3.4%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
+  }
+
+  .media-img[data-parallax] {
+    translate: none;
+  }
+}
