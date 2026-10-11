@@ -81,8 +81,8 @@ The site is light and warm, with a single accent color. Every value is a CSS var
 Yellow text cannot be read on a light page, so the accent is used as a highlighter:
 
 - Display headlines: a yellow band the height of the capitals sits behind the key line (class .accent inside .display).
-- Small labels and numbers: a yellow marker stroke under the text.
-- Lists and links: a band or stroke sweeps in on hover.
+- Small labels, numbers and text links: plain ink, with no yellow mark under the text (static or on hover).
+- Index lists (Experiences, Stays, Services): a band sweeps in behind the name of the row in focus.
 - Buttons: solid yellow with dark text.
 
 Over photographs (hero images, photo captions) the rule flips: text is light, and accent words are simply yellow. This switch is one block in tokens.css ("Over a photograph") that redefines the same role tokens, so no component needs its own dark styles.
@@ -230,6 +230,8 @@ Fields:
 - Venue Type: None, Verde Villa, Event Hall
 - Number of Units: For villa bookings
 - Activities Checklist: Zip lining, sky biking, paddle boats, horse riding, playground, kiddy pool
+
+Layout (desktop): one section title, then a 12-column grid with the form on the left (7 columns) and the notes on the right (4 columns). Both columns open with the same ruled title row, so "01 Your details" and "Before you send" sit level. Every group uses the same two field columns, the activities are ruled checkbox rows on those columns, and all controls share one height. The notes column lists what happens next and the park contact as ruled label / value rows. A focused field is marked by a thicker ink underline.
 
 Why this matters: Every page leads here. The form captures qualified intent. A visitor who fills this out is a serious prospect, and management gets everything they need in one submission.
 
@@ -461,7 +463,7 @@ Motion is slow and quiet: long ease-out curves, no bounce. Everything is disable
 | Photo wipes | Images | A wipe reveals the photo while it settles from a slight zoom (data-reveal="clip", component ui/Media.jsx) |
 | Hairlines | Dividers | Draw from the left (data-reveal="rule") |
 | Parallax | Large images | Images drift slightly inside their frames (hooks/useParallax.js) |
-| Hover | Links, buttons, lists | A yellow highlighter stroke sweeps in behind links and list names; a dark panel rises through buttons; list rows slide and swap the photo beside them |
+| Hover | Links, buttons, lists | A yellow band sweeps in behind index list names; text links only move their arrow; a dark panel rises through buttons; list rows slide and swap the photo beside them |
 | Film strip | Home, Park moments | A slow, looping strip of photographs that pauses on hover |
 | Story scroll | About | The sentence stays pinned while each word lights up with the scroll |
 

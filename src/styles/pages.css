@@ -335,7 +335,7 @@
 
 .menu-search:focus-within {
   border-bottom-color: var(--fg);
-  box-shadow: 0 3px 0 var(--accent);
+  box-shadow: 0 1px 0 var(--fg);
 }
 
 .menu-search svg {

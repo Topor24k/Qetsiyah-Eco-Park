@@ -161,13 +161,12 @@ ol {
   text-wrap: pretty;
 }
 
-/* The accent. On light surfaces it is a highlighter: a band the height of
-   the capitals behind display type (repeated on each line the text wraps
-   onto), or a marker stroke under small labels. Over photographs --hl is off
-   and the text itself turns yellow. */
+/* The accent. On light surfaces it is a highlighter band the height of the
+   capitals behind display type (repeated on each line the text wraps onto);
+   small labels carry no mark. Over photographs --hl is off and the text
+   itself turns yellow. */
 .accent {
   color: var(--accent-fg);
-  background: var(--hl) no-repeat 0 94% / 100% 0.5em;
 }
 
 .label.accent {
@@ -266,7 +265,6 @@ ol {
 
 .section-head-label .num {
   color: var(--accent-fg);
-  background: var(--hl) no-repeat 0 94% / 100% 0.5em;
 }
 
 .section--paper .section-head-label .num,
@@ -379,16 +377,14 @@ ol {
   width: 100%;
 }
 
-/* Secondary action: a text link. On hover a highlighter stroke sweeps in
-   behind it (light surfaces) or the text turns yellow (over photographs). */
+/* Secondary action: an underlined text link. On hover the arrow moves out;
+   over photographs the text also turns yellow. */
 .link-arrow {
   display: inline-flex;
   align-items: center;
   gap: 12px;
   padding: 8px 0;
-  background:
-    linear-gradient(currentColor, currentColor) no-repeat 0 100% / 100% 1px,
-    var(--hl) no-repeat 0 100% / 0% 0.66em;
+  background: linear-gradient(currentColor, currentColor) no-repeat 0 100% / 100% 1px;
   font-family: var(--font-body);
   font-size: 0.72rem;
   font-weight: 700;
@@ -407,11 +403,10 @@ ol {
 .link-arrow:focus-visible {
   gap: 18px;
   color: var(--accent-fg);
-  background-size: 100% 1px, 100% 0.66em;
 }
 
 .section--accent .link-arrow:hover {
-  background-size: 0 1px, 0 0;
+  background-size: 0 1px;
 }
 
 /* Square icon-only control. */
