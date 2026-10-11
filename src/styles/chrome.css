@@ -129,6 +129,54 @@
   gap: 22px;
 }
 
+/* Sound on / off: four bars that move while the interface sounds are on and
+   rest flat when they are off. */
+.nav-sound {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  flex: none;
+  place-items: center;
+  margin-right: -8px;
+}
+
+.nav-sound-bars {
+  display: flex;
+  height: 14px;
+  align-items: flex-end;
+  gap: 3px;
+}
+
+.nav-sound-bars i {
+  width: 2px;
+  height: 100%;
+  background: currentColor;
+  transform: scaleY(0.14);
+  transform-origin: center bottom;
+  transition: transform 0.5s var(--ease);
+}
+
+.nav-sound.is-on .nav-sound-bars i:nth-child(1) { transform: scaleY(0.5); }
+.nav-sound.is-on .nav-sound-bars i:nth-child(2) { transform: scaleY(1); }
+.nav-sound.is-on .nav-sound-bars i:nth-child(3) { transform: scaleY(0.7); }
+.nav-sound.is-on .nav-sound-bars i:nth-child(4) { transform: scaleY(0.36); }
+
+@keyframes sound-bar {
+  from { transform: scaleY(0.24); }
+  to { transform: scaleY(1); }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .nav-sound.is-on .nav-sound-bars i {
+    animation: sound-bar 1.1s var(--ease-inout) infinite alternate;
+  }
+
+  .nav-sound.is-on .nav-sound-bars i:nth-child(1) { animation-delay: -0.8s; }
+  .nav-sound.is-on .nav-sound-bars i:nth-child(2) { animation-delay: -0.2s; }
+  .nav-sound.is-on .nav-sound-bars i:nth-child(3) { animation-delay: -0.55s; }
+  .nav-sound.is-on .nav-sound-bars i:nth-child(4) { animation-delay: -1s; }
+}
+
 .nav-burger {
   display: none;
   align-items: center;
@@ -723,6 +771,27 @@
   .footer-base {
     flex-direction: column;
     gap: 4px;
+  }
+}
+
+/* The narrowest phones: closer spacing, so the wordmark, the sound switch and
+   Menu all stay on the bar. */
+@media (max-width: 359px) {
+  .nav-bar {
+    gap: 10px;
+  }
+
+  .nav-end {
+    gap: 6px;
+  }
+
+  .nav-sound {
+    width: 30px;
+    margin-right: -4px;
+  }
+
+  .nav-burger {
+    gap: 8px;
   }
 }
 

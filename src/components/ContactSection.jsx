@@ -2,6 +2,7 @@ import React, { useRef, useState } from 'react';
 import { ArrowLeft, ArrowRight, ArrowUpRight, Minus, Plus } from 'lucide-react';
 import { Lines } from './ui/Lines';
 import { useMediaQuery } from '../hooks/useMediaQuery';
+import { playSound } from '../utils/sound';
 
 const emptyForm = {
   fullName: '',
@@ -71,6 +72,7 @@ export function ContactSection() {
   const handleSubmit = (e) => {
     e.preventDefault();
     setSubmitted(true);
+    playSound('success', { delay: 0.16 });
     setTimeout(() => {
       setSubmitted(false);
       setFormData(emptyForm);

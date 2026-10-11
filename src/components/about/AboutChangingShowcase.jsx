@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 
 const aboutShowcaseSlides = [
@@ -59,14 +59,12 @@ const aboutShowcaseSlides = [
   }
 ];
 
-// How long each photograph within a chapter stays on screen.
-const SUB_IMAGE_INTERVAL = 5000;
-
 export function AboutChangingShowcase() {
   const [activeSlide, setActiveSlide] = useState(0);
   const total = aboutShowcaseSlides.length;
 
-  // Track sub-image rotation index for each of the 5 slides
+  // Which photograph each of the 5 chapters is showing. Photographs change
+  // only when a visitor picks one; nothing advances on its own.
   const [subImageIndices, setSubImageIndices] = useState(() => aboutShowcaseSlides.map(() => 0));
 
   const selectPrevious = () => {
@@ -80,22 +78,6 @@ export function AboutChangingShowcase() {
   const activeContent = aboutShowcaseSlides[activeSlide];
   const activeSubImage = subImageIndices[activeSlide] || 0;
 
-  // Rotate through the photographs of the chapter on screen.
-  useEffect(() => {
-    const imageCount = aboutShowcaseSlides[activeSlide].images.length;
-    if (imageCount < 2) return undefined;
-
-    const timer = window.setInterval(() => {
-      setSubImageIndices((prev) => {
-        const next = [...prev];
-        next[activeSlide] = ((prev[activeSlide] || 0) + 1) % imageCount;
-        return next;
-      });
-    }, SUB_IMAGE_INTERVAL);
-
-    return () => window.clearInterval(timer);
-  }, [activeSlide, activeSubImage]);
-
   return (
     <section className="section section--charcoal chapters" aria-roledescription="carousel" aria-label="About Qetsiyah themes">
       <div className="shell">
@@ -107,20 +89,13 @@ export function AboutChangingShowcase() {
               <span>{activeContent.label}</span>
             </p>
 
-            <h2 className="display display-md chapters-title" key={`title-${activeSlide}`}>
-              <span className="ln"><span>{activeContent.titleTop}</span></span>
-              <span className="ln"><span><span className="accent">{activeContent.titleBottom}</span></span></span>
-            </h2>
+            <div className="chapters-body">
+              <h2 className="display display-md chapters-title" key={`title-${activeSlide}`}>
+                <span className="ln"><span>{activeContent.titleTop}</span></span>
+                <span className="ln"><span><span className="accent">{activeContent.titleBottom}</span></span></span>
+              </h2>
 
-            <p className="body chapters-text" key={`text-${activeSlide}`}>{activeContent.subtitle}</p>
-
-            <div className="chapters-arrows">
-              <button className="chapters-arrow" onClick={selectPrevious} aria-label="Previous image" type="button">
-                <ArrowLeft size={18} />
-              </button>
-              <button className="chapters-arrow" onClick={selectNext} aria-label="Next image" type="button">
-                <ArrowRight size={18} />
-              </button>
+              <p className="body chapters-text" key={`text-${activeSlide}`}>{activeContent.subtitle}</p>
             </div>
           </div>
 
@@ -142,8 +117,15 @@ export function AboutChangingShowcase() {
               })
             )}
 
+            <button className="chapters-arrow chapters-arrow--prev" onClick={selectPrevious} aria-label="Previous chapter" type="button">
+              <ArrowLeft size={18} aria-hidden="true" />
+            </button>
+            <button className="chapters-arrow chapters-arrow--next" onClick={selectNext} aria-label="Next chapter" type="button">
+              <ArrowRight size={18} aria-hidden="true" />
+            </button>
+
             {activeContent.images.length > 1 && (
-              <div className="chapters-pills" aria-label="Rotating gallery indicators">
+              <div className="chapters-pills" aria-label={`Pictures of ${activeContent.label}`}>
                 {activeContent.images.map((_, pIdx) => (
                   <button
                     key={pIdx}

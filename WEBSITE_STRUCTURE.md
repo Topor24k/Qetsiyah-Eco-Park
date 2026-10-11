@@ -117,7 +117,7 @@ Anton is loaded with display=block so headlines never flash in a fallback face.
 
 ### 5.1 Desktop Navigation (src/components/Navbar.jsx)
 
-A minimal bar: the Qetsiyah wordmark, small uppercase links, and a Booking button.
+A minimal bar: the Qetsiyah wordmark, small uppercase links, a sound on / off switch (four small bars), and a Booking button.
 
 | State | Trigger | Appearance |
 | :--- | :--- | :--- |
@@ -267,7 +267,7 @@ Why this matters: It forces a moment of pause. Instead of skimming, the visitor 
 
 SUB-SECTION 3: ABOUT CHANGING SHOWCASE (src/components/about/AboutChangingShowcase.jsx)
 
-A full-width infinite carousel with five themed chapters. Each chapter has multiple photos that rotate every 5 seconds.
+A carousel with five themed chapters. Each chapter has one to three photos; they change only when a visitor picks one (nothing advances on its own).
 
 | Chapter | Narrative |
 | :--- | :--- |
@@ -277,9 +277,9 @@ A full-width infinite carousel with five themed chapters. Each chapter has multi
 | The Hospitality | The host-guest relationship: warmth, reception, entertainment, and goodwill |
 | The Future | Continuous improvement, adapting to challenges, future milestones |
 
-Navigation: Prev/Next arrow buttons and clickable dot indicators. The carousel wraps infinitely.
+Navigation: Prev/Next arrow buttons on the left and right edges of the photograph move between chapters, the small lines at the photograph's bottom-right switch between that chapter's photos, and the five numbered tabs below jump straight to a chapter. The carousel wraps infinitely.
 
-Why this matters: Photos rotate automatically so visitors who pause on a chapter see more of the story without clicking. Each chapter tells a different facet of Qetsiyah identity, moving beyond marketing copy into genuine storytelling.
+Why this matters: Each chapter tells a different facet of Qetsiyah identity, moving beyond marketing copy into genuine storytelling.
 
 ---
 
@@ -469,6 +469,26 @@ Motion is slow and quiet: long ease-out curves, no bounce. Everything is disable
 
 Scroll reveals are driven by hooks/useScrollReveal.js, which marks any element carrying data-reveal as it enters the screen.
 
+### 8.1 Interface sounds
+
+The site has quiet interface sounds. They are generated in the browser with the Web Audio API (src/utils/sound.js), so there are no audio files to host or load. The palette is organic to suit the park: wood, air, soft keys and a kalimba.
+
+| Sound | When it plays |
+| :--- | :--- |
+| Wooden tap / fuller knock | Links and list rows / solid buttons |
+| Light tick | Tabs, picture lines, dropdown choices, the guest counter |
+| Soft keys | Typing in any field (separate sounds for space and delete) |
+| Rising air, a low landing, falling air | The page curtain between pages |
+| Short breath of air | Menus, the What we offer panel and FAQ answers opening or closing; chapters and photos sliding; the page gliding to a section |
+| Camera shutter | A gallery photo opening |
+| Two small notes up / down | An activity ticked / unticked |
+| Four rising kalimba notes | The inquiry is sent |
+| Two muted knocks | A required field is empty or wrong |
+
+How it is wired: hooks/useInterfaceSounds.js listens once at the document for clicks, typing and invalid fields and picks the sound from the control's class; the page-curtain, gallery-viewer and form-sent sounds are played where those things happen (App.jsx, ParkGallerySection.jsx, ContactSection.jsx). A control can choose its own sound with data-sound="name" or stay silent with data-sound="off".
+
+Rules: nothing plays until the visitor has touched the page (browsers require this), there are no hover sounds and no background music, and the header switch (components/ui/SoundToggle.jsx) turns everything off and remembers the choice on that device. Sound is on by default. To change how a sound feels, edit its entry in the voices list in src/utils/sound.js; MASTER_LEVEL at the top sets the overall volume.
+
 ---
 
 ## 9. Mobile Experience
@@ -606,8 +626,8 @@ The dining preview was removed from Home at the owner's request; the full menu i
 | Activities | A centered sticky bar with activity search and jump tabs (shared/QuickNav.jsx), then numbered entries with large photos, a full-bleed courts image, and a yellow call to action. No intro header |
 | Food Offers | The same sticky search and category tabs; each category has a large title beside a hairline price list; tapping a dish opens its photo in place |
 | Stays and Venues, Services | Numbered index with a photo that follows the row. No intro header |
-| Gallery | Three photographs at different depths above the title; text tabs; sharp mosaic; full-screen viewer with counter and swipe |
-| About | Pinned sentence that lights up word by word (360vh), then five chapters with rotating photographs |
+| Gallery | Three photographs at different depths above the title; text tabs centered in the bar (on phones the chosen tab slides to the middle of the row); sharp mosaic; full-screen viewer with counter and swipe |
+| About | Pinned sentence that lights up word by word (360vh), then five chapters, each with its own photographs (changed by the visitor, not on a timer) |
 | Announcements, Must Visit | COMING SOON title card with next-step links (Must Visit shows only the hotel name and the links) |
 
 ### 11.4 Shared pieces
@@ -618,6 +638,8 @@ The dining preview was removed from Home at the owner's request; the full menu i
 | src/components/ui/Lines.jsx | Headline split into masked lines |
 | src/components/ui/Media.jsx | Photo frame with wipe reveal and parallax |
 | src/components/ui/PageCurtain.jsx | Title card shown between pages |
+| src/components/ui/SoundToggle.jsx | Header switch for the interface sounds |
+| src/utils/sound.js, src/hooks/useInterfaceSounds.js | The generated interface sounds and the single listener that plays them (section 8.1) |
 | src/hooks/useScrollReveal.js, useParallax.js, useMediaQuery.js | Reveals, image drift, phone/desktop switch for the booking form |
 | src/utils/scrollToAnchor.js | Anchor scrolling that clears the header and sticky bars |
 | public/optimized/hero-layers | The hero photo as two aligned layers: full picture and foreground cutout |

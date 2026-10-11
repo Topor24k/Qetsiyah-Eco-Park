@@ -12,6 +12,8 @@ import { VisitGuideSection } from './components/home/VisitGuideSection';
 import { PageCurtain } from './components/ui/PageCurtain';
 import { useScrollReveal } from './hooks/useScrollReveal';
 import { useParallax } from './hooks/useParallax';
+import { useInterfaceSounds } from './hooks/useInterfaceSounds';
+import { playSound } from './utils/sound';
 import { scrollToAnchor } from './utils/scrollToAnchor';
 import { foodMenuCatalog } from './data/foodMenuCatalog';
 import { parkActivities, parkCourts, parkServices, parkStays } from './data/parkInfo';
@@ -94,6 +96,7 @@ export function App() {
 
   useScrollReveal();
   useParallax();
+  useInterfaceSounds();
 
   // Lift the opening curtain.
   useEffect(() => {
@@ -161,6 +164,7 @@ export function App() {
       const el = isSectionAnchor(anchor) ? document.getElementById(anchor) : null;
       if (el) scrollToAnchor(el);
       else window.scrollTo({ top: 0, behavior: 'smooth' });
+      playSound('glide', { delay: 0.05 });
       return;
     }
 
@@ -182,12 +186,14 @@ export function App() {
     // Curtain in, swap the page beneath it, curtain out.
     isTransitioningRef.current = true;
     setCurtain({ title: frameTitles[frameName], phase: 'in' });
+    playSound('curtainIn');
 
     window.setTimeout(() => {
       swapFrame();
       window.setTimeout(() => {
         landOn(anchor);
         setCurtain((current) => (current ? { ...current, phase: 'out' } : current));
+        playSound('curtainOut');
         window.setTimeout(() => {
           setCurtain(null);
           isTransitioningRef.current = false;

@@ -174,6 +174,29 @@
   color: inherit;
 }
 
+/* Gallery: the set tabs sit in the middle of the bar. Auto margins give way
+   when the tabs are wider than the screen, so the row still scrolls from its
+   first tab on phones. */
+.gallery-tabs .tab:first-child {
+  margin-left: auto;
+}
+
+.gallery-tabs .tab:last-child {
+  margin-right: auto;
+}
+
+/* Laptop widths: tighter spacing, so all six sets still fit on one centered
+   row instead of running off the right edge. */
+@media (min-width: 1025px) and (max-width: 1439px) {
+  .gallery-tabs .tabs-scroll {
+    gap: clamp(14px, 1.9vw, 28px);
+  }
+
+  .gallery-tabs .tab {
+    letter-spacing: 0.14em;
+  }
+}
+
 /* ---------------------------------------------------------------------------
    Activities guide
    --------------------------------------------------------------------------- */
@@ -925,20 +948,23 @@
   display: grid;
   grid-template-columns: minmax(0, 0.86fr) minmax(0, 1.14fr);
   gap: clamp(32px, 6vw, 120px);
-  align-items: end;
+  align-items: stretch;
 }
 
+/* The copy is exactly as tall as the photograph: its ruled label row starts
+   on the photograph's top edge and its text ends on the bottom edge. */
 .chapters-copy {
   display: flex;
-  min-height: clamp(380px, 40vw, 600px);
   flex-direction: column;
-  align-items: flex-start;
+  justify-content: space-between;
+  gap: clamp(28px, 4vw, 56px);
 }
 
 .chapters-label {
   display: flex;
   gap: 12px;
-  margin-bottom: clamp(24px, 3vw, 44px);
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--line-strong);
 }
 
 .chapters-title {
@@ -959,27 +985,55 @@
   animation: rise-in 1.2s var(--ease) 0.25s backwards;
 }
 
-.chapters-arrows {
-  display: flex;
-  gap: 10px;
-  margin-top: auto;
-  padding-top: 32px;
-}
-
+/* Previous / next sit on the photograph itself, at mid-height on its left
+   and right edges. */
 .chapters-arrow {
+  position: absolute;
+  z-index: 2;
+  top: 50%;
   display: grid;
   width: 56px;
   height: 56px;
   place-items: center;
-  border: 1px solid var(--line-strong);
-  color: var(--fg);
-  transition: background-color 0.5s var(--ease), color 0.5s var(--ease), border-color 0.5s var(--ease);
+  background: var(--paper);
+  color: var(--ink);
+  translate: 0 -50%;
+  transition: background-color 0.5s var(--ease);
 }
 
-.chapters-arrow:hover {
-  border-color: var(--accent);
+.chapters-arrow--prev {
+  left: 0;
+}
+
+.chapters-arrow--next {
+  right: 0;
+}
+
+.chapters-arrow svg {
+  transition: transform 0.6s var(--ease);
+}
+
+.chapters-arrow:active {
   background: var(--accent);
-  color: var(--ink);
+}
+
+.chapters-arrow:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: -8px;
+}
+
+@media (hover: hover) {
+  .chapters-arrow:hover {
+    background: var(--accent);
+  }
+
+  .chapters-arrow--prev:hover svg {
+    transform: translate3d(-3px, 0, 0);
+  }
+
+  .chapters-arrow--next:hover svg {
+    transform: translate3d(3px, 0, 0);
+  }
 }
 
 .chapters-stage {
@@ -1204,12 +1258,12 @@
   }
 
   .chapters-copy {
-    min-height: 0;
+    gap: 22px;
   }
 
-  .chapters-arrows {
-    margin-top: 28px;
-    padding-top: 0;
+  .chapters-arrow {
+    width: 46px;
+    height: 46px;
   }
 
   .soon-foot {

@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { ArrowRight, ArrowUpRight, Minus, Plus } from 'lucide-react';
 import { parkInfo } from '../data/parkInfo';
+import { SoundToggle } from './ui/SoundToggle';
 
 // "What we offer" panel: four columns of deep links into the offer pages.
 const offerColumns = [
@@ -218,6 +219,7 @@ export function Navbar({ activeFrame, onNavigate }) {
           </nav>
 
           <div className="nav-end">
+            <SoundToggle />
             <a className="btn btn--sm nav-book" href="#booking" onClick={(e) => go(e, 'home', '#booking')}>
               Booking
             </a>

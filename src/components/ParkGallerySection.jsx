@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { playSound } from '../utils/sound';
 
 const categories = [
   { id: 'scenery-atmosphere', label: 'Scenery & Atmosphere' },
@@ -59,6 +60,7 @@ export function ParkGallerySection() {
   const [activeCategory, setActiveCategory] = useState('scenery-atmosphere');
   const [lightboxIndex, setLightboxIndex] = useState(null);
   const swipeStartRef = useRef(null);
+  const tabsRef = useRef(null);
 
   const activeCategoryLabel = categories.find((category) => category.id === activeCategory)?.label ?? 'Park';
 
@@ -76,9 +78,11 @@ export function ParkGallerySection() {
       if (lightboxIndex === null) return;
       if (event.key === 'Escape') closeLightbox();
       if (event.key === 'ArrowLeft') {
+        playSound('slidePrev');
         setLightboxIndex((current) => current > 0 ? current - 1 : activeItems.length - 1);
       }
       if (event.key === 'ArrowRight') {
+        playSound('slideNext');
         setLightboxIndex((current) => current < activeItems.length - 1 ? current + 1 : 0);
       }
     };
@@ -91,12 +95,27 @@ export function ParkGallerySection() {
     document.body.style.overflow = '';
   }, []);
 
+  // Where the tab row is wider than the screen (phones, tablets), bring the
+  // chosen set to the middle of the row.
+  useEffect(() => {
+    const row = tabsRef.current;
+    const tab = row?.querySelector('.tab.is-active');
+    if (!row || !tab || row.scrollWidth <= row.clientWidth) return;
+
+    const offset = tab.getBoundingClientRect().left - row.getBoundingClientRect().left;
+    row.scrollTo({
+      left: row.scrollLeft + offset - (row.clientWidth - tab.offsetWidth) / 2,
+      behavior: 'smooth'
+    });
+  }, [activeCategory]);
+
   const openLightbox = (index) => {
     setLightboxIndex(index);
     document.body.style.overflow = 'hidden';
   };
 
   const closeLightbox = () => {
+    playSound('close');
     setLightboxIndex(null);
     document.body.style.overflow = '';
   };
@@ -125,13 +144,14 @@ export function ParkGallerySection() {
     const deltaX = touch.clientX - start.x;
     const deltaY = touch.clientY - start.y;
     if (Math.abs(deltaX) < 48 || Math.abs(deltaX) < Math.abs(deltaY) * 1.2) return;
+    playSound(deltaX < 0 ? 'slideNext' : 'slidePrev');
     changeImage(deltaX < 0 ? 'next' : 'previous', event);
   };
 
   return (
     <section className="gallery" id="park-gallery-mosaic">
       <div className="tabs-bar gallery-tabs" aria-label="Park photo categories">
-        <div className="tabs-scroll shell">
+        <div className="tabs-scroll shell" ref={tabsRef}>
           {categories.map((category, index) => (
             <button
               key={category.id}
