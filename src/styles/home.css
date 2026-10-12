@@ -162,32 +162,61 @@
 }
 
 .statement-grid {
-  display: grid;
-  grid-template-columns: repeat(12, minmax(0, 1fr));
-  column-gap: clamp(16px, 2vw, 32px);
+  --statement-fs: min(24.6vw, 31svh);
 }
 
-.statement-label {
-  grid-column: 1 / span 4;
+/* The list shares a row with the headline's first line. An invisible copy of
+   that line (the ghost) holds its exact space: when the list fits beside it
+   the two sit side by side, and when it does not the row wraps upward and the
+   list moves above the headline. */
+.statement-row {
+  display: flex;
+  flex-wrap: wrap-reverse;
+  align-items: stretch;
+  gap: clamp(36px, 4.6vw, 76px) clamp(32px, 4.4vw, 80px);
+  margin-top: clamp(30px, 4.4vw, 76px);
 }
 
+.statement-ghost {
+  flex: none;
+  margin-left: -0.035em;
+  font-size: var(--statement-fs);
+  line-height: 0.9;
+  white-space: nowrap;
+  visibility: hidden;
+  user-select: none;
+}
+
+/* Beside the headline the list is exactly as tall as its capitals: the top
+   rule sits on the top of the letters and the bottom rule on their baseline
+   (0.0145em and 0.0265em are where those fall inside Anton's 0.9 line). */
 .statement-list {
-  grid-column: 8 / -1;
+  display: grid;
+  min-width: 0;
+  max-width: 720px;
+  flex: 1 1 360px;
+  grid-auto-rows: 1fr;
+  margin: calc(var(--statement-fs) * 0.0145) 0 calc(var(--statement-fs) * 0.0265) auto;
   border-top: 1px solid var(--line);
 }
 
+/* Rows are at least 48px, but never taller than a third of the capitals, so
+   on a short screen the list still fits the height of the letters. */
 .statement-list li {
   display: grid;
+  min-height: min(48px, calc(var(--statement-fs) * 0.28));
   grid-template-columns: 44px minmax(0, 1fr);
-  padding: 15px 0;
+  align-items: center;
+  padding: 4px 0;
   border-bottom: 1px solid var(--line);
 }
 
+/* The real headline is drawn over the ghost line: up by one line (0.9em),
+   plus the 0.08em its first line mask adds above the letters. */
 .statement-title {
-  margin-top: clamp(56px, 8vw, 150px);
+  margin-top: calc(var(--statement-fs) * -0.98);
   margin-left: -0.035em;
-  grid-column: 1 / -1;
-  font-size: min(24.6vw, 31svh);
+  font-size: var(--statement-fs);
   line-height: 0.9;
 }
 
@@ -1156,27 +1185,21 @@ a.contact-row:hover .contact-arrow {
   }
 
   .statement-grid {
-    grid-template-columns: minmax(0, 1fr);
+    --statement-fs: 24.6vw;
   }
 
-  .statement-label,
-  .statement-list,
-  .statement-title {
-    grid-column: 1 / -1;
-  }
-
-  .statement-list {
+  .statement-row {
+    row-gap: 56px;
     margin-top: 22px;
   }
 
-  .statement-list li {
-    grid-template-columns: 34px minmax(0, 1fr);
-    padding: 13px 0;
+  .statement-list {
+    max-width: none;
   }
 
-  .statement-title {
-    margin-top: 56px;
-    font-size: 24.6vw;
+  .statement-list li {
+    min-height: 44px;
+    grid-template-columns: 34px minmax(0, 1fr);
   }
 
   .film-frame {

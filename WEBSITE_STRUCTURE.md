@@ -612,7 +612,7 @@ The dining preview was removed from Home at the owner's request; the full menu i
 | Section | File | What it does |
 | :--- | :--- | :--- |
 | Hero | components/HeroSection.jsx | Layered name behind the landscape, tagline, Book and Explore actions |
-| Welcome | components/WelcomeSection.jsx | ALL ARE WELCOME HERE. at full scale on the accent color |
+| Welcome | components/WelcomeSection.jsx | ALL ARE WELCOME HERE. at full scale on the accent color. The 01 / 02 / 03 list sits beside the ALL ARE line, exactly as tall as its capitals (top rule on the top of the letters, bottom rule on their baseline); where there is no room beside it (phones, tablets, very tall or very large screens) the list moves above the headline |
 | Experiences | components/home/ExperiencesRail.jsx | Six activities as an oversized hairline list with a matching photo |
 | Park moments | components/home/MomentsTeaser.jsx | Drifting strip of park photographs leading to the gallery |
 | Visit guide | components/home/VisitGuideSection.jsx | Hours, fee, directions, contact, FAQ |
